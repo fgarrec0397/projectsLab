@@ -1,15 +1,61 @@
 {
   "$schema": "https://turbo.build/schema.json",
-  "globalDependencies": ["**/.env.*local"],
   "pipeline": {
-    "build": {
-      "dependsOn": ["^build"],
-      "outputs": [".next/**", "!.next/cache/**"]
+    "audit": {
+      "outputs": []
     },
-    "lint": {},
+    "audit:fix": {
+      "outputs": []
+    },
     "dev": {
       "cache": false,
       "persistent": true
+    },
+    "dev-light": {
+      "cache": false,
+      "persistent": true
+    },
+    "build": {
+      "outputs": ["dist/**", "build/**"],
+      "dependsOn": ["lint", "test"]
+    },
+    "release:patch": {
+      "dependsOn": ["build"]
+    },
+    "release:minor": {
+      "dependsOn": ["build"]
+    },
+    "release:major": {
+      "dependsOn": ["build"]
+    },
+    "lint": {
+      "outputs": []
+    },
+    "format": {
+      "outputs": []
+    },
+    "test": {
+      "outputs": []
+    },
+    "test:coverage": {
+      "outputs": ["coverage/**"]
+    },
+    "test:watch": {
+      "cache": false,
+      "persistent": true,
+      "outputs": []
+    },
+    "storybook": {
+      "cache": false,
+      "outputs": []
+    },
+    "update:check": {
+      "cache": false,
+      "outputs": []
+    },
+    "update": {
+      "cache": false,
+      "outputs": []
     }
   }
 }

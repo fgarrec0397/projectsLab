@@ -1,0 +1,13 @@
+{
+  "name": "@projectslab/typescript-config",
+  "version": "1.0.0",
+  "scripts": {
+    "audit": "npm audit",
+    "audit:fix": "npm audit fix",
+    "update:check": "ncu",
+    "update": "ncu -u"
+  },
+  "dependencies": {
+    "typescript": "^4.9.5"
+  }
+}

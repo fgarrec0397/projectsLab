@@ -1,0 +1,14 @@
+{
+  "extends": "@projectslab/typescript-config/base.json",
+  "compilerOptions": {
+    "baseUrl": "./src",
+    "paths": {
+        "@helpers/*": ["./*"],
+    },
+  },
+  "references": [{ "path": "./tsconfig.vite.json" }],
+  "include": [
+    "src",
+    "vitest.config.ts"
+  ],
+}

@@ -1,15 +1,30 @@
 {
   "private": true,
   "scripts": {
-    "build": "turbo run build",
+    "audit": "turbo run audit",
+    "audit:fix": "turbo run audit:fix",
+    "build": "npm run patch && turbo run build --concurrency=1",
     "dev": "turbo run dev",
+    "test": "turbo run test --concurrency=1",
+    "test:coverage": "turbo run test:coverage",
+    "test:watch": "turbo run test:watch",
     "lint": "turbo run lint",
-    "format": "prettier --write \"**/*.{ts,tsx,md}\""
+    "format": "turbo run format",
+    "prepare": "husky install",
+    "patch": "patch-package",
+    "release": "standard-version",
+    "release:patch": "standard-version --release-as patch",
+    "release:minor": "standard-version --release-as minor",
+    "release:major": "standard-version --release-as major",
+    "storybook": "turbo run storybook",
+    "update:check": "turbo run update:check --concurrency=1",
+    "update": "turbo run update --concurrency=1"
   },
   "devDependencies": {
-    "eslint": "^8.48.0",
-    "prettier": "^3.0.3",
-    "tsconfig": "*",
+    "@commitlint/cli": "^17.4.2",
+    "@commitlint/config-conventional": "^17.4.2",
+    "husky": "^8.0.3",
+    "standard-version": "^9.5.0",
     "turbo": "latest"
   },
   "name": "ouijaboard",

@@ -3,7 +3,7 @@
   "scripts": {
     "audit": "turbo run audit",
     "audit:fix": "turbo run audit:fix",
-    "build": "npm run patch && turbo run build --concurrency=1",
+    "build": "turbo run build --concurrency=1",
     "dev": "turbo run dev",
     "test": "turbo run test --concurrency=1",
     "test:coverage": "turbo run test:coverage",

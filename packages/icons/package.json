@@ -1,0 +1,27 @@
+{
+    "name": "@projectslab/icons",
+    "version": "1.0.0",
+    "description": "",
+    "main": "index.js",
+    "prettier": "@projectslab/prettier-config",
+    "scripts": {
+        "audit": "npm audit",
+        "audit:fix": "npm audit fix",
+        "lint": "eslint --ext .ts,.tsx --fix",
+        "format": "prettier --write ./*",
+        "update:check": "ncu",
+        "update": "ncu -u"
+    },
+    "dependencies": {
+        "@projectslab/eslint-config": "*",
+        "@projectslab/prettier-config": "*",
+        "@mui/icons-material": "^5.14.9",
+        "react": "^18.2.0",
+        "react-dom": "^18.2.0"
+    },
+    "devDependencies": {
+        "@projectslab/typescript-config": "*",
+        "@types/react": "^18.2.22",
+        "@types/react-dom": "^18.2.7"
+    }
+}

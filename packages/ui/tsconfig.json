@@ -1,0 +1,15 @@
+{
+  "extends": "@projectslab/typescript-config/base.json",
+  "compilerOptions": {
+    "baseUrl": "./src",
+    "paths": {
+        "@mui/styled-engine": ["../../../node_modules/@mui/styled-engine-sc"],
+        "@ui/*": ["./*"],
+    },
+  },
+  "include": [
+    "src", 
+    "vite.config.ts",
+    ".storybook"
+  ],
+}

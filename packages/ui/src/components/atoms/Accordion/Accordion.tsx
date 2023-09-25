@@ -5,57 +5,27 @@ import AccordionDetailsLib, {
 import AccordionSummaryLib, {
     AccordionSummaryProps as LibAccordionSummaryProps,
 } from "@mui/material/AccordionSummary";
-import { styled } from "@mui/material/styles";
 import ArrowDropDown from "@projectslab/icons/ArrowDropDown";
-import pxToRem from "@ui/theme/utilities/pxToRem";
 import { FC } from "react";
 
 export type AccordionProps = LibAccordionProps;
 export type AccordionSummaryProps = LibAccordionSummaryProps;
 export type AccordionDetailsProps = LibAccordionDetailsProps;
 
-const StyledAccordion = styled(AccordionLib)`
-    &.Mui-expanded {
-        margin-top: 0;
-        margin-bottom: 0;
-
-        &:before {
-            opacity: 1;
-        }
-    }
-`;
-
 const Accordion: FC<AccordionProps> = ({ children, ...props }) => {
-    return <StyledAccordion {...props}>{children}</StyledAccordion>;
+    return <AccordionLib {...props}>{children}</AccordionLib>;
 };
-
-const StyledAccordionSummary = styled(AccordionSummaryLib)`
-    min-height: ${pxToRem(37)};
-    background-color: ${({ theme }) => theme.palette.background.paperDark};
-
-    &.Mui-expanded {
-        min-height: ${pxToRem(37)};
-
-        .MuiAccordionSummary-content {
-            margin: ${pxToRem(12)} 0;
-        }
-    }
-`;
 
 export const AccordionSummary: FC<AccordionSummaryProps> = ({ children, ...props }) => {
     return (
-        <StyledAccordionSummary expandIcon={<ArrowDropDown />} {...props}>
+        <AccordionSummaryLib expandIcon={<ArrowDropDown />} {...props}>
             {children}
-        </StyledAccordionSummary>
+        </AccordionSummaryLib>
     );
 };
 
-const StyledAccordionDetails = styled(AccordionDetailsLib)`
-    padding: ${pxToRem(10)} ${pxToRem(16)} ${pxToRem(10)};
-`;
-
 export const AccordionDetails: FC<LibAccordionDetailsProps> = ({ children, ...props }) => {
-    return <StyledAccordionDetails {...props}>{children}</StyledAccordionDetails>;
+    return <AccordionDetailsLib {...props}>{children}</AccordionDetailsLib>;
 };
 
 export default Accordion;

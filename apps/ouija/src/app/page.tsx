@@ -1,10 +1,9 @@
-import Image from 'next/image'
-import styles from './page.module.css'
+import Ouijaboard from "@/components/Ouijaboard/Ouijaboard";
 
 export default function Home() {
-  return (
-    <main>
-      My ouija project
-    </main>
-  )
+    return (
+        <main>
+            <Ouijaboard />
+        </main>
+    );
 }

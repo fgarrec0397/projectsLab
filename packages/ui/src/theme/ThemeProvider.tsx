@@ -3,15 +3,15 @@ import { HasChildren } from "@projectslab/helpers";
 import { SnackbarProvider } from "notistack";
 import { FC } from "react";
 
-import appTheme from "./theme";
+// import appTheme from "./theme";
 
 export type Theme = ThemeLib;
 
 type Props = HasChildren & {
-    theme?: Theme;
+    theme: Theme;
 };
 
-const ThemeProvider: FC<Props> = ({ theme = appTheme, children }) => {
+const ThemeProvider: FC<Props> = ({ theme, children }) => {
     return (
         <ThemeProviderLib theme={theme}>
             <SnackbarProvider maxSnack={3}>{children}</SnackbarProvider>

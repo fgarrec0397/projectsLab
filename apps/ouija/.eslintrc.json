@@ -1,0 +1,14 @@
+{
+    "extends": ["@projectslab"],
+    "settings": {
+        "react": {
+            "version": "detect"
+        },
+        "import/resolver": {
+            "typescript": {}
+        }
+    },
+    "parserOptions": {
+        "project": ["./tsconfig.json"]
+    }
+}

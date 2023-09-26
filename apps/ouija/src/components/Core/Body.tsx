@@ -12,6 +12,7 @@ const styles: BodyStyles = {
     body: {
         sx: (theme) => ({
             backgroundColor: theme.palette.background.default,
+            cursor: "none",
         }),
     },
 };

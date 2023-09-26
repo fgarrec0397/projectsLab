@@ -4,22 +4,22 @@ const boardData: BoardElement[] = [
     {
         id: "yes",
         value: "Yes",
-        position: [134, 603],
+        position: [114, 328],
     },
     {
         id: "no",
         value: "No",
-        position: [134, 1352],
+        position: [103, 1059],
     },
     {
         id: "a",
         value: "A",
-        position: [404, 420],
+        position: [364, 129],
     },
     {
         id: "b",
         value: "B",
-        position: [373, 513],
+        position: [317, 229],
     },
     {
         id: "c",
@@ -114,12 +114,12 @@ const boardData: BoardElement[] = [
     {
         id: "u",
         value: "U",
-        position: [1000, 0],
+        position: [450, 1108],
     },
     {
         id: "v",
         value: "V",
-        position: [450, 1108],
+        position: [200, 828],
     },
     {
         id: "w",

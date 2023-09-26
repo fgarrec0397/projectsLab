@@ -7,13 +7,19 @@ import { FC } from "react";
 import boardData from "./boardData";
 
 type InteractiveOverlayStyles = {
-    pointerStyle?: BoxProps;
+    pointerContainer?: BoxProps;
+    pointer?: BoxProps;
 };
 
 const styles: InteractiveOverlayStyles = {
-    pointerStyle: {
+    pointerContainer: {
+        position: "absolute",
+        width: 1344,
+        height: 896,
+    },
+    pointer: {
         sx: {
-            position: "absolute",
+            position: "relative",
             width: 10,
             height: 10,
             backgroundColor: "red",
@@ -23,12 +29,12 @@ const styles: InteractiveOverlayStyles = {
 
 const InteractiveOverlay: FC<HasChildren> = () => {
     return (
-        <>
+        <Box {...styles.pointerContainer}>
             {boardData.map((x) => {
                 const letterStyles: BoxProps = {
-                    ...styles.pointerStyle,
+                    ...styles.pointer,
                     sx: {
-                        ...styles.pointerStyle?.sx,
+                        ...styles.pointer?.sx,
                         top: x.position[0],
                         left: x.position[1],
                     },
@@ -36,7 +42,7 @@ const InteractiveOverlay: FC<HasChildren> = () => {
 
                 return <Box key={x.id} id={x.id} {...letterStyles} />;
             })}
-        </>
+        </Box>
     );
 };
 

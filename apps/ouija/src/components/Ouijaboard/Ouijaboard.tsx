@@ -22,16 +22,62 @@ const styles: OuijaboardStyles = {
     },
 };
 
+const lettersArray = [
+    {
+        id: "yes",
+        value: "Yes",
+        position: [114, 328],
+    },
+    {
+        id: "no",
+        value: "No",
+        position: [103, 1059],
+    },
+    {
+        id: "a",
+        value: "A",
+        position: [364, 129],
+    },
+    {
+        id: "b",
+        value: "B",
+        position: [317, 229],
+    },
+    {
+        id: "v",
+        value: "V",
+        position: [450, 1108],
+    },
+];
+
 const Ouijaboard: FC = () => {
+    function moveCursorTo(idElement: string) {
+        const cursor = document.getElementById("cursor");
+        const currentElement = document.getElementById(idElement);
+        const left = currentElement?.getBoundingClientRect().left;
+        const top = currentElement?.getBoundingClientRect().top;
+
+        if (!cursor || !left || !top) {
+            return;
+        }
+
+        cursor.style.transition = "left 0.3s ease, top 0.3s ease";
+        cursor.style.left = `${left}px`;
+        cursor.style.top = `${top}px`;
+
+        // Add animation classes or transitions here
+    }
     const onClickTest = () => {
-        console.log("test");
-        document.addEventListener("click", () => {
-            lettersArray.forEach((letter, index) => {
-                setTimeout(() => {
-                    moveCursorTo(letter);
-                }, index * 1000); // Delay between movements (adjust as needed)
-            });
+        lettersArray.forEach((letter, index) => {
+            setTimeout(() => {
+                moveCursorTo(letter.id);
+            }, index * 3000); // Delay between movements (adjust as needed)
         });
+
+        const cursor = document.getElementById("cursor");
+        if (cursor) {
+            cursor.style.transition = "unset";
+        }
     };
 
     return (

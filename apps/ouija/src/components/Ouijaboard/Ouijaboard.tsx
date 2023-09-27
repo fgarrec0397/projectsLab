@@ -51,8 +51,7 @@ const lettersArray = [
 ];
 
 const Ouijaboard: FC = () => {
-    function moveCursorTo(idElement: string) {
-        const cursor = document.getElementById("cursor");
+    const moveCursorTo = (idElement: string, cursor: HTMLElement) => {
         const currentElement = document.getElementById(idElement);
         const left = currentElement?.getBoundingClientRect().left;
         const top = currentElement?.getBoundingClientRect().top;
@@ -64,20 +63,35 @@ const Ouijaboard: FC = () => {
         cursor.style.transition = "left 0.3s ease, top 0.3s ease";
         cursor.style.left = `${left}px`;
         cursor.style.top = `${top}px`;
+    };
 
-        // Add animation classes or transitions here
-    }
-    const onClickTest = () => {
-        lettersArray.forEach((letter, index) => {
-            setTimeout(() => {
-                moveCursorTo(letter.id);
-            }, index * 3000); // Delay between movements (adjust as needed)
+    const initCursorMovement = async (cursor: HTMLElement) => {
+        const movementsPromises: Promise<void>[] = [];
+
+        lettersArray.forEach(async (letter, index) => {
+            movementsPromises.push(
+                new Promise<void>((resolve) => {
+                    setTimeout(() => {
+                        moveCursorTo(letter.id, cursor);
+                        resolve();
+                    }, index * 3000);
+                })
+            );
         });
 
+        await Promise.all(movementsPromises);
+    };
+
+    const onClickTest = async () => {
         const cursor = document.getElementById("cursor");
-        if (cursor) {
-            cursor.style.transition = "unset";
+
+        if (!cursor) {
+            return;
         }
+
+        await initCursorMovement(cursor);
+
+        cursor.style.transition = "transform 0.3s ease";
     };
 
     return (

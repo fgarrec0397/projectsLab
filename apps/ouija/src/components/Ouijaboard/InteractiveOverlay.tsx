@@ -19,7 +19,7 @@ const styles: InteractiveOverlayStyles = {
     },
     pointer: {
         sx: {
-            position: "relative",
+            position: "absolute",
             width: 10,
             height: 10,
             backgroundColor: "red",

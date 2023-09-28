@@ -9,9 +9,10 @@
       ],
       "@ui/*": [
         "../../packages/ui/src/*"
-      ],
+      ]
     },
-    "incremental": true
+    "incremental": true,
+    "strictNullChecks": true
   },
   "include": [
     "next-env.d.ts",

@@ -4,7 +4,7 @@ export type FetchRequestConfig<Data = any> = AxiosRequestConfig<Data>;
 export type FetchResponse<Data = any> = AxiosResponse<Data>;
 
 export class Fetcher {
-    static async get<DataType = any, ResponseType = FetchResponse<DataType>>(
+    static async get<DataType = any, ResponseType = DataType>(
         endpoint: string,
         config?: FetchRequestConfig<DataType>
     ) {
@@ -12,20 +12,16 @@ export class Fetcher {
         return response;
     }
 
-    static async post<DataType = any, ResponseType = FetchResponse<DataType>>(
+    static async post<DataType = any, ResponseType = DataType>(
         endpoint: string,
         data: DataType,
         config?: FetchRequestConfig<DataType>
     ) {
-        const response = await axios.post<DataType, FetchResponse<ResponseType>, DataType>(
-            endpoint,
-            data,
-            config
-        );
+        const response = await axios.post<DataType, ResponseType, DataType>(endpoint, data, config);
         return response;
     }
 
-    static async delete<DataType = any, ResponseType = FetchResponse<DataType>>(
+    static async delete<DataType = any, ResponseType = DataType>(
         endpoint: string,
         config: FetchRequestConfig<DataType>
     ) {
@@ -33,19 +29,19 @@ export class Fetcher {
         return response;
     }
 
-    static async patch<DataType = any, ResponseType = FetchResponse<DataType>>(
+    static async patch<DataType = any, ResponseType = DataType>(
         endpoint: string,
         config: FetchRequestConfig<DataType>
     ) {
-        const response = axios.patch<DataType, FetchResponse<ResponseType>>(endpoint, config);
+        const response = axios.patch<DataType, ResponseType>(endpoint, config);
         return response;
     }
 
-    static async put<DataType = any, ResponseType = FetchResponse<DataType>>(
+    static async put<DataType = any, ResponseType = DataType>(
         endpoint: string,
         config: FetchRequestConfig<DataType>
     ) {
-        const response = axios.put<DataType, FetchResponse<ResponseType>>(endpoint, config);
+        const response = axios.put<DataType, ResponseType>(endpoint, config);
         return response;
     }
 }

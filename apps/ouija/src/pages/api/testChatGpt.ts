@@ -15,14 +15,20 @@ type ResponseData = {
 };
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse<ResponseData>) {
-    const prompt = getInitialPrompt(entities[0]);
+    if (req.method === "GET") {
+        const prompt = getInitialPrompt(entities[0]);
 
-    const chatCompletion = await openai.chat.completions.create({
-        messages: [{ role: "user", content: prompt }],
-        model: "gpt-3.5-turbo",
-    });
+        const chatCompletion = await openai.chat.completions.create({
+            messages: [{ role: "user", content: prompt }],
+            model: "gpt-3.5-turbo",
+        });
 
-    console.log(chatCompletion.choices[0].message, "chatCompletion message");
+        console.log(chatCompletion.choices[0].message, "chatCompletion message");
 
-    res.status(200).json({ message: chatCompletion.choices[0].message });
+        res.status(200).json({ message: chatCompletion.choices[0].message });
+    }
+
+    if (req.method === "POST") {
+        console.log(req.body, "req");
+    }
 }

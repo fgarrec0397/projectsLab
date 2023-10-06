@@ -1,30 +1,23 @@
-// Import necessary libraries
 import { useCallback, useEffect, useState } from "react";
 
-// This is the main component of our application
 export default function Home() {
-    // Define state variables for the result, recording status, and media recorder
     const [result, setResult] = useState<string | null>(null);
     const [isRecording, setIsRecording] = useState<boolean>(false);
     const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(null);
 
-    // Function to start recording
     const startRecording = useCallback(() => {
         if (mediaRecorder) {
             mediaRecorder.start();
         }
     }, [mediaRecorder]);
 
-    // Function to stop recording
     const stopRecording = useCallback(() => {
         if (mediaRecorder) {
             mediaRecorder.stop();
         }
     }, [mediaRecorder]);
 
-    // This useEffect hook sets up the media recorder when the component mounts
     useEffect(() => {
-        // This array will hold the audio data
         let chunks: Blob[] = [];
 
         if (typeof window !== "undefined") {
@@ -45,8 +38,6 @@ export default function Home() {
                         audio.onerror = function (err) {
                             console.error("Error playing audio:", err);
                         };
-
-                        audio.play();
 
                         try {
                             const reader = new FileReader();

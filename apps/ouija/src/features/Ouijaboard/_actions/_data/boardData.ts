@@ -1,4 +1,4 @@
-import { BoardElement } from "@/types/BoardElement";
+import { BoardElement } from "@/features/Ouijaboard/ouijaBoardTypes";
 
 const boardData: BoardElement[] = [
     {

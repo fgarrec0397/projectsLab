@@ -4,7 +4,7 @@ import { Box, BoxProps, Button } from "@projectslab/ui";
 import Image from "next/image";
 import { FC } from "react";
 
-import InteractiveOverlay from "./InteractiveOverlay";
+import InteractiveOverlay from "./components/InteractiveOverlay";
 
 type OuijaboardStyles = {
     imageWrapper?: BoxProps;

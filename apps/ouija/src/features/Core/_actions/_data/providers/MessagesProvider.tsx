@@ -1,7 +1,7 @@
 import { HasChildren } from "@projectslab/helpers";
 import { createContext, Dispatch, FC, SetStateAction, useState } from "react";
 
-import { Message } from "@/types/Message";
+import { Message } from "@/features/Core/coreTypes";
 
 export interface MessagesContextModel {
     messages: Message[];

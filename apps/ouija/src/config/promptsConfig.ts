@@ -1,4 +1,7 @@
-import { Entity } from "@/types/Entity";
+export type Entity = {
+    description: string;
+    traits: string;
+};
 
 export const getInitialPrompt = (entity: Entity) => `
     You are a player of a game called Ouija. In fact, you play as the entity so all your responses should be answered by “yes”, “no”, very short precise answers between 1 and 4 words. 

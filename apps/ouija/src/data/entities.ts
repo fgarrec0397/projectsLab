@@ -1,4 +1,4 @@
-import { Entity } from "@/types/Entity";
+import { Entity } from "@/config/promptsConfig";
 
 export default [
     {

@@ -4,9 +4,9 @@ import { Fetcher, useQuery } from "@projectslab/helpers";
 import { ChatCompletionMessage, ChatCompletionMessageParam } from "openai/resources/chat/index.mjs";
 import { useEffect, useState } from "react";
 
-import Microphone from "@/components/Microphone/Microphone";
-import Ouijaboard from "@/components/Ouijaboard/Ouijaboard";
-import Palette from "@/components/Palette/Palette";
+import Microphone from "@/features/Microphone/Microphone";
+import Ouijaboard from "@/features/Ouijaboard/Ouijaboard";
+import Palette from "@/features/Palette/Palette";
 
 const questions: string[] = ["is anybody here", "what is your name"];
 

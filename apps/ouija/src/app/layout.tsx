@@ -4,7 +4,7 @@ import { QueryClient, QueryClientProvider } from "@projectslab/helpers";
 import { CssBaseline } from "@ui/components";
 import { ThemeProvider } from "@ui/theme";
 
-import Body from "@/components/Core/Body";
+import Body from "@/features/Core/Body";
 import theme from "@/theme";
 
 const queryClient = new QueryClient();

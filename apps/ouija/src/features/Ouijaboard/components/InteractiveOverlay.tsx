@@ -4,7 +4,7 @@ import { HasChildren } from "@projectslab/helpers";
 import { Box, BoxProps } from "@ui/index";
 import { FC } from "react";
 
-import boardData from "./boardData";
+import boardData from "../_actions/_data/boardData";
 
 type InteractiveOverlayStyles = {
     pointerContainer?: BoxProps;

@@ -1,5 +1,5 @@
 import { HasChildren } from "@projectslab/helpers";
-import { createContext, Dispatch, FC, SetStateAction, useState } from "react";
+import { createContext, Dispatch, FC, SetStateAction, useContext, useState } from "react";
 
 import { OuijaboardMessage } from "@/features/Ouijaboard/ouijaBoardTypes";
 
@@ -16,6 +16,10 @@ export const defaultContext: OuijaboardContextModel = {
 export const OuijaboardContext = createContext<OuijaboardContextModel>(defaultContext);
 
 type Props = HasChildren;
+
+export const useOuijaboardContext = () => {
+    return useContext(OuijaboardContext);
+};
 
 const OuijaboardContextProvider: FC<Props> = ({ children }) => {
     const [messages, setMessages] = useState<OuijaboardMessage[]>([]);

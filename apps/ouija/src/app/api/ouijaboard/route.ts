@@ -19,5 +19,18 @@ export const GET = async () => {
 
     console.log(chatCompletion.choices[0].message, "chatCompletion message");
 
-    return NextResponse.json({ message: chatCompletion.choices[0].message }, { status: 200 });
+    return NextResponse.json(chatCompletion.choices[0].message, { status: 200 });
+};
+
+export const POST = async (request: Request) => {
+    const requestJson = await request.json();
+    const messages = requestJson.messages;
+
+    console.log(messages, "messages");
+    const chatCompletion = await openai.chat.completions.create({
+        messages,
+        model: "gpt-3.5-turbo",
+    });
+
+    return NextResponse.json(chatCompletion.choices[0].message);
 };

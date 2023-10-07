@@ -1,23 +1,21 @@
 "use client";
 
-import { QueryClient, QueryClientProvider } from "@projectslab/helpers";
 import { CssBaseline } from "@ui/components";
 import { ThemeProvider } from "@ui/theme";
 
-import Body from "@/features/Core/Body";
+import Core from "@/features/Core/Core";
+import OuijaboardContextProvider from "@/features/Ouijaboard/_actions/_data/providers/OuijaboardProvider";
 import theme from "@/theme";
-
-const queryClient = new QueryClient();
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
     return (
-        <QueryClientProvider client={queryClient}>
+        <OuijaboardContextProvider>
             <ThemeProvider theme={theme}>
                 <CssBaseline />
                 <html lang="en">
-                    <Body>{children}</Body>
+                    <Core>{children}</Core>
                 </html>
             </ThemeProvider>
-        </QueryClientProvider>
+        </OuijaboardContextProvider>
     );
 }

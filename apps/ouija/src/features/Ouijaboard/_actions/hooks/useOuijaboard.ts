@@ -1,16 +1,41 @@
 import { Fetcher } from "@projectslab/helpers";
-import { useCallback } from "react";
+import { useCallback, useEffect, useState } from "react";
 
-import { BoardElement } from "../../ouijaBoardTypes";
+import { BoardElement, OuijaboardMessage } from "../../ouijaBoardTypes";
+import useOuijaboardService from "../_data/hooks/useOuijaboardService";
 
 export default () => {
-    const initOuijaboard = useCallback(async () => {
-        console.log("initOuijaboard");
+    const { messages, updateMessages } = useOuijaboardService();
+    const [isInitCalled, setIsInitCalled] = useState(false);
+    const ouijaboardBaseURL = "/api/ouijaboard";
 
-        const messagesResponse = await Fetcher.get("/api/ouijaboard");
-        const messagesData = await messagesResponse.data;
-        console.log(messagesData, "messagesData");
-    }, []);
+    useEffect(() => {
+        console.log(messages, "messages useEffect");
+    }, [messages]);
+
+    const initOuijaboard = useCallback(async () => {
+        if (isInitCalled) {
+            return;
+        }
+
+        const messageResponse = await Fetcher.get<void, OuijaboardMessage>(ouijaboardBaseURL);
+
+        updateMessages(messageResponse);
+        setIsInitCalled(true);
+    }, [isInitCalled, updateMessages]);
+
+    const sendQuestion = useCallback(
+        async (question: string) => {
+            console.log({ messages }, "before send question");
+
+            const messagesWithQuestion = [...messages, { role: "user", content: question }];
+            const questionResponse = await Fetcher.post(ouijaboardBaseURL, {
+                messages: messagesWithQuestion,
+            });
+            console.log(questionResponse, "questionResponse");
+        },
+        [messages]
+    );
 
     const moveCursorTo = useCallback((idElement: string, cursor: HTMLElement) => {
         const currentElement = document.getElementById(idElement);
@@ -47,8 +72,10 @@ export default () => {
     );
 
     return {
+        messages,
         initOuijaboard,
         moveCursorTo,
         initCursorMovement,
+        sendQuestion,
     };
 };

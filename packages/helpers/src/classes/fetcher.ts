@@ -9,7 +9,7 @@ export class Fetcher {
         config?: FetchRequestConfig<DataType>
     ) {
         const response = axios.get<DataType, FetchResponse<ResponseType>>(endpoint, config);
-        return response;
+        return (await response).data;
     }
 
     static async post<DataType = any, ResponseType = DataType>(

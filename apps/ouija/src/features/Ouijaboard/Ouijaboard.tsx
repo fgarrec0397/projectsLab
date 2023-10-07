@@ -2,9 +2,10 @@
 
 import { Box, BoxProps } from "@projectslab/ui";
 import Image from "next/image";
-import { FC } from "react";
+import { FC, useEffect } from "react";
 
 import useHandleInitOuijaboard from "./_actions/hooks/useHandleInitOuijaboard";
+import useOuijaboard from "./_actions/hooks/useOuijaboard";
 import InteractiveOverlay from "./components/InteractiveOverlay";
 
 type OuijaboardStyles = {
@@ -52,6 +53,8 @@ const lettersArray = [
 ];
 
 const Ouijaboard: FC = () => {
+    const { messages } = useOuijaboard();
+
     const moveCursorTo = (idElement: string, cursor: HTMLElement) => {
         const currentElement = document.getElementById(idElement);
         const left = currentElement?.getBoundingClientRect().left;

@@ -22,7 +22,6 @@ const styles: InteractiveOverlayStyles = {
             position: "absolute",
             width: 10,
             height: 10,
-            backgroundColor: "red",
         },
     },
 };

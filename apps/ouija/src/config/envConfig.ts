@@ -4,7 +4,7 @@ export const getOpenAiApiKey = () => {
     const apiKey = getEnv().OPENAI_API_KEY;
 
     if (!apiKey) {
-        throw Error("Your OpenAI API keep is not set");
+        throw Error("OPENAI_API_KEY is not set");
     }
 
     return apiKey;

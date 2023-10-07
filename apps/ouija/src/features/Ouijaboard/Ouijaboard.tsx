@@ -1,9 +1,10 @@
 "use client";
 
-import { Box, BoxProps, Button } from "@projectslab/ui";
+import { Box, BoxProps } from "@projectslab/ui";
 import Image from "next/image";
 import { FC } from "react";
 
+import useHandleInitOuijaboard from "./_actions/hooks/useHandleInitOuijaboard";
 import InteractiveOverlay from "./components/InteractiveOverlay";
 
 type OuijaboardStyles = {
@@ -94,20 +95,12 @@ const Ouijaboard: FC = () => {
         cursor.style.transition = "transform 0.3s ease";
     };
 
+    useHandleInitOuijaboard();
+
     return (
         <>
             <Box {...styles.imageWrapper}>
                 <InteractiveOverlay />
-                <Button
-                    onClick={onClickTest}
-                    variant="contained"
-                    sx={{
-                        position: "absolute",
-                        bottom: 100,
-                    }}
-                >
-                    Test
-                </Button>
                 <Image src="/Ouijaboard.jpg" alt="ouija board" width={1344} height={896} />
             </Box>
         </>

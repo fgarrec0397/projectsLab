@@ -45,7 +45,7 @@ export default function Home() {
                             reader.onloadend = async function () {
                                 const base64Audio = reader.result?.toString().split(",")[1]; // Remove the data URL prefix
                                 if (base64Audio) {
-                                    const response = await fetch("/api/testChatGpt", {
+                                    const response = await fetch("/api/whisper", {
                                         method: "POST",
                                         headers: {
                                             "Content-Type": "application/json",

@@ -4,11 +4,13 @@ import { HasChildren } from "@projectslab/helpers";
 import { Paper, PaperProps } from "@projectslab/ui";
 import { FC } from "react";
 
-type BodyStyles = {
+type Props = HasChildren;
+
+type CoreBodyStyles = {
     body?: PaperProps;
 };
 
-const styles: BodyStyles = {
+const styles: CoreBodyStyles = {
     body: {
         sx: (theme) => ({
             backgroundColor: theme.palette.background.default,
@@ -17,7 +19,7 @@ const styles: BodyStyles = {
     },
 };
 
-const Body: FC<HasChildren> = ({ children }) => {
+const CoreBody: FC<Props> = ({ children }) => {
     return (
         <Paper component="body" {...styles.body}>
             {children}
@@ -25,4 +27,4 @@ const Body: FC<HasChildren> = ({ children }) => {
     );
 };
 
-export default Body;
+export default CoreBody;

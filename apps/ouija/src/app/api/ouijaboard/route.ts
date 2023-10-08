@@ -9,28 +9,29 @@ const openai = new OpenAI({
     apiKey: getOpenAiApiKey(),
 });
 
-export const GET = async () => {
-    const prompt = getInitialPrompt(entities[0]);
-
-    const chatCompletion = await openai.chat.completions.create({
-        messages: [{ role: "user", content: prompt }],
-        model: "gpt-3.5-turbo",
-    });
-
-    console.log(chatCompletion.choices[0].message, "chatCompletion message");
-
-    return NextResponse.json(chatCompletion.choices[0].message, { status: 200 });
-};
-
 export const POST = async (request: Request) => {
+    const prompt = getInitialPrompt(entities[0]);
     const requestJson = await request.json();
-    const messages = requestJson.messages;
+    const requestMessages = requestJson.messages;
+    const messages = [
+        {
+            role: "user",
+            content: prompt,
+        },
+        ...requestMessages,
+    ];
 
-    console.log(messages, "messages");
+    console.log(requestMessages, "requestMessages");
+
+    const messagesMapped = messages.filter((x) => x !== null || x !== undefined);
+    // console.log(messagesMapped, "messages in post request");
+
     const chatCompletion = await openai.chat.completions.create({
-        messages,
+        messages: messagesMapped,
         model: "gpt-3.5-turbo",
     });
+
+    console.log(chatCompletion.choices[0].message, "chatCompletion.choices[0].message");
 
     return NextResponse.json(chatCompletion.choices[0].message);
 };

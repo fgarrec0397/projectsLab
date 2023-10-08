@@ -1,40 +1,38 @@
 import { Fetcher } from "@projectslab/helpers";
+import { ChatCompletionMessage } from "openai/resources/chat/completions.mjs";
 import { useCallback, useEffect, useState } from "react";
 
 import { BoardElement, OuijaboardMessage } from "../../ouijaBoardTypes";
 import useOuijaboardService from "../_data/hooks/useOuijaboardService";
 
 export default () => {
-    const { messages, updateMessages } = useOuijaboardService();
-    const [isInitCalled, setIsInitCalled] = useState(false);
+    const { messages, updateMessages, isConnectionInit, updateConnection } = useOuijaboardService();
     const ouijaboardBaseURL = "/api/ouijaboard";
-
-    useEffect(() => {
-        console.log(messages, "messages useEffect");
-    }, [messages]);
-
-    const initOuijaboard = useCallback(async () => {
-        if (isInitCalled) {
-            return;
-        }
-
-        const messageResponse = await Fetcher.get<void, OuijaboardMessage>(ouijaboardBaseURL);
-
-        updateMessages(messageResponse);
-        setIsInitCalled(true);
-    }, [isInitCalled, updateMessages]);
 
     const sendQuestion = useCallback(
         async (question: string) => {
             console.log({ messages }, "before send question");
 
-            const messagesWithQuestion = [...messages, { role: "user", content: question }];
+            if (!isConnectionInit) {
+                const confirmConnectionResponse = await Fetcher.post("/api/confirmConnection", {
+                    question,
+                });
+
+                console.log(confirmConnectionResponse, "confirmConnectionResponse");
+            }
+
+            const newMessage: OuijaboardMessage = { role: "user", content: question };
+            const messagesWithQuestion = [...messages, newMessage];
+            console.log(messagesWithQuestion, "messagesWithQuestion");
+
             const questionResponse = await Fetcher.post(ouijaboardBaseURL, {
                 messages: messagesWithQuestion,
             });
             console.log(questionResponse, "questionResponse");
+
+            updateMessages(newMessage);
         },
-        [messages]
+        [messages, updateMessages]
     );
 
     const moveCursorTo = useCallback((idElement: string, cursor: HTMLElement) => {
@@ -73,7 +71,6 @@ export default () => {
 
     return {
         messages,
-        initOuijaboard,
         moveCursorTo,
         initCursorMovement,
         sendQuestion,

@@ -17,8 +17,12 @@ export class Fetcher {
         data: DataType,
         config?: FetchRequestConfig<DataType>
     ) {
-        const response = await axios.post<DataType, ResponseType, DataType>(endpoint, data, config);
-        return response;
+        const response = await axios.post<DataType, FetchResponse<ResponseType>>(
+            endpoint,
+            data,
+            config
+        );
+        return response.data;
     }
 
     static async delete<DataType = any, ResponseType = DataType>(

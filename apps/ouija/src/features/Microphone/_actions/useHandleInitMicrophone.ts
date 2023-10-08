@@ -3,7 +3,6 @@ import { useCallback, useEffect, useState } from "react";
 import useOuijaboard from "@/features/Ouijaboard/_actions/hooks/useOuijaboard";
 
 export default () => {
-    const [result, setResult] = useState<string | null>(null);
     const [isRecording, setIsRecording] = useState<boolean>(false);
     const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(null);
     const { sendQuestion } = useOuijaboard();
@@ -68,7 +67,6 @@ export default () => {
                                     if (data.result) {
                                         await sendQuestion(data.result);
                                     }
-                                    // setResult(data.result);
                                 }
                             };
                         } catch (error) {

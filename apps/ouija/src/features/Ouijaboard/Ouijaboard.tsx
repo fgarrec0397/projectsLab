@@ -2,9 +2,8 @@
 
 import { Box, BoxProps } from "@projectslab/ui";
 import Image from "next/image";
-import { FC, useEffect } from "react";
+import { FC } from "react";
 
-import useHandleInitOuijaboard from "./_actions/hooks/useHandleInitOuijaboard";
 import useOuijaboard from "./_actions/hooks/useOuijaboard";
 import InteractiveOverlay from "./components/InteractiveOverlay";
 
@@ -97,8 +96,6 @@ const Ouijaboard: FC = () => {
 
         cursor.style.transition = "transform 0.3s ease";
     };
-
-    useHandleInitOuijaboard();
 
     return (
         <>

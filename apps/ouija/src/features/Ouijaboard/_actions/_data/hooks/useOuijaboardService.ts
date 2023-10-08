@@ -5,7 +5,7 @@ import { OuijaboardMessage } from "@/features/Ouijaboard/ouijaBoardTypes";
 import { useOuijaboardContext } from "../providers/OuijaboardProvider";
 
 export default () => {
-    const { messages, setMessages } = useOuijaboardContext();
+    const { messages, setMessages, isConnectionInit, setIsConnectionInit } = useOuijaboardContext();
 
     const updateMessages = useCallback(
         (newMessage: OuijaboardMessage) => {
@@ -18,8 +18,17 @@ export default () => {
         [setMessages]
     );
 
+    const updateConnection = useCallback(
+        (value: boolean) => {
+            setIsConnectionInit(value);
+        },
+        [setIsConnectionInit]
+    );
+
     return {
         messages,
         updateMessages,
+        isConnectionInit,
+        updateConnection,
     };
 };

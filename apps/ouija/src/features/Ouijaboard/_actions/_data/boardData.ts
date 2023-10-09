@@ -1,6 +1,6 @@
-import { BoardElement } from "@/features/Ouijaboard/ouijaBoardTypes";
+import { BoardPointer } from "@/features/Ouijaboard/ouijaBoardTypes";
 
-const boardData: BoardElement[] = [
+const boardData: BoardPointer[] = [
     {
         id: "yes",
         value: "Yes",

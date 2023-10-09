@@ -6,6 +6,7 @@ import { FC } from "react";
 
 import useOuijaboard from "./_actions/hooks/useOuijaboard";
 import InteractiveOverlay from "./components/InteractiveOverlay";
+import { BoardPointer } from "./ouijaBoardTypes";
 
 type OuijaboardStyles = {
     imageWrapper?: BoxProps;
@@ -49,54 +50,9 @@ const lettersArray = [
         value: "V",
         position: [450, 1108],
     },
-];
+] as BoardPointer[];
 
 const Ouijaboard: FC = () => {
-    const { messages } = useOuijaboard();
-
-    const moveCursorTo = (idElement: string, cursor: HTMLElement) => {
-        const currentElement = document.getElementById(idElement);
-        const left = currentElement?.getBoundingClientRect().left;
-        const top = currentElement?.getBoundingClientRect().top;
-
-        if (!cursor || !left || !top) {
-            return;
-        }
-
-        cursor.style.transition = "left 0.3s ease, top 0.3s ease";
-        cursor.style.left = `${left}px`;
-        cursor.style.top = `${top}px`;
-    };
-
-    const initCursorMovement = async (cursor: HTMLElement) => {
-        const movementsPromises: Promise<void>[] = [];
-
-        lettersArray.forEach(async (letter, index) => {
-            movementsPromises.push(
-                new Promise<void>((resolve) => {
-                    setTimeout(() => {
-                        moveCursorTo(letter.id, cursor);
-                        resolve();
-                    }, index * 3000);
-                })
-            );
-        });
-
-        await Promise.all(movementsPromises);
-    };
-
-    const onClickTest = async () => {
-        const cursor = document.getElementById("cursor");
-
-        if (!cursor) {
-            return;
-        }
-
-        await initCursorMovement(cursor);
-
-        cursor.style.transition = "transform 0.3s ease";
-    };
-
     return (
         <>
             <Box {...styles.imageWrapper}>

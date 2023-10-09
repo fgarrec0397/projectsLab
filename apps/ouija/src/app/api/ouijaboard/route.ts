@@ -21,17 +21,12 @@ export const POST = async (request: Request) => {
         ...requestMessages,
     ];
 
-    console.log(requestMessages, "requestMessages");
-
     const messagesMapped = messages.filter((x) => x !== null || x !== undefined);
-    // console.log(messagesMapped, "messages in post request");
 
     const chatCompletion = await openai.chat.completions.create({
         messages: messagesMapped,
         model: "gpt-3.5-turbo",
     });
-
-    console.log(chatCompletion.choices[0].message, "chatCompletion.choices[0].message");
 
     return NextResponse.json(chatCompletion.choices[0].message);
 };

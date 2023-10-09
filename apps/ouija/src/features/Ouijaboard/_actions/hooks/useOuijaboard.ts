@@ -1,41 +1,19 @@
 import { Fetcher } from "@projectslab/helpers";
-import { ChatCompletionMessage } from "openai/resources/chat/completions.mjs";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback } from "react";
 
-import { BoardElement, OuijaboardMessage } from "../../ouijaBoardTypes";
+import { BoardPointer, OuijaboardMessage } from "../../ouijaBoardTypes";
+import boardData from "../_data/boardData";
 import useOuijaboardService from "../_data/hooks/useOuijaboardService";
 
 export default () => {
-    const { messages, updateMessages, isConnectionInit, updateConnection } = useOuijaboardService();
+    const { messages, addMessage, isConnectionInit, updateConnection } = useOuijaboardService();
     const ouijaboardBaseURL = "/api/ouijaboard";
 
-    const sendQuestion = useCallback(
-        async (question: string) => {
-            console.log({ messages }, "before send question");
+    const moveCursorTo = useCallback((idElement?: string, cursor?: HTMLElement) => {
+        if (!idElement) {
+            return;
+        }
 
-            if (!isConnectionInit) {
-                const confirmConnectionResponse = await Fetcher.post("/api/confirmConnection", {
-                    question,
-                });
-
-                console.log(confirmConnectionResponse, "confirmConnectionResponse");
-            }
-
-            const newMessage: OuijaboardMessage = { role: "user", content: question };
-            const messagesWithQuestion = [...messages, newMessage];
-            console.log(messagesWithQuestion, "messagesWithQuestion");
-
-            const questionResponse = await Fetcher.post(ouijaboardBaseURL, {
-                messages: messagesWithQuestion,
-            });
-            console.log(questionResponse, "questionResponse");
-
-            updateMessages(newMessage);
-        },
-        [messages, updateMessages]
-    );
-
-    const moveCursorTo = useCallback((idElement: string, cursor: HTMLElement) => {
         const currentElement = document.getElementById(idElement);
         const left = currentElement?.getBoundingClientRect().left;
         const top = currentElement?.getBoundingClientRect().top;
@@ -49,15 +27,15 @@ export default () => {
         cursor.style.top = `${top}px`;
     }, []);
 
-    const initCursorMovement = useCallback(
-        async (cursor: HTMLElement, lettersArray: BoardElement[]) => {
+    const moveCursor = useCallback(
+        async (cursor: HTMLElement, pointers: (BoardPointer | undefined)[]) => {
             const movementsPromises: Promise<void>[] = [];
 
-            lettersArray.forEach(async (letter, index) => {
+            pointers.forEach(async (letter, index) => {
                 movementsPromises.push(
                     new Promise<void>((resolve) => {
                         setTimeout(() => {
-                            moveCursorTo(letter.id, cursor);
+                            moveCursorTo(letter?.id, cursor);
                             resolve();
                         }, index * 3000);
                     })
@@ -69,10 +47,74 @@ export default () => {
         [moveCursorTo]
     );
 
+    const initCursorMovement = useCallback(
+        async (pointers: (BoardPointer | undefined)[]) => {
+            const cursor = document.getElementById("cursor");
+
+            if (!cursor) {
+                return;
+            }
+
+            await moveCursor(cursor, pointers);
+
+            cursor.style.transition = "transform 0.3s ease";
+        },
+        [moveCursor]
+    );
+
+    const sendQuestion = useCallback(
+        async (question: string) => {
+            if (!isConnectionInit) {
+                const confirmConnectionResponse = await Fetcher.post<{ question: string }, boolean>(
+                    "/api/confirmConnection",
+                    {
+                        question,
+                    }
+                );
+
+                updateConnection(confirmConnectionResponse);
+
+                if (!confirmConnectionResponse) {
+                    // eslint-disable-next-line no-console
+                    console.log("No action is possible since the connection is not possible");
+                    return;
+                }
+            }
+
+            const newMessage: OuijaboardMessage = { role: "user", content: question };
+            const messagesWithQuestion: OuijaboardMessage[] = [...messages, newMessage];
+
+            const response = await Fetcher.post<
+                { messages: OuijaboardMessage[] },
+                OuijaboardMessage
+            >(ouijaboardBaseURL, {
+                messages: messagesWithQuestion,
+            });
+
+            addMessage(newMessage);
+
+            const responseContent = response.content;
+
+            const pointers: (BoardPointer | undefined)[] = responseContent!
+                .split("")
+                .map((x) => x.toLowerCase())
+                .map((x) => {
+                    const boardDataElement = boardData.find((y) => y.id === x);
+                    return boardDataElement;
+                });
+
+            console.log(response, "response");
+            console.log(pointers, "pointers");
+            initCursorMovement(pointers);
+        },
+        [isConnectionInit, messages, addMessage, initCursorMovement, updateConnection]
+    );
+
     return {
         messages,
         moveCursorTo,
-        initCursorMovement,
+        moveCursor,
         sendQuestion,
+        initCursorMovement,
     };
 };

@@ -13,6 +13,7 @@ type CoreBodyStyles = {
 const styles: CoreBodyStyles = {
     body: {
         sx: (theme) => ({
+            overflow: "hidden",
             backgroundColor: theme.palette.background.default,
             cursor: "none",
         }),

@@ -6,6 +6,7 @@ import boardData from "../_data/boardData";
 import useOuijaboardService from "../_data/hooks/useOuijaboardService";
 
 export default () => {
+    const intervalBetweenMovement = 3000;
     const { messages, addMessage, isConnectionInit, updateConnection } = useOuijaboardService();
     const ouijaboardBaseURL = "/api/ouijaboard";
 
@@ -37,7 +38,7 @@ export default () => {
                         setTimeout(() => {
                             moveCursorTo(letter?.id, cursor);
                             resolve();
-                        }, index * 3000);
+                        }, index * intervalBetweenMovement);
                     })
                 );
             });
@@ -57,7 +58,9 @@ export default () => {
 
             await moveCursor(cursor, pointers);
 
-            cursor.style.transition = "transform 0.3s ease";
+            setTimeout(() => {
+                cursor.style.transition = "transform 0.3s ease";
+            }, intervalBetweenMovement);
         },
         [moveCursor]
     );
@@ -95,7 +98,7 @@ export default () => {
 
             const responseContent = response.content;
 
-            const pointers: (BoardPointer | undefined)[] = responseContent!
+            let pointers: (BoardPointer | undefined)[] = responseContent!
                 .split("")
                 .map((x) => x.toLowerCase())
                 .map((x) => {
@@ -103,8 +106,18 @@ export default () => {
                     return boardDataElement;
                 });
 
-            console.log(response, "response");
-            console.log(pointers, "pointers");
+            if (responseContent?.toLowerCase().includes("yes")) {
+                pointers = [boardData.find((y) => y.id === "yes")];
+            }
+
+            if (responseContent?.toLowerCase().includes("no")) {
+                pointers = [boardData.find((y) => y.id === "no")];
+            }
+
+            if (responseContent?.toLowerCase().includes("good bye")) {
+                pointers = [boardData.find((y) => y.id === "goodbye")];
+            }
+
             initCursorMovement(pointers);
         },
         [isConnectionInit, messages, addMessage, initCursorMovement, updateConnection]

@@ -23,6 +23,8 @@ export const POST = async (request: Request) => {
 
     const messagesMapped = messages.filter((x) => x !== null || x !== undefined);
 
+    console.log(messagesMapped, "messagesMapped");
+
     const chatCompletion = await openai.chat.completions.create({
         messages: messagesMapped,
         model: "gpt-3.5-turbo",

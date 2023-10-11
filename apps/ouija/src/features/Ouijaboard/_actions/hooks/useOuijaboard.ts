@@ -6,8 +6,9 @@ import boardData from "../_data/boardData";
 import useOuijaboardService from "../_data/hooks/useOuijaboardService";
 
 export default () => {
-    const intervalBetweenMovement = 3000;
+    // const [rotation, setRotation] = useState(0);
     const { messages, addMessage, isConnectionInit, updateConnection } = useOuijaboardService();
+    const intervalBetweenMovement = 10000;
     const ouijaboardBaseURL = "/api/ouijaboard";
 
     const moveCursorTo = useCallback((idElement?: string, cursor?: HTMLElement) => {
@@ -15,15 +16,23 @@ export default () => {
             return;
         }
 
+        // const newX = cursor
+
         const currentElement = document.getElementById(idElement);
+        const cursorLeft = cursor?.getBoundingClientRect().left;
         const left = currentElement?.getBoundingClientRect().left;
         const top = currentElement?.getBoundingClientRect().top;
 
-        if (!cursor || !left || !top) {
+        if (!cursor || !left || !top || !cursorLeft) {
             return;
         }
 
-        cursor.style.transition = "left 0.3s ease, top 0.3s ease";
+        const cursorRotation = cursorLeft > left ? -20 : 20;
+
+        cursor.style.transition = `left ${intervalBetweenMovement / 1000}s ease, top ${
+            intervalBetweenMovement / 1000
+        }s ease`;
+        cursor.style.transform = `translate(-50%, -65%) rotate(${cursorRotation}deg)`;
         cursor.style.left = `${left}px`;
         cursor.style.top = `${top}px`;
     }, []);
@@ -117,6 +126,8 @@ export default () => {
             if (responseContent?.toLowerCase().includes("good bye")) {
                 pointers = [boardData.find((y) => y.id === "goodbye")];
             }
+
+            console.log(...pointers, "pointers");
 
             initCursorMovement(pointers);
         },

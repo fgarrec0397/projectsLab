@@ -6,7 +6,7 @@ import boardData from "../_data/boardData";
 import useOuijaboardService from "../_data/hooks/useOuijaboardService";
 
 export default () => {
-    const { messages, addMessage, isConnectionInit, updateConnection } = useOuijaboardService();
+    const { messages, addMessage, entityIndex, updateEntityIndex } = useOuijaboardService();
     const intervalBetweenMovement = 3000;
     const ouijaboardBaseURL = "/api/ouijaboard";
 
@@ -73,31 +73,38 @@ export default () => {
 
     const sendQuestion = useCallback(
         async (question: string) => {
-            if (!isConnectionInit) {
-                const confirmConnectionResponse = await Fetcher.post<{ question: string }, boolean>(
-                    "/api/confirmConnection",
+            let localEntityIndex = 0;
+
+            if (!entityIndex) {
+                const entityResponse = await Fetcher.post<{ question: string }, number | false>(
+                    "/api/entity",
                     {
                         question,
                     }
                 );
 
-                updateConnection(confirmConnectionResponse);
-
-                if (!confirmConnectionResponse) {
+                if (typeof entityResponse === "boolean" && !entityResponse) {
                     // eslint-disable-next-line no-console
                     console.log("No action is possible since the connection is not possible");
                     return;
                 }
+
+                localEntityIndex = entityResponse;
+
+                updateEntityIndex(entityResponse);
             }
+
+            localEntityIndex = entityIndex ? entityIndex : localEntityIndex;
 
             const newMessage: OuijaboardMessage = { role: "user", content: question };
             const messagesWithQuestion: OuijaboardMessage[] = [...messages, newMessage];
 
             const response = await Fetcher.post<
-                { messages: OuijaboardMessage[] },
+                { messages: OuijaboardMessage[]; entityIndex: number },
                 OuijaboardMessage
             >(ouijaboardBaseURL, {
                 messages: messagesWithQuestion,
+                entityIndex: localEntityIndex,
             });
 
             addMessage(newMessage);
@@ -124,11 +131,9 @@ export default () => {
                 pointers = [boardData.find((y) => y.id === "goodbye")];
             }
 
-            console.log(...pointers, "pointers");
-
             initCursorMovement(pointers);
         },
-        [isConnectionInit, messages, addMessage, initCursorMovement, updateConnection]
+        [entityIndex, messages, addMessage, initCursorMovement, updateEntityIndex]
     );
 
     return {

@@ -1,16 +1,11 @@
 import { exec } from "child_process";
 import fs from "fs";
 import { NextResponse } from "next/server";
-import OpenAI from "openai";
 import util from "util";
 
 const execAsync = util.promisify(exec);
 
-import { getOpenAiApiKey } from "@/config/envConfig";
-
-const openai = new OpenAI({
-    apiKey: getOpenAiApiKey(),
-});
+import { openai } from "@/config/openAiConfig";
 
 export const POST = async (request: Request) => {
     const req = await request.json();

@@ -1,4 +1,5 @@
 export { default as capitalizeString } from "./capitalizeString";
+export { getRandomIndex } from "./getRandomIndex";
 export { default as getRandomNumber } from "./getRandomNumber";
 export { default as getStringToBooleanValue } from "./getStringToBooleanValue";
 export { default as recursiveArrayRemoveitem } from "./recursiveArrayRemoveitem";

@@ -30,5 +30,7 @@ export const POST = async (request: Request) => {
         model: "gpt-3.5-turbo",
     });
 
+    console.log(chatCompletion.choices[0].message);
+
     return NextResponse.json(chatCompletion.choices[0].message);
 };

@@ -28,12 +28,15 @@ export default () => {
                 .then((stream) => {
                     const newMediaRecorder = new MediaRecorder(stream);
                     newMediaRecorder.onstart = () => {
+                        console.log("Recording started");
                         chunks = [];
                     };
                     newMediaRecorder.ondataavailable = (e) => {
                         chunks.push(e.data);
                     };
                     newMediaRecorder.onstop = async () => {
+                        console.log("Recording stopped");
+
                         const audioBlob = new Blob(chunks, { type: "audio/webm" });
                         const audioUrl = URL.createObjectURL(audioBlob);
                         const audio = new Audio(audioUrl);

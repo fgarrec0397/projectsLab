@@ -6,17 +6,14 @@ import boardData from "../_data/boardData";
 import useOuijaboardService from "../_data/hooks/useOuijaboardService";
 
 export default () => {
-    // const [rotation, setRotation] = useState(0);
     const { messages, addMessage, isConnectionInit, updateConnection } = useOuijaboardService();
-    const intervalBetweenMovement = 10000;
+    const intervalBetweenMovement = 3000;
     const ouijaboardBaseURL = "/api/ouijaboard";
 
     const moveCursorTo = useCallback((idElement?: string, cursor?: HTMLElement) => {
         if (!idElement) {
             return;
         }
-
-        // const newX = cursor
 
         const currentElement = document.getElementById(idElement);
         const cursorLeft = cursor?.getBoundingClientRect().left;
@@ -31,7 +28,7 @@ export default () => {
 
         cursor.style.transition = `left ${intervalBetweenMovement / 1000}s ease, top ${
             intervalBetweenMovement / 1000
-        }s ease`;
+        }s ease, transform ${intervalBetweenMovement / 500}s ease`;
         cursor.style.transform = `translate(-50%, -65%) rotate(${cursorRotation}deg)`;
         cursor.style.left = `${left}px`;
         cursor.style.top = `${top}px`;

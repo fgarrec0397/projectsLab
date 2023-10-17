@@ -50,27 +50,27 @@ export default () => {
                             reader.onloadend = async function () {
                                 const base64Audio = reader.result?.toString().split(",")[1]; // Remove the data URL prefix
                                 if (base64Audio) {
-                                    // const response = await fetch("/api/whisper", {
-                                    //     method: "POST",
-                                    //     headers: {
-                                    //         "Content-Type": "application/json",
-                                    //     },
-                                    //     body: JSON.stringify({ audio: base64Audio }),
-                                    // });
-                                    // const data = await response.json();
-                                    // if (response.status !== 200) {
-                                    //     throw (
-                                    //         data.error ||
-                                    //         new Error(
-                                    //             `Request failed with status ${response.status}`
-                                    //         )
-                                    //     );
-                                    // }
+                                    const response = await fetch("/api/whisper", {
+                                        method: "POST",
+                                        headers: {
+                                            "Content-Type": "application/json",
+                                        },
+                                        body: JSON.stringify({ audio: base64Audio }),
+                                    });
+                                    const data = await response.json();
+                                    if (response.status !== 200) {
+                                        throw (
+                                            data.error ||
+                                            new Error(
+                                                `Request failed with status ${response.status}`
+                                            )
+                                        );
+                                    }
 
-                                    // if (data.result) {
-                                    // await sendQuestion(data.result);
-                                    await sendQuestion("is anybody here?");
-                                    // }
+                                    if (data.result) {
+                                        await sendQuestion(data.result);
+                                        // await sendQuestion("is anybody here?");
+                                    }
                                 }
                             };
                         } catch (error) {

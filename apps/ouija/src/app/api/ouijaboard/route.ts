@@ -1,8 +1,13 @@
 import { NextResponse } from "next/server";
+import OpenAI from "openai";
 
-import { openai } from "@/config/openAiConfig";
+import { getOpenAiApiKey } from "@/config/envConfig";
 import { getInitialPrompt } from "@/config/promptsConfig";
 import entities from "@/data/entities";
+
+export const openai = new OpenAI({
+    apiKey: getOpenAiApiKey(),
+});
 
 export const POST = async (request: Request) => {
     const requestJson = await request.json();

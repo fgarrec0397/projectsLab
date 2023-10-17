@@ -97,7 +97,7 @@ export default () => {
             localEntityIndex = entityIndex ? entityIndex : localEntityIndex;
 
             const newMessage: OuijaboardMessage = { role: "user", content: question };
-            const messagesWithQuestion: OuijaboardMessage[] = [...messages, newMessage];
+            const messagesWithQuestion: OuijaboardMessage[] = [newMessage];
 
             const response = await Fetcher.post<
                 { messages: OuijaboardMessage[]; entityIndex: number },
@@ -107,7 +107,9 @@ export default () => {
                 entityIndex: localEntityIndex,
             });
 
-            addMessage(newMessage);
+            console.log(newMessage, "newMessage");
+
+            // addMessage(newMessage);
 
             const responseContent = response.content;
 
@@ -133,7 +135,7 @@ export default () => {
 
             initCursorMovement(pointers);
         },
-        [entityIndex, messages, addMessage, initCursorMovement, updateEntityIndex]
+        [entityIndex, initCursorMovement, updateEntityIndex]
     );
 
     return {

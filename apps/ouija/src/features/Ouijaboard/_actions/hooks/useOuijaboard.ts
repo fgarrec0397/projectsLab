@@ -6,7 +6,7 @@ import boardData from "../_data/boardData";
 import useOuijaboardService from "../_data/hooks/useOuijaboardService";
 
 export default () => {
-    const { messages, addMessage, entityIndex, updateEntityIndex } = useOuijaboardService();
+    const { messages, entityIndex, updateEntityIndex } = useOuijaboardService();
     const intervalBetweenMovement = 3000;
     const ouijaboardBaseURL = "/api/ouijaboard";
 
@@ -106,10 +106,6 @@ export default () => {
                 messages: messagesWithQuestion,
                 entityIndex: localEntityIndex,
             });
-
-            console.log(newMessage, "newMessage");
-
-            // addMessage(newMessage);
 
             const responseContent = response.content;
 

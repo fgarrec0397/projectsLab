@@ -5,7 +5,7 @@ import { getOpenAiApiKey } from "@/config/envConfig";
 import { getInitialPrompt } from "@/config/promptsConfig";
 import entities from "@/data/entities";
 
-export const openai = new OpenAI({
+const openai = new OpenAI({
     apiKey: getOpenAiApiKey(),
 });
 
@@ -13,7 +13,6 @@ export const POST = async (request: Request) => {
     const requestJson = await request.json();
     const requestMessages = requestJson.messages;
     const requestEntityIndex = requestJson.entityIndex;
-    console.log(requestJson, "requestJson");
 
     const prompt = getInitialPrompt(entities[requestEntityIndex]);
     const messages = [

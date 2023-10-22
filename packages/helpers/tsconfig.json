@@ -9,6 +9,5 @@
   "references": [{ "path": "./tsconfig.vite.json" }],
   "include": [
     "src",
-    "vitest.config.ts"
   ],
 }

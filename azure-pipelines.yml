@@ -20,10 +20,8 @@ steps:
    npm install
    npm run build
  displayName: 'npm install and build'
- # NOTE: These environment variables are only required if using the contentful powered sample project
- # insert your own credentials here
  env:
-   OPENAI_API_KEY: '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'
+   OPENAI_API_KEY: ''
 
 - task: ArchiveFiles@2
  inputs:

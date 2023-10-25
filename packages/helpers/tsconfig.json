@@ -6,7 +6,6 @@
         "@helpers/*": ["./*"],
     },
   },
-  "references": [{ "path": "./tsconfig.vite.json" }],
   "include": [
     "src",
   ],

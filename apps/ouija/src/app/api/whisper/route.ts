@@ -1,16 +1,14 @@
 // import { path as ffmpegPath } from "@ffmpeg-installer/ffmpeg";
-import { exec, spawn } from "child_process";
+import { spawn } from "child_process";
 // import ffmpeg from "ffmpeg-static";
 import fs from "fs";
 import { NextResponse } from "next/server";
-import util from "util";
 // const ffmpegPath = path; // Use the path from the @ffmpeg-installer/ffmpeg package
-
-const execAsync = util.promisify(exec);
-
+// const execAsync = util.promisify(exec);
 import OpenAI from "openai";
 import path from "path";
 
+// import util from "util";
 import { getOpenAiApiKey } from "@/config/envConfig";
 
 const openai = new OpenAI({

@@ -1,11 +1,15 @@
-import { exec } from "child_process";
+// import { path as ffmpegPath } from "@ffmpeg-installer/ffmpeg";
+import { exec, spawn } from "child_process";
+// import ffmpeg from "ffmpeg-static";
 import fs from "fs";
 import { NextResponse } from "next/server";
 import util from "util";
+// const ffmpegPath = path; // Use the path from the @ffmpeg-installer/ffmpeg package
 
 const execAsync = util.promisify(exec);
 
 import OpenAI from "openai";
+import path from "path";
 
 import { getOpenAiApiKey } from "@/config/envConfig";
 
@@ -16,6 +20,7 @@ const openai = new OpenAI({
 export const POST = async (request: Request) => {
     const req = await request.json();
     const base64Audio = req.audio;
+    // console.log(ffmpeg, "ffmpeg");
 
     console.log("Whisper POST");
 
@@ -64,18 +69,21 @@ async function convertAudioToMp3(audioData: Buffer) {
     const inputPath = "/tmp/input.webm";
     const outputPath = "/tmp/output.mp3";
 
-    console.log("convertAudioToMp3");
-
     fs.writeFileSync(inputPath, audioData);
-    console.log("convertAudioToMp3 after writeFileSync");
+    const ffmpegPath = path.join(process.cwd(), "src", "libs", "ffmpeg.exe");
 
-    await execAsync(`ffmpeg -i ${inputPath} ${outputPath}`);
-    console.log("convertAudioToMp3 after execAsync");
+    const ffmpegProcess = spawn(ffmpegPath, ["-i", inputPath, outputPath]);
 
-    const mp3AudioData = fs.readFileSync(outputPath);
-
-    fs.unlinkSync(inputPath);
-    fs.unlinkSync(outputPath);
-
-    return mp3AudioData;
+    return new Promise<Buffer>((resolve, reject) => {
+        ffmpegProcess.on("exit", (code) => {
+            if (code === 0) {
+                const mp3AudioData = fs.readFileSync(outputPath);
+                fs.unlinkSync(inputPath);
+                fs.unlinkSync(outputPath);
+                resolve(mp3AudioData);
+            } else {
+                reject(new Error(`FFmpeg command failed with code ${code}`));
+            }
+        });
+    });
 }

@@ -24,7 +24,8 @@ jobs:
       - name: npm install, build, and test
         run: |
           cd ./apps/audio-encoder
-          npm install
+          npm set-script prepare ""
+          npm ci --only=production
           npm run build --if-present
           npm run test --if-present
           npm run lint --if-present

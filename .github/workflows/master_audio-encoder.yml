@@ -23,8 +23,8 @@ jobs:
 
       - name: npm install, build, and test
         run: |
-          cd ./apps/audio-encoder
           npm pkg set prepare ""
+          cd ./apps/audio-encoder
           npm ci --only=production
           npm run build --if-present
           npm run test --if-present

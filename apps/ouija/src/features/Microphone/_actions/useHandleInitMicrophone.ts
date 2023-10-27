@@ -50,7 +50,7 @@ export default () => {
                             reader.onloadend = async function () {
                                 const base64Audio = reader.result?.toString().split(",")[1]; // Remove the data URL prefix
                                 if (base64Audio) {
-                                    const response = await fetch("/api/whisper", {
+                                    const response = await fetch("/audio-encoder/audioToText", {
                                         method: "POST",
                                         headers: {
                                             "Content-Type": "application/json",
@@ -69,7 +69,6 @@ export default () => {
 
                                     if (data.result) {
                                         await sendQuestion(data.result);
-                                        // await sendQuestion("is anybody here?");
                                     }
                                 }
                             };

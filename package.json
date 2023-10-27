@@ -10,7 +10,6 @@
     "test:watch": "turbo run test:watch",
     "lint": "turbo run lint",
     "format": "turbo run format",
-    "prepare": "husky install",
     "patch": "patch-package",
     "release": "standard-version",
     "release:patch": "standard-version --release-as patch",

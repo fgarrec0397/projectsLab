@@ -50,13 +50,16 @@ export default () => {
                             reader.onloadend = async function () {
                                 const base64Audio = reader.result?.toString().split(",")[1]; // Remove the data URL prefix
                                 if (base64Audio) {
-                                    const response = await fetch("/audio-encoder/audioToText", {
-                                        method: "POST",
-                                        headers: {
-                                            "Content-Type": "application/json",
-                                        },
-                                        body: JSON.stringify({ audio: base64Audio }),
-                                    });
+                                    const response = await fetch(
+                                        "https://audio-encoder.azurewebsites.net/audioToText",
+                                        {
+                                            method: "POST",
+                                            headers: {
+                                                "Content-Type": "application/json",
+                                            },
+                                            body: JSON.stringify({ audio: base64Audio }),
+                                        }
+                                    );
                                     const data = await response.json();
                                     if (response.status !== 200) {
                                         throw (

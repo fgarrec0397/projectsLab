@@ -1,6 +1,7 @@
 {
   "name": "@projectslab/eslint-config",
   "main": "index.js",
+  "version": "0.0.0",
   "prettier": "@projectslab/prettier-config",
   "scripts": {
     "audit": "npm audit",

@@ -1,5 +1,9 @@
 {
+  "version": "1.0.0",
   "private": true,
+  "repository": "git@github.com:fgarrec0397/projectsLab.git",
+  "author": "fga97 <fgarrec0397@gmail.com>",
+  "license": "MIT",
   "scripts": {
     "audit": "turbo run audit",
     "audit:fix": "turbo run audit:fix",
@@ -26,8 +30,11 @@
     "standard-version": "^9.5.0",
     "turbo": "latest"
   },
-  "name": "ouijaboard",
-  "packageManager": "npm@8.15.0",
+  "packageManager": "yarn@1.22.19",
+  "engines": {
+    "node": ">=14.0.0",
+    "npm": ">=7.0.0"
+  },
   "workspaces": [
     "apps/*",
     "packages/*"

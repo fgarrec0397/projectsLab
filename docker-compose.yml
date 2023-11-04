@@ -1,0 +1,29 @@
+version: "3"
+
+services:
+  ouija:
+    container_name: ouija
+    build:
+      context: .
+      dockerfile: ./apps/ouija/Dockerfile
+    restart: always
+    ports:
+      - 3000:3000
+    networks:
+      - projectsLab_network
+  audio-encoder:
+    container_name: audio-encoder
+    build:
+      context: .
+      dockerfile: ./apps/audio-encoder/Dockerfile
+    restart: always
+    ports:
+      - 3001:3001
+    networks:
+      - projectsLab_network
+
+# Define a network, which allows containers to communicate
+# with each other, by using their container name as a hostname
+networks:
+  projectsLab_network:
+    external: true

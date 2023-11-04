@@ -1,9 +1,9 @@
 FROM node:18-alpine AS base
 
-ARG APP_NAME=audio-encoder
+ARG APP_NAME=ouija
 
-# The web Dockerfile is copy-pasted into our main docs at /docs/handbook/deploying-with-docker.
-# Make sure you update this Dockerfile, the Dockerfile in the web workspace and copy that over to Dockerfile in the docs.
+# This Dockerfile is copy-pasted into our main docs at /docs/handbook/deploying-with-docker.
+# Make sure you update both files!
 
 FROM base AS builder
 # Check https://github.com/nodejs/docker-node/tree/b4117f9333da4138b03a546ec926ef50a31506c3#nodealpine to understand why libc6-compat might be needed.
@@ -21,13 +21,13 @@ RUN apk add --no-cache libc6-compat
 RUN apk update
 WORKDIR /app
 
-# First install dependencies (as they change less often)
+# First install the dependencies (as they change less often)
 COPY .gitignore .gitignore
 COPY --from=builder /app/out/json/ .
 COPY --from=builder /app/out/yarn.lock ./yarn.lock
 RUN yarn install
 
-# Build the project and its dependencies
+# Build the project
 COPY --from=builder /app/out/full/ .
 COPY turbo.json turbo.json
 
@@ -44,9 +44,17 @@ FROM base AS runner
 WORKDIR /app
 
 # Don't run production as root
-RUN addgroup --system --gid 1001 expressjs
-RUN adduser --system --uid 1001 expressjs
-USER expressjs
-COPY --from=installer /app .
+RUN addgroup --system --gid 1001 nodejs
+RUN adduser --system --uid 1001 nextjs
+USER nextjs
 
-CMD node apps/$APP_NAME/dist/index.js
+COPY --from=installer /app/apps/$APP_NAME/next.config.js .
+COPY --from=installer /app/apps/$APP_NAME/package.json .
+
+# Automatically leverage output traces to reduce image size
+# https://nextjs.org/docs/advanced-features/output-file-tracing
+COPY --from=installer --chown=nextjs:nodejs /app/apps/$APP_NAME/.next/standalone ./
+COPY --from=installer --chown=nextjs:nodejs /app/apps/$APP_NAME/.next/static ./apps/$APP_NAME/.next/static
+COPY --from=installer --chown=nextjs:nodejs /app/apps/$APP_NAME/public ./apps/$APP_NAME/public
+
+CMD ts-node apps/audio-encoder/src/index.ts

@@ -9,6 +9,8 @@
     "audit:fix": "turbo run audit:fix",
     "build": "turbo run build --concurrency=1",
     "dev": "turbo run dev",
+    "dev:ouija": "turbo run dev --filter=ouija --filter=audio-encoder",
+    "dev:nextjs": "turbo run dev --filter=nextjs --filter=audio-encoder",
     "test": "turbo run test --concurrency=1",
     "test:coverage": "turbo run test:coverage",
     "test:watch": "turbo run test:watch",
@@ -32,7 +34,7 @@
   },
   "packageManager": "yarn@1.22.19",
   "engines": {
-    "node": ">=14.0.0",
+    "node": ">=18.0.0",
     "npm": ">=7.0.0"
   },
   "workspaces": [

@@ -2,6 +2,7 @@
 
 const nextConfig = {
     transpilePackages: ["@projectslab/ui", "@projectslab/helpers"],
+    output: "standalone",
     async rewrites() {
         return [
             {

@@ -3,6 +3,7 @@ import { useCallback, useEffect, useState } from "react";
 import useOuijaboard from "@/features/Ouijaboard/_actions/hooks/useOuijaboard";
 
 export default () => {
+    const audioEncoderApiUrl = process.env.NEXT_PUBLIC_AUDIO_ENCODER_API_URL;
     const [isRecording, setIsRecording] = useState<boolean>(false);
     const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(null);
     const { sendQuestion } = useOuijaboard();
@@ -51,7 +52,7 @@ export default () => {
                                 const base64Audio = reader.result?.toString().split(",")[1]; // Remove the data URL prefix
                                 if (base64Audio) {
                                     const response = await fetch(
-                                        "https://audio-encoder.azurewebsites.net/audioToText",
+                                        `${audioEncoderApiUrl}/audioToText`,
                                         {
                                             method: "POST",
                                             headers: {
@@ -84,7 +85,7 @@ export default () => {
                 })
                 .catch((err) => console.error("Error accessing microphone:", err));
         }
-    }, [sendQuestion]);
+    }, [audioEncoderApiUrl, sendQuestion]);
 
     useEffect(() => {
         const keyboardRecordButtonIsDownHandler = (event: KeyboardEvent) => {

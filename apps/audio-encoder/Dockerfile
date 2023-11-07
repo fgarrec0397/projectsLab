@@ -26,6 +26,7 @@ COPY .gitignore .gitignore
 COPY --from=builder /app/out/json/ .
 COPY --from=builder /app/out/yarn.lock ./yarn.lock
 RUN yarn install
+RUN yarn global add ts-node
 
 # Build the project and its dependencies
 COPY --from=builder /app/out/full/ .
@@ -49,4 +50,4 @@ RUN adduser --system --uid 1001 expressjs
 USER expressjs
 COPY --from=installer /app .
 
-CMD ts-node apps/$APP_NAME/src/index.ts
+CMD ["npx", "ts-node", "apps/audio-encoder/src/index.ts"]

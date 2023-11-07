@@ -57,4 +57,4 @@ COPY --from=installer --chown=nextjs:nodejs /app/apps/$APP_NAME/.next/standalone
 COPY --from=installer --chown=nextjs:nodejs /app/apps/$APP_NAME/.next/static ./apps/$APP_NAME/.next/static
 COPY --from=installer --chown=nextjs:nodejs /app/apps/$APP_NAME/public ./apps/$APP_NAME/public
 
-CMD ts-node apps/audio-encoder/src/index.ts
+CMD node apps/ouija/server.js

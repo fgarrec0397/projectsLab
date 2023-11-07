@@ -7,7 +7,7 @@ const nextConfig = {
         return [
             {
                 source: "/audio-encoder/:path*",
-                destination: `http://localhost:${process.env.SERVER_PORT || 5001}/:path*`,
+                destination: `http://localhost:${process.env.PORT || 3001}/:path*`,
             },
         ];
     },

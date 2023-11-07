@@ -11,6 +11,8 @@
     "dev": "turbo run dev",
     "dev:ouija": "turbo run dev --filter=ouija --filter=audio-encoder",
     "dev:nextjs": "turbo run dev --filter=nextjs --filter=audio-encoder",
+    "docker:build": "set \"COMPOSE_DOCKER_CLI_BUILD=1\" && set \"DOCKER_BUILDKIT=1\" && docker-compose -f docker-compose.yml build",
+    "docker:start": "docker-compose -f docker-compose.yml up -d",
     "test": "turbo run test --concurrency=1",
     "test:coverage": "turbo run test:coverage",
     "test:watch": "turbo run test:watch",

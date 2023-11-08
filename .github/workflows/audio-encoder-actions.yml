@@ -28,7 +28,6 @@ name: Build and deploy a container to an Azure Web App
 
 env:
   APP_NAME: audio-encoder  # set this to the name of your Azure Web App
-  IMAGE_NAME: ${{ env.REPO }}_audio-encoder ghcr.io/${{ env.REPO }}/${{ env.APP_NAME }}:${{ github.sha }}
 
 on:
   push:

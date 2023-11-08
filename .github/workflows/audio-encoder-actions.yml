@@ -28,6 +28,7 @@ name: Build and deploy a container to an Azure Web App
 
 env:
   APP_NAME: audio-encoder  # set this to the name of your Azure Web App
+  AUDIO_ENCODER_IMAGE_NAME: ${{ env.REPO }}_audio-encoder ghcr.io/${{ env.REPO }}/${{ env.APP_NAME }}:${{ github.sha }}
 
 on:
   push:
@@ -60,11 +61,12 @@ jobs:
       - name: Build and push container image to registry
         run: |
           docker-compose -f docker-compose.yml build audio-encoder
-          docker tag ${{ env.REPO }}_audio-encoder ghcr.io/${{ env.REPO }}/${{ env.APP_NAME }}:${{ github.sha }}
+          docker tag ${{ env.AUDIO_ENCODER_IMAGE_NAME }}
           docker push ghcr.io/${{ env.REPO }}/${{ env.APP_NAME }}:${{ github.sha }}
         env:
           COMPOSE_DOCKER_CLI_BUILD: 1
           DOCKER_BUILDKIT: 1
+          AUDIO_ENCODER_IMAGE_NAME: ${{ env.AUDIO_ENCODER_IMAGE_NAME }}
 
   deploy:
     permissions:

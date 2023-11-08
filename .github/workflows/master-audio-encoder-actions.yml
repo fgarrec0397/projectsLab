@@ -31,7 +31,7 @@ env:
 
 on:
   push:
-    branches: [ "master" ]
+    branches: [ "develop" ]
   workflow_dispatch:
 
 permissions:
@@ -39,6 +39,7 @@ permissions:
 
 jobs:
   build:
+    permissions: write-all
     runs-on: ubuntu-latest
 
     steps:
@@ -60,10 +61,8 @@ jobs:
       - name: Build and push container image to registry
         run: |
           docker-compose -f docker-compose.yml build audio-encoder
-          IMAGE_ID=$(docker-compose -f docker-compose.yml images -q audio-encoder)
-          TAGGED_IMAGE="ghcr.io/${{ env.REPO }}/${{ env.APP_NAME }}:${{ github.sha }}"
-          docker tag $IMAGE_ID $TAGGED_IMAGE
-          docker push $TAGGED_IMAGE
+          docker tag projectslab_audio-encoder ghcr.io/${{ env.REPO }}/${{ env.APP_NAME }}:${{ github.sha }}
+          docker push ghcr.io/${{ env.REPO }}/${{ env.APP_NAME }}:${{ github.sha }}
         env:
           COMPOSE_DOCKER_CLI_BUILD: 1
           DOCKER_BUILDKIT: 1
@@ -87,4 +86,4 @@ jobs:
         with:
           app-name: ${{ env.APP_NAME }}
           publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
-          images: 'ghcr.io/${{ env.REPO }}:${{ github.sha }}'
+          images: 'ghcr.io/${{ env.REPO }}/${{ env.APP_NAME }}:${{ github.sha }}'

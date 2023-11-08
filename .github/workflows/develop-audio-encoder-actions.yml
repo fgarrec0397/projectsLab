@@ -60,7 +60,7 @@ jobs:
       - name: Build and push container image to registry
         run: |
           docker-compose -f docker-compose.yml build audio-encoder
-          docker tag ${{ env.REPO }}_audio-encoder ghcr.io/${{ env.REPO }}/${{ env.APP_NAME }}:${{ github.sha }}
+          docker tag projectslab_audio-encoder ghcr.io/${{ env.REPO }}/${{ env.APP_NAME }}:${{ github.sha }}
           docker push ghcr.io/${{ env.REPO }}/${{ env.APP_NAME }}:${{ github.sha }}
         env:
           COMPOSE_DOCKER_CLI_BUILD: 1

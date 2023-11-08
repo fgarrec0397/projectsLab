@@ -16,7 +16,6 @@ services:
     build:
       context: .
       dockerfile: ./apps/audio-encoder/Dockerfile
-      image: ${AUDIO_ENCODER_IMAGE_NAME}
     restart: always
     ports:
       - 3001:3001

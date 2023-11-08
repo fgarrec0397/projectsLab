@@ -18,7 +18,7 @@
 #       DOCKER_REGISTRY_SERVER_USERNAME: Set this to the GitHub username or organization that owns the repository
 #       DOCKER_REGISTRY_SERVER_PASSWORD: Set this to the value of your PAT token from the previous step
 #
-# 5. Change the value for the AZURE_WEBAPP_NAME.
+# 5. Change the value for the APP_NAME.
 #
 # For more information on GitHub Actions for Azure: https://github.com/Azure/Actions
 # For more information on the Azure Web Apps Deploy action: https://github.com/Azure/webapps-deploy
@@ -27,7 +27,7 @@
 name: Build and deploy a container to an Azure Web App
 
 env:
-  AZURE_WEBAPP_NAME: audio-encoder  # set this to the name of your Azure Web App
+  APP_NAME: audio-encoder  # set this to the name of your Azure Web App
 
 on:
   push:
@@ -58,11 +58,25 @@ jobs:
         run: echo "REPO=${GITHUB_REPOSITORY,,}" >>${GITHUB_ENV}
 
       - name: Build and push container image to registry
-        uses: docker/build-push-action@0565240e2d4ab88bba5387d719585280857ece09 # v5.0.0
-        with:
-          push: true
-          tags: ghcr.io/${{ env.REPO }}:${{ github.sha }}
-          file: ./Dockerfile
+        run: |
+          docker-compose -f docker-compose.yml build audio-encoder
+          docker tag ${COMPOSE_PROJECT_NAME}_audio-encoder ghcr.io/${{ env.REPO }}/${{ env.APP_NAME }}:${{ github.sha }}
+          docker push ghcr.io/${{ env.REPO }}/${{ env.APP_NAME }}:${{ github.sha }}
+        env:
+          COMPOSE_DOCKER_CLI_BUILD: 1
+          DOCKER_BUILDKIT: 1
+      # - name: Build and push container image to registry
+      #   - uses: adambirds/docker-compose-action@v1.3.0
+      #     with:
+      #       compose-file: "./docker-compose.yml"
+      #       down-flags: "--volumes"
+      #       services: |
+      #         audio-encoder
+        # uses: docker/build-push-action@0565240e2d4ab88bba5387d719585280857ece09 # v5.0.0
+        # with:
+        #   push: true
+        #   tags: ghcr.io/${{ env.REPO }}/${{ env.APP_NAME }}:${{ github.sha }}
+        #   file: ./Dockerfile
 
   deploy:
     permissions:
@@ -81,6 +95,6 @@ jobs:
         id: deploy-to-webapp
         uses: azure/webapps-deploy@v2
         with:
-          app-name: ${{ env.AZURE_WEBAPP_NAME }}
+          app-name: ${{ env.APP_NAME }}
           publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
           images: 'ghcr.io/${{ env.REPO }}:${{ github.sha }}'

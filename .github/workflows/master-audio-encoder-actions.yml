@@ -1,4 +1,4 @@
-name: Build and deploy a container to an Azure Web App
+name: Build and deploy the audio container app to Azure
 
 env:
   APP_NAME: audio-encoder  # Azure Web App Name
@@ -6,6 +6,7 @@ env:
 on:
   push:
     branches: [ "master" ]
+    path: 'apps/audio-encoder/**'
   workflow_dispatch:
 
 permissions:

@@ -31,6 +31,8 @@ app.use(cors(corsOptions));
 
 // app.use(cors());
 
+console.log("test");
+
 const main = async () => {
     app.use("/", routes());
 

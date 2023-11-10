@@ -6,7 +6,7 @@ env:
 on:
   push:
     branches: [ "master" ]
-    path: 'apps/audio-encoder/**'
+    paths: 'apps/audio-encoder/**'
   workflow_dispatch:
 
 permissions:
@@ -14,7 +14,6 @@ permissions:
 
 jobs:
   build:
-    if: ${{ contains(github.event.paths, 'apps/audio-encoder/') }}
     permissions: write-all
     runs-on: ubuntu-latest
 
@@ -44,7 +43,6 @@ jobs:
           DOCKER_BUILDKIT: 1
 
   deploy:
-    if: ${{ contains(github.event.paths, 'apps/audio-encoder/') }}
     permissions:
       contents: none
     runs-on: ubuntu-latest

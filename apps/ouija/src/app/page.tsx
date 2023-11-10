@@ -5,6 +5,8 @@ import Ouijaboard from "@/features/Ouijaboard/Ouijaboard";
 import Palette from "@/features/Palette/Palette";
 
 export default function Home() {
+    console.log("test");
+
     return (
         <main>
             <Palette />

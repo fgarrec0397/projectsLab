@@ -7,12 +7,28 @@ on:
       - 'packages/**'
 
 jobs:
-  deploy:
+  build:
     runs-on: ubuntu-latest
+
     steps:
-      - name: Checkout code
+      - name: Checkout Repository
         uses: actions/checkout@v2
-      - name: Deploy to Vercel
-        uses: amondnet/vercel-action@v20
-        with:
-          vercel-token: ${{ secrets.VERCEL_TOKEN }}
+
+      - name: Install Dependencies
+        run: yarn
+
+      - name: Build Next.js App
+        run: yarn build
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+
+      - name: Deploy Next.js App
+        run: |
+          # Add any additional deployment steps or commands
+          # Deploy to Vercel using the Vercel CLI or GitHub Actions Vercel action
+          vercel --token ${{ secrets.VERCEL_TOKEN }}

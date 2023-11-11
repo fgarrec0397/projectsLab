@@ -8,6 +8,8 @@ import OuijaboardContextProvider from "@/features/Ouijaboard/_actions/_data/prov
 import theme from "@/theme";
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
+    console.log("trigger action");
+
     return (
         <OuijaboardContextProvider>
             <ThemeProvider theme={theme}>

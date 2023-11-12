@@ -9,6 +9,7 @@ on:
     paths: 
       - 'apps/audio-encoder/**'
       - 'packages/**'
+      - '.github/workflows/**'
   workflow_dispatch:
 
 permissions:

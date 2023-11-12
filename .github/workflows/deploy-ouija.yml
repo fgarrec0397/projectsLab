@@ -36,4 +36,3 @@ jobs:
           vercel-project-name: projects-lab-ouija
           vercel-org-id: ${{ secrets.ORG_ID}}
           vercel-project-id: ${{ secrets.PROJECT_ID}}
-          working-directory: ./apps/ouija

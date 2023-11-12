@@ -2,9 +2,9 @@ name: Build and deploy ouija app to Vercel
 on:
   push:
     branches: ["master"]
-    paths: 
-      - 'apps/ouija/**'
-      - 'packages/**'
+    # paths: 
+    #   - 'apps/ouija/**'
+    #   - 'packages/**'
 
 jobs:
   build:

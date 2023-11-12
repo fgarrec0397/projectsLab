@@ -1,4 +1,4 @@
-name: Build and deploy ouija app to Vercek
+name: Build and deploy ouija app to Vercel
 on:
   push:
     branches: ["master"]
@@ -18,7 +18,9 @@ jobs:
         run: yarn
 
       - name: Build Next.js App
-        run: yarn build
+        run: yarn build:ouija
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
   deploy:
     needs: build
     runs-on: ubuntu-latest

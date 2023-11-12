@@ -8,6 +8,7 @@
     "audit": "turbo run audit",
     "audit:fix": "turbo run audit:fix",
     "build": "turbo run build --concurrency=1",
+    "build:ouija": "turbo run build --filter=ouija --no-cache",
     "dev": "turbo run dev",
     "dev:ouija": "turbo run dev --filter=ouija --filter=audio-encoder",
     "dev:nextjs": "turbo run dev --filter=nextjs --filter=audio-encoder",

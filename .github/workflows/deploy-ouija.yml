@@ -33,4 +33,4 @@ jobs:
         run: |
           # Add any additional deployment steps or commands
           # Deploy to Vercel using the Vercel CLI or GitHub Actions Vercel action
-          vercel --token ${{ secrets.VERCEL_TOKEN }}
+          vercel --token ${{ secrets.VERCEL_TOKEN }} --confirm

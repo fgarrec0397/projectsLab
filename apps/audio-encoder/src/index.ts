@@ -9,7 +9,7 @@ const port = process.env.PORT || 3001;
 
 app.use(express.json());
 
-const allowedOrigins = ["http://example.com", "http://localhost:3000"]; // Add your allowed origins
+const allowedOrigins = ["https://projects-lab-ouija.vercel.app", "http://localhost:3000"]; // Add your allowed origins
 
 // app.use(
 //     cors({

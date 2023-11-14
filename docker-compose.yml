@@ -17,7 +17,7 @@ services:
     container_name: audio-encoder
     build:
       context: .
-      dockerfile: ./apps/audio-encoder/Dockerfile
+      dockerfile: ./services/audio-encoder/Dockerfile
     restart: always
     ports:
       - 3001:3001

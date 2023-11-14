@@ -13,6 +13,7 @@
     "@projectslab/eslint-config": "*",
     "@projectslab/helpers": "*",
     "@projectslab/prettier-config": "*",
+    "@projectslab/next-pwa": "*",
     "@projectslab/typescript-config": "*",
     "@projectslab/ui": "*",
     "axios": "^1.6.0",

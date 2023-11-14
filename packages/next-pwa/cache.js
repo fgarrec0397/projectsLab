@@ -48,12 +48,12 @@ module.exports = [
   },
   {
     urlPattern: /\/_next\/image\?url=.+$/i,
-    handler: "StaleWhileRevalidate",
+    handler: "CacheFirst",
     options: {
       cacheName: "next-image",
       expiration: {
         maxEntries: 64,
-        maxAgeSeconds: 24 * 60 * 60, // 24 hours
+        maxAgeSeconds: 7 * 24 * 60 * 60, // 7 days
       },
     },
   },

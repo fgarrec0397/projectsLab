@@ -1,6 +1,6 @@
 FROM node:18-alpine AS base
 
-ARG APP_NAME=audio-encoder
+ARG APP_NAME=videos-factory-service
 
 FROM base AS builder
     
@@ -44,4 +44,4 @@ USER expressjs
 
 COPY --from=installer /app .
 
-CMD ["npx", "ts-node", "apps/audio-encoder/src/index.ts"]
+CMD ["npx", "ts-node", "services/videos-factory-service/src/index.ts"]

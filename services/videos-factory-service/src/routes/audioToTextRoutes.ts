@@ -1,8 +1,9 @@
-import express from "express";
+import { Router } from "express";
+
 import audioToTextController from "../controllers/audioToTextController";
 
 const audioToTextRoutes = () => {
-    const router = express.Router();
+    const router = Router();
 
     router.post("/", audioToTextController.post);
 

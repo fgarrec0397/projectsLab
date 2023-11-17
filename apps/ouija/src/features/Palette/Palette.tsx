@@ -1,7 +1,6 @@
 "use client";
 
-import { HasChildren } from "@projectslab/helpers";
-import { CSSProperties, FC, useEffect, useState } from "react";
+import { CSSProperties, FC, PropsWithChildren, useEffect, useState } from "react";
 
 type PaletteStyles = {
     palette?: CSSProperties;
@@ -20,7 +19,7 @@ const styles: PaletteStyles = {
     },
 };
 
-const Palette: FC<HasChildren> = () => {
+const Palette: FC<PropsWithChildren> = () => {
     const [cursorPosition, setCursorPosition] = useState({ x: 0, y: 0 });
     const [rotation, setRotation] = useState(0);
 

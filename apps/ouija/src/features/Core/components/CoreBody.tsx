@@ -1,10 +1,7 @@
 "use client";
 
-import { HasChildren } from "@projectslab/helpers";
 import { Paper, PaperProps } from "@projectslab/ui";
-import { FC } from "react";
-
-type Props = HasChildren;
+import { FC, PropsWithChildren } from "react";
 
 type CoreBodyStyles = {
     body?: PaperProps;
@@ -20,7 +17,7 @@ const styles: CoreBodyStyles = {
     },
 };
 
-const CoreBody: FC<Props> = ({ children }) => {
+const CoreBody: FC<PropsWithChildren> = ({ children }) => {
     return (
         <Paper component="body" {...styles.body}>
             {children}

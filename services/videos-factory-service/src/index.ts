@@ -1,21 +1,17 @@
-import express from "express";
-import routes from "./routes/_routes";
 import "dotenv/config";
+
 import cors from "cors";
+import express, { json } from "express";
+
+import routes from "./routes/_routes";
 
 const app = express();
 
 const port = process.env.PORT || 3001;
 
-app.use(express.json());
+app.use(json());
 
 const allowedOrigins = ["https://projects-lab-ouija.vercel.app", "http://localhost:3000"]; // Add your allowed origins
-
-// app.use(
-//     cors({
-//         origin: "http://localhost:3000",
-//     })
-// );
 
 const corsOptions: any = {
     origin: function (origin: string, callback: (err: Error | null, options?: any) => void) {
@@ -28,8 +24,6 @@ const corsOptions: any = {
 };
 
 app.use(cors(corsOptions));
-
-// app.use(cors());
 
 const main = async () => {
     app.use("/", routes());

@@ -1,8 +1,7 @@
 "use client";
 
-import { HasChildren } from "@projectslab/helpers";
 import { Box, BoxProps } from "@ui/index";
-import { FC } from "react";
+import { FC, PropsWithChildren } from "react";
 
 import boardData from "../_actions/_data/boardData";
 
@@ -26,7 +25,7 @@ const styles: InteractiveOverlayStyles = {
     },
 };
 
-const InteractiveOverlay: FC<HasChildren> = () => {
+const InteractiveOverlay: FC<PropsWithChildren> = () => {
     return (
         <Box {...styles.pointerContainer}>
             {boardData.map((x) => {

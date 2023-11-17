@@ -2,7 +2,7 @@ import TreeItemLib, { TreeItemProps as LibTreeItemProps } from "@mui/lab/TreeIte
 import TreeViewLib, { TreeViewProps as LibTreeViewProps } from "@mui/lab/TreeView";
 import { FC } from "react";
 
-export type TreeViewProps = LibTreeViewProps;
+export type TreeViewProps = LibTreeViewProps<undefined>;
 export type TreeItemProps = LibTreeItemProps;
 
 const TreeView: FC<TreeViewProps> = ({ children, ...props }) => {

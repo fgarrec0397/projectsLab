@@ -1,13 +1,10 @@
 import { Theme as ThemeLib, ThemeProvider as ThemeProviderLib } from "@mui/material/styles";
-import { HasChildren } from "@projectslab/helpers";
 import { SnackbarProvider } from "notistack";
-import { FC } from "react";
-
-// import appTheme from "./theme";
+import { FC, PropsWithChildren } from "react";
 
 export type Theme = ThemeLib;
 
-type Props = HasChildren & {
+type Props = PropsWithChildren & {
     theme: Theme;
 };
 

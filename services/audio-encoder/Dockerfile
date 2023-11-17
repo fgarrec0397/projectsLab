@@ -44,4 +44,4 @@ USER expressjs
 
 COPY --from=installer /app .
 
-CMD ["npx", "ts-node", "apps/audio-encoder/src/index.ts"]
+CMD ["npx", "ts-node", "services/audio-encoder/src/index.ts"]

@@ -1,8 +1,9 @@
-import express from "express";
+import { Router } from "express";
+
 import okController from "../controllers/okController";
 
 const okRoutes = () => {
-    const router = express.Router();
+    const router = Router();
 
     router.get("/", okController.get);
 

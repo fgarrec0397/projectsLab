@@ -1,13 +1,10 @@
 "use client";
 
-import { HasChildren } from "@projectslab/helpers";
-import { FC } from "react";
+import { FC, PropsWithChildren } from "react";
 
 import CoreBody from "./components/CoreBody";
 
-type Props = HasChildren;
-
-const Core: FC<Props> = ({ children }) => {
+const Core: FC<PropsWithChildren> = ({ children }) => {
     return <CoreBody>{children}</CoreBody>;
 };
 

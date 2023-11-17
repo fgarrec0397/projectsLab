@@ -1,6 +1,6 @@
 FROM node:18-alpine AS base
 
-ARG APP_NAME=ouija
+ARG APP_NAME=videos-factory
 
 # This Dockerfile is copy-pasted into our main docs at /docs/handbook/deploying-with-docker.
 # Make sure you update both files!

@@ -11,6 +11,7 @@
     "build:ouija": "turbo run build --filter=ouija --no-cache",
     "dev": "turbo run dev",
     "dev:ouija": "turbo run dev --filter=ouija --filter=audio-encoder",
+    "dev:video-factory": "turbo run dev --filter=videos-factory --filter=videos-factory-service",
     "docker:build": "set \"COMPOSE_DOCKER_CLI_BUILD=1\" && set \"DOCKER_BUILDKIT=1\" && docker-compose -f docker-compose.yml build",
     "docker:build:audio-encoder": "docker-compose build audio-encoder",
     "docker:build:ouija": "docker-compose build --no-cache ouija",

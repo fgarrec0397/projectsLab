@@ -1,3 +1,5 @@
+"use client";
+
 import FormGroupLib, { FormGroupProps as LibFormGroupProps } from "@mui/material/FormGroup";
 import FormLabelLib, { FormLabelProps as LibFormLabelProps } from "@mui/material/FormLabel";
 import { FC } from "react";

@@ -1,3 +1,5 @@
+"use client";
+
 import LoadingButtonLib, {
     LoadingButtonProps as LibLoadingButtonProps,
 } from "@mui/lab/LoadingButton";

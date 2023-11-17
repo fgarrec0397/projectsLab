@@ -1,3 +1,5 @@
+"use client";
+
 import ContainerLib, { ContainerProps as LibContainerProps } from "@mui/material/Container";
 import { FC } from "react";
 

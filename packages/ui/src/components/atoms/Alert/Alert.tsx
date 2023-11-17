@@ -1,3 +1,5 @@
+"use client";
+
 import AlertLib, { AlertProps as LibAlertProps } from "@mui/material/Alert";
 import { FC } from "react";
 

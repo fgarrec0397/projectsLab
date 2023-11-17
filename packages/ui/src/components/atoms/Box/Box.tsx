@@ -1,3 +1,5 @@
+"use client";
+
 import BoxLib, { BoxProps as LibBoxProps } from "@mui/material/Box";
 import { FC, forwardRef } from "react";
 

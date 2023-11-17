@@ -1,3 +1,5 @@
+"use client";
+
 import CheckboxLib, { CheckboxProps as LibCheckboxProps } from "@mui/material/Checkbox";
 import { FC } from "react";
 

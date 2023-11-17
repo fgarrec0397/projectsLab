@@ -1,3 +1,5 @@
+"use client";
+
 import ModalLib, { ModalProps as LibModalProps } from "@mui/material/Modal";
 import { FC } from "react";
 

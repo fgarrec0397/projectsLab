@@ -1,3 +1,5 @@
+"use client";
+
 import TooltipLib, { TooltipProps as LibTooltipProps } from "@mui/material/Tooltip";
 import { FC } from "react";
 

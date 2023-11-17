@@ -7,15 +7,7 @@ type CoreBodyStyles = {
     body?: PaperProps;
 };
 
-const styles: CoreBodyStyles = {
-    body: {
-        sx: (theme) => ({
-            overflow: "hidden",
-            backgroundColor: theme.palette.background.default,
-            cursor: "none",
-        }),
-    },
-};
+const styles: CoreBodyStyles = {};
 
 const CoreBody: FC<PropsWithChildren> = ({ children }) => {
     return (

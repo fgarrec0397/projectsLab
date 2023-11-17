@@ -1,3 +1,5 @@
+"use client";
+
 import AccordionLib, { AccordionProps as LibAccordionProps } from "@mui/material/Accordion";
 import AccordionDetailsLib, {
     AccordionDetailsProps as LibAccordionDetailsProps,

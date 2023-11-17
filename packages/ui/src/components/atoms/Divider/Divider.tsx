@@ -1,3 +1,5 @@
+"use client";
+
 import DividerLib, { DividerProps as LibDividerProps } from "@mui/material/Divider";
 import { FC } from "react";
 

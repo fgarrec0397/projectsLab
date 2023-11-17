@@ -1,3 +1,5 @@
+"use client";
+
 import DialogLib, { DialogProps as LibDialogProps } from "@mui/material/Dialog";
 import DialogActionsLib, {
     DialogActionsProps as LibDialogActionsProps,

@@ -1,3 +1,5 @@
+"use client";
+
 import TypographyLib, { TypographyProps as LibTypographyProps } from "@mui/material/Typography";
 import { FC } from "react";
 

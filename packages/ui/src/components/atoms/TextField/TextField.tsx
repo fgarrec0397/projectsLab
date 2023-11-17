@@ -1,3 +1,5 @@
+"use client";
+
 import InputAdornmentLib, {
     InputAdornmentProps as LibInputAdornmentProps,
 } from "@mui/material/InputAdornment";

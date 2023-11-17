@@ -1,3 +1,9 @@
+import { Button } from "@ui/components";
+
 export default function Home() {
-    return <main>Videos Factory app</main>;
+    return (
+        <main>
+            <Button />
+        </main>
+    );
 }

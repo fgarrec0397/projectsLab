@@ -1,3 +1,5 @@
+"use client";
+
 import SkeletonLib, { SkeletonProps as LibSkeletonProps } from "@mui/material/Skeleton";
 import { FC, forwardRef } from "react";
 

@@ -1,3 +1,5 @@
+"use client";
+
 import TreeItemLib, { TreeItemProps as LibTreeItemProps } from "@mui/lab/TreeItem";
 import TreeViewLib, { TreeViewProps as LibTreeViewProps } from "@mui/lab/TreeView";
 import { FC } from "react";

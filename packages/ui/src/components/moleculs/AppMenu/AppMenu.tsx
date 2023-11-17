@@ -1,3 +1,5 @@
+"use client";
+
 import { pxToRem } from "@ui/theme";
 import { FC, ReactNode, useState } from "react";
 

@@ -1,3 +1,5 @@
+"use client";
+
 import BreadcrumbsLib, { BreadcrumbsProps as LibBreadcrumbsProps } from "@mui/material/Breadcrumbs";
 import { FC } from "react";
 

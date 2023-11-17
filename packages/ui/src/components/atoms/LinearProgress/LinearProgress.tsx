@@ -1,3 +1,5 @@
+"use client";
+
 import LinearProgressLib, {
     LinearProgressProps as LibLinearProgressProps,
 } from "@mui/material/LinearProgress";

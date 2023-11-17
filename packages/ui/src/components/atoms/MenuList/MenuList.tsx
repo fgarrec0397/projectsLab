@@ -1,3 +1,5 @@
+"use client";
+
 import MenuListLib, { MenuListProps as LibMenuListProps } from "@mui/material/MenuList";
 import { FC } from "react";
 

@@ -1,3 +1,5 @@
+"use client";
+
 import StepLib, { StepProps as LibStepProps } from "@mui/material/Step";
 import StepLabelLib, { StepLabelProps as LibStepLabelProps } from "@mui/material/StepLabel";
 import StepperLib, { StepperProps as LibStepperProps } from "@mui/material/Stepper";

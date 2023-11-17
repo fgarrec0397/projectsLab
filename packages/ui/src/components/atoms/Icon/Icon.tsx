@@ -1,3 +1,5 @@
+"use client";
+
 import SvgIconLib, { SvgIconProps as LibSvgIconProps } from "@mui/material/SvgIcon";
 import { FC } from "react";
 

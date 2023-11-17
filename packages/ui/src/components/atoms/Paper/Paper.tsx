@@ -1,3 +1,5 @@
+"use client";
+
 import PaperLib, { PaperProps as LibPaperProps } from "@mui/material/Paper";
 import { FC } from "react";
 

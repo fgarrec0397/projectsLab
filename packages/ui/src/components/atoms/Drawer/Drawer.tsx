@@ -1,3 +1,5 @@
+"use client";
+
 import DrawerLib, { DrawerProps as LibDrawerProps } from "@mui/material/Drawer";
 import { FC } from "react";
 

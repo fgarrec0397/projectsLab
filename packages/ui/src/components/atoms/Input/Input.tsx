@@ -1,3 +1,5 @@
+"use client";
+
 import InputLib, { InputProps as LibInputProps } from "@mui/material/Input";
 import { FC } from "react";
 

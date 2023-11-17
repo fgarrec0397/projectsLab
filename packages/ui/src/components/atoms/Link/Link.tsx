@@ -1,3 +1,5 @@
+"use client";
+
 import LinkLib, { LinkProps as LibLinkProps } from "@mui/material/Link";
 import { FC } from "react";
 

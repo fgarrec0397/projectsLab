@@ -1,3 +1,5 @@
+"use client";
+
 import AddCircle from "@projectslab/icons/AddCircle";
 import DefaultImage from "@projectslab/icons/DefaultImage";
 import Folder from "@projectslab/icons/Folder";

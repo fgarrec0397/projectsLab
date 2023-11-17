@@ -1,3 +1,5 @@
+"use client";
+
 import { capitalizeString } from "@projectslab/helpers";
 import {
     Box,

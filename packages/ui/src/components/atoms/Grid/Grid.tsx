@@ -1,3 +1,5 @@
+"use client";
+
 import GridLib, { GridProps as LibGridProps } from "@mui/material/Grid";
 import { FC } from "react";
 

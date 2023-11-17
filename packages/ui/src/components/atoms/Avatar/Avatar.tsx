@@ -1,3 +1,5 @@
+"use client";
+
 import AvatarLib, { AvatarProps as LibAvatarProps } from "@mui/material/Avatar";
 import { FC } from "react";
 

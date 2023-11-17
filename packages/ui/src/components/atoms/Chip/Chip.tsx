@@ -1,3 +1,5 @@
+"use client";
+
 import ChipLib, { ChipProps as LibChipProps } from "@mui/material/Chip";
 import { FC } from "react";
 

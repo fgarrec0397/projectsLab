@@ -1,0 +1,12 @@
+{
+  "extends": "@projectslab/typescript-config/base.json",
+  "compilerOptions": {
+    "baseUrl": "./src",
+    "paths": {
+        "@helpers/*": ["./*"],
+    },
+  },
+  "include": [
+    "src",
+  ],
+}

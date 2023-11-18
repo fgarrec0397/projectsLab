@@ -1,10 +1,13 @@
 "use client";
 
+import { Fetcher } from "@projectslab/helpers";
 import { Button } from "@ui/components";
 
 export default function Home() {
-    const onClickHandler = () => {
+    const onClickHandler = async () => {
         console.log("onClickHandler");
+        const response = await Fetcher.get("/api/video");
+        console.log(response, "response");
     };
 
     return (

@@ -16,6 +16,7 @@
   "dependencies": {
     "@projectslab/icons": "*",
     "@projectslab/helpers": "*",
+    "@projectslab/helpers-client": "*",
     "@projectslab/typescript-config": "*",
     "@emotion/react": "^11.11.1",
     "@emotion/styled": "^11.11.0",

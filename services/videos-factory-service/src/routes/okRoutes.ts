@@ -1,11 +1,13 @@
 import { Router } from "express";
 
-import okController from "../controllers/okController";
+import okV1Controller from "../controllers/okV1Controller";
 
-const okRoutes = () => {
+const okRoutes = (version: number) => {
     const router = Router();
 
-    router.get("/", okController.get);
+    if (version === 1) {
+        router.get("/", okV1Controller.get);
+    }
 
     return router;
 };

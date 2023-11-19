@@ -7,7 +7,7 @@ export default function Home() {
     const onClickHandler = async () => {
         console.log("onClickHandler");
         const response = await Fetcher.get("/api/video");
-        console.log(response, "response");
+        // console.log(response, "response");
     };
 
     return (

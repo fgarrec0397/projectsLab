@@ -1,11 +1,11 @@
 import { Router } from "express";
 
-import v1Routes from "./v1Routes";
+import okRoutes from "./okRoutes";
 
 const routes = () => {
     const router = Router();
 
-    router.use("/v1", v1Routes());
+    router.use("/ok", okRoutes(1));
 
     return router;
 };

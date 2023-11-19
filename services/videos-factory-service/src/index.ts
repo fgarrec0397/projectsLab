@@ -1,4 +1,5 @@
 import "dotenv/config";
+import "module-alias/register";
 
 import cors from "cors";
 import express, { json } from "express";

@@ -1,6 +1,6 @@
 import { Router } from "express";
 
-import okController from "../../controllers/v1/okController";
+import okController from "../../core/controllers/v1/okController";
 
 const okRoutes = () => {
     const router = Router();

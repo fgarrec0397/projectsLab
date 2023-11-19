@@ -1,6 +1,6 @@
 import { Router } from "express";
 
-import videoController from "../../controllers/v1/videoController";
+import videoController from "../../video/controllers/v1/videoController";
 
 const okRoutes = () => {
     const router = Router();

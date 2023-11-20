@@ -1,11 +1,12 @@
-import { Canvas, CanvasRenderingContext2D, loadImage } from "canvas";
+import { Canvas, loadImage, registerFont } from "canvas";
 import ffmpegStatic from "ffmpeg-static";
 import { setFfmpegPath } from "fluent-ffmpeg";
 import fs from "fs";
 
 import { getAssetsPath } from "../../core/utils/getAssetsPath";
-import { interpolateKeyframes } from "../utils/interpolateKeyFrames";
-import { stitchFramesToVideo } from "./videoService";
+import { renderMainComposition } from "../compositions/renderMainComposition";
+import { getVideoFrameReader } from "../utils/getVideoFrameReader";
+import { stitchFramesToVideo } from "../utils/stitchFramesToVideo";
 
 // Tell fluent-ffmpeg where it can find FFmpeg
 setFfmpegPath(ffmpegStatic || "");
@@ -19,16 +20,46 @@ export const renderVideo = async () => {
         await fs.promises.mkdir(path, { recursive: true });
     }
 
+    // The video length and frame rate, as well as the number of frames required
+    // to create the video
+    const duration = 9.15;
+    const frameRate = 60;
+    const frameCount = Math.floor(duration * frameRate);
+
+    console.log("Extracting frames from video 1...");
+    console.log({
+        path: getAssetsPath("pexels-4782135.mp4"),
+        tmpPath: getAssetsPath("tmp/video-1"),
+        fameRate: frameRate,
+    });
+
+    const getVideo1Frame = await getVideoFrameReader(
+        getAssetsPath("pexels-4782135.mp4"),
+        getAssetsPath("tmp/video-1"),
+        frameRate
+    );
+
+    console.log("Extracting frames from video 2...");
+    const getVideo2Frame = await getVideoFrameReader(
+        getAssetsPath("pexels-3576378.mp4"),
+        getAssetsPath("tmp/video-2"),
+        frameRate
+    );
+
+    console.log("Extracting frames from video 3...");
+    const getVideo3Frame = await getVideoFrameReader(
+        getAssetsPath("pexels-2829177.mp4"),
+        getAssetsPath("tmp/video-3"),
+        frameRate
+    );
+
     const canvas = new Canvas(1280, 720);
     const context = canvas.getContext("2d");
 
     const logo = await loadImage(getAssetsPath("logo.svg"));
 
-    // The video length and frame rate, as well as the number of frames required
-    // to create the video
-    const duration = 3;
-    const frameRate = 60;
-    const frameCount = Math.floor(duration * frameRate);
+    registerFont(getAssetsPath("caveat-medium.ttf"), { family: "Caveat" });
+    registerFont(getAssetsPath("chivo-regular.ttf"), { family: "Chivo" });
 
     // Render each frame
     for (let i = 0; i < frameCount; i++) {
@@ -42,7 +73,21 @@ export const renderVideo = async () => {
         context.fillStyle = "#ffffff";
         context.fillRect(0, 0, canvas.width, canvas.height);
 
-        renderFrame(context, duration, time);
+        // Grab a frame from our input videos
+        const image1 = await getVideo1Frame();
+        const image2 = await getVideo2Frame();
+        const image3 = await getVideo3Frame();
+
+        renderMainComposition(
+            context,
+            image1,
+            image2,
+            image3,
+            logo,
+            canvas.width,
+            canvas.height,
+            time
+        );
 
         // Store the image in the directory where it can be found by FFmpeg
         const output = canvas.toBuffer("image/png");
@@ -58,26 +103,4 @@ export const renderVideo = async () => {
         duration,
         frameRate
     );
-
-    function renderFrame(
-        canvasContext: CanvasRenderingContext2D,
-        frameDuration: number,
-        time: number
-    ) {
-        // Calculate the x position over time
-        const x = interpolateKeyframes(
-            [
-                // At time 0, we want x to be 100
-                { time: 0, value: 100 },
-                // At time 1.5, we want x to be 550 (using Cubic easing)
-                { time: 1.5, value: 550, easing: "cubic-in-out" },
-                // At time 3, we want x to be 200 (using Cubic easing)
-                { time: 3, value: 200, easing: "cubic-in-out" },
-            ],
-            time
-        );
-
-        // Draw the image
-        context.drawImage(logo, x, 100, 500, 500);
-    }
 };

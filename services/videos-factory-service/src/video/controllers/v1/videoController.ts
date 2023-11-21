@@ -1,12 +1,18 @@
 import { Request, Response } from "express";
 
-import { renderVideo } from "../../services/renderVideo";
+import { VideoService } from "../../services/videoService";
 
-const get = async (request: Request, result: Response) => {
-    await renderVideo();
-    result.status(200).json({ result: "video controller GET" });
-};
+class VideoController {
+    async get(request: Request, result: Response) {
+        const duration = 9;
+        const frameRate = 60;
 
-export default {
-    get,
-};
+        const video = new VideoService({ duration, frameRate, size: { width: 1280, height: 720 } });
+
+        await video.renderVideo();
+
+        result.status(200).json({ result: "video controller GET" });
+    }
+}
+
+export default new VideoController();

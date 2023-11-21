@@ -3,6 +3,7 @@ import { existsSync, mkdirSync } from "fs";
 import path from "path";
 
 // Example usage: await extractFramesFromVideo('video.mp4', 'frame-%04d.png', 60);
+
 export const extractFramesFromVideo = async (
     inputFilepath: string,
     outputFilepath: string,

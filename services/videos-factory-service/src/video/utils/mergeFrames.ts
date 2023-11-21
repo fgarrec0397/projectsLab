@@ -1,6 +1,6 @@
 import ffmpeg from "fluent-ffmpeg";
 
-export const stitchFramesToVideo = async (
+export const mergeFrames = async (
     framesFilepath: string,
     soundtrackFilePath: string,
     outputFilepath: string,

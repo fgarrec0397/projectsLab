@@ -2,14 +2,24 @@ import { CanvasRenderingContext2D } from "canvas";
 
 import { interpolateKeyframes } from "../utils/interpolateKeyFrames";
 
-export function renderAnimatedText(
+/**
+ *
+ * @param context The canvas context
+ * @param text
+ * @param font
+ * @param x
+ * @param y
+ * @param time
+ * @returns
+ */
+export const renderAnimatedText = (
     context: CanvasRenderingContext2D,
     text: string,
     font: string,
     x: number,
     y: number,
     time: number
-) {
+) => {
     if (time < 0) {
         return;
     }
@@ -40,4 +50,4 @@ export function renderAnimatedText(
     context.fillText(text, x, y + offset);
 
     context.restore();
-}
+};

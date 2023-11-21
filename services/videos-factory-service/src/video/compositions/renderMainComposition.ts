@@ -42,6 +42,7 @@ export function renderMainComposition(
     context.save();
     context.translate(0.25 * width * (1 - slideProgress), 0);
     context.globalAlpha = slideProgress;
+    context.fillStyle = "black";
 
     renderOutro(context, logo, width, height, time - 6.59);
 

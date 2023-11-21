@@ -22,17 +22,11 @@ export const renderVideo = async () => {
 
     // The video length and frame rate, as well as the number of frames required
     // to create the video
-    const duration = 9.15;
+    const duration = 1 + (13 / 60) * 60; // 1.13 minute
     const frameRate = 60;
     const frameCount = Math.floor(duration * frameRate);
 
     console.log("Extracting frames from video 1...");
-    console.log({
-        path: getAssetsPath("pexels-4782135.mp4"),
-        tmpPath: getAssetsPath("tmp/video-1"),
-        fameRate: frameRate,
-    });
-
     const getVideo1Frame = await getVideoFrameReader(
         getAssetsPath("pexels-4782135.mp4"),
         getAssetsPath("tmp/video-1"),

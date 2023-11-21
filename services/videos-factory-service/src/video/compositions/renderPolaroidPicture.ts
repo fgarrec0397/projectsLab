@@ -35,5 +35,6 @@ export function renderPolaroidPicture(
 
     // Draw the caption
     context.font = `${0.09 * height}px 'Caveat'`;
+    context.fillStyle = "black";
     context.fillText(caption, 0.05 * width, 0.95 * height);
 }

@@ -4,7 +4,6 @@ import { setFfmpegPath } from "fluent-ffmpeg";
 import fs from "fs";
 
 import { getAssetsPath } from "../../core/utils/getAssetsPath";
-import { renderMainComposition } from "../compositions/renderMainComposition";
 import { getVideoFrameReader } from "../utils/getVideoFrameReader";
 import { mergeFrames } from "../utils/mergeFrames";
 import { SceneService } from "./sceneService";
@@ -12,13 +11,15 @@ import { SceneService } from "./sceneService";
 // Tell fluent-ffmpeg where it can find FFmpeg
 setFfmpegPath(ffmpegStatic || "");
 
+export type VideoSize = {
+    width: number;
+    height: number;
+};
+
 export type VideoOptions = {
     duration: number;
     frameRate: number;
-    size: {
-        width: number;
-        height: number;
-    };
+    size: VideoSize;
 };
 
 export class VideoService {
@@ -32,6 +33,8 @@ export class VideoService {
 
     frameCount: number;
 
+    size: VideoSize;
+
     constructor({ duration, frameRate, size }: VideoOptions) {
         this.canvas = new Canvas(size.width, size.height);
         this.canvasContext = this.canvas.getContext("2d");
@@ -39,6 +42,7 @@ export class VideoService {
         this.duration = duration;
         this.frameRate = frameRate;
         this.frameCount = Math.floor(duration * frameRate);
+        this.size = size;
 
         this.cleanUpDirectories();
         this.registerFonts();
@@ -68,8 +72,7 @@ export class VideoService {
 
         const logo = await loadImage(getAssetsPath("logo.svg"));
 
-        // TODO - need to move this code in the loop.So We should instantiate our class here then call renderScene in the loop
-        const scene = new SceneService(this.canvasContext, { image1, image2, image3, logo }, {});
+        const scene = new SceneService(this.canvasContext);
 
         // Render each frame
         for (let i = 0; i < this.frameCount; i++) {
@@ -88,15 +91,9 @@ export class VideoService {
             const image2 = await getVideo2Frame();
             const image3 = await getVideo3Frame();
 
-            renderMainComposition(
-                this.canvasContext,
-                image1,
-                image2,
-                image3,
-                logo,
-                this.canvas.width,
-                this.canvas.height,
-                time
+            scene.renderScenes(
+                { image1, image2, image3, logo },
+                { width: this.size.width, height: this.size.height, time }
             );
 
             // Store the image in the directory where it can be found by FFmpeg
@@ -108,7 +105,7 @@ export class VideoService {
             );
         }
 
-        // Stitch all frames together with FFmpeg
+        // Merge all frames together with FFmpeg
         await mergeFrames(
             getAssetsPath("tmp/output/frame-%04d.png"),
             getAssetsPath("catch-up-loop-119712.mp3"),

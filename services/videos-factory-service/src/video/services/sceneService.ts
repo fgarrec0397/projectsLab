@@ -4,8 +4,7 @@ import { renderOutro } from "../compositions/renderOutro";
 import { renderThreePictures } from "../compositions/renderThreePictures";
 import { interpolateKeyframes } from "../utils/interpolateKeyFrames";
 
-// TODO - need to pass assets and config in param of each scene function
-export type Scene = () => void;
+export type Scene = (assets: SceneAssets, config: SceneConfig) => Scene[] | Scene | void;
 
 export type SceneAssets = {
     image1: Image;
@@ -23,71 +22,71 @@ export type SceneConfig = {
 export class SceneService {
     context: CanvasRenderingContext2D;
 
-    assets: SceneAssets;
-
-    config: SceneConfig;
-
     scenes: Scene[];
 
-    constructor(context: CanvasRenderingContext2D, assets: SceneAssets, config: SceneConfig) {
+    constructor(context: CanvasRenderingContext2D) {
         this.context = context;
-        this.assets = assets;
-        this.config = config;
 
-        this.scenes = this.initScenes(context, assets, config);
+        this.scenes = this.initScenes(context);
     }
 
-    // TODO -
-    renderScenes() {
-        this.scenes.forEach((scene) => {
-            scene();
-        });
+    renderScenes(assets: SceneAssets, config: SceneConfig) {
+        const callScenesRecursively = (scenes: Scene[]) => {
+            scenes.forEach((scene) => {
+                const result = scene(assets, config);
+
+                if (Array.isArray(result)) {
+                    callScenesRecursively(result);
+                }
+            });
+        };
+
+        callScenesRecursively(this.scenes);
     }
 
-    private initScenes(
-        context: CanvasRenderingContext2D,
-        assets: SceneAssets,
-        config: SceneConfig
-    ) {
-        const slideProgress = interpolateKeyframes(
-            [
-                { time: 6.59, value: 0 },
-                { time: 7.63, value: 1, easing: "cubic-in-out" },
-            ],
-            config.time
-        );
-
-        // TODO - need to pass assets and config in param of each scene function
-        const scene1 = () => {
-            context.save();
-            context.translate(0.25 * config.width * -slideProgress, 0);
-            context.globalAlpha = 1 - slideProgress;
-
-            // Render the polaroid picture scene using relative sizes
-            renderThreePictures(
-                context,
-                assets.image1,
-                assets.image2,
-                assets.image3,
-                0.9636 * config.width,
-                0.8843 * config.height,
-                config.time
+    private initScenes(context: CanvasRenderingContext2D) {
+        const mainScene = (mainSceneAssets: SceneAssets, mainSceneConfig: SceneConfig) => {
+            const slideProgress = interpolateKeyframes(
+                [
+                    { time: 6.59, value: 0 },
+                    { time: 7.63, value: 1, easing: "cubic-in-out" },
+                ],
+                mainSceneConfig.time
             );
 
-            context.restore();
+            const scene1 = (assets: SceneAssets, config: SceneConfig) => {
+                context.save();
+                context.translate(0.25 * config.width * -slideProgress, 0);
+                context.globalAlpha = 1 - slideProgress;
+
+                // Render the polaroid picture scene using relative sizes
+                renderThreePictures(
+                    context,
+                    assets.image1,
+                    assets.image2,
+                    assets.image3,
+                    0.9636 * config.width,
+                    0.8843 * config.height,
+                    config.time
+                );
+
+                context.restore();
+            };
+
+            const scene2 = (assets: SceneAssets, config: SceneConfig) => {
+                context.save();
+                context.translate(0.25 * config.width * (1 - slideProgress), 0);
+                context.globalAlpha = slideProgress;
+                context.fillStyle = "black";
+
+                renderOutro(context, assets.logo, config.width, config.height, config.time - 6.59);
+
+                context.restore();
+            };
+
+            return [scene1, scene2];
         };
 
-        const scene2 = () => {
-            context.save();
-            context.translate(0.25 * config.width * (1 - slideProgress), 0);
-            context.globalAlpha = slideProgress;
-            context.fillStyle = "black";
-
-            renderOutro(context, assets.logo, config.width, config.height, config.time - 6.59);
-
-            context.restore();
-        };
-
-        return [scene1, scene2];
+        return [mainScene];
     }
 }

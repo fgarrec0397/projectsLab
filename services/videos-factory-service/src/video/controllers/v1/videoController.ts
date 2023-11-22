@@ -4,7 +4,7 @@ import { VideoService } from "../../services/videoService";
 
 class VideoController {
     async get(request: Request, result: Response) {
-        const duration = 9;
+        const duration = 9; // 9
         const frameRate = 60;
 
         const video = new VideoService({ duration, frameRate, size: { width: 1280, height: 720 } });

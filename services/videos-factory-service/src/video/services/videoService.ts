@@ -1,4 +1,4 @@
-import { Canvas, CanvasRenderingContext2D, loadImage, registerFont } from "canvas";
+import { Canvas, CanvasRenderingContext2D, Image, loadImage, registerFont } from "canvas";
 import ffmpegStatic from "ffmpeg-static";
 import { setFfmpegPath } from "fluent-ffmpeg";
 import fs from "fs";
@@ -35,6 +35,10 @@ export class VideoService {
 
     size: VideoSize;
 
+    sceneService: SceneService;
+
+    videosReaders?: (() => Promise<Image>)[];
+
     constructor({ duration, frameRate, size }: VideoOptions) {
         this.canvas = new Canvas(size.width, size.height);
         this.canvasContext = this.canvas.getContext("2d");
@@ -43,12 +47,55 @@ export class VideoService {
         this.frameRate = frameRate;
         this.frameCount = Math.floor(duration * frameRate);
         this.size = size;
+        this.sceneService = new SceneService(this.canvasContext);
 
         this.cleanUpDirectories();
         this.registerFonts();
     }
 
     async renderVideo() {
+        await this.initRenderVideo();
+        const logo = await loadImage(getAssetsPath("logo.svg"));
+
+        // Render each frame
+        for (let i = 0; i < this.frameCount; i++) {
+            const time = i / this.frameRate;
+
+            // eslint-disable-next-line no-console
+            console.log(`Rendering frame ${i} at ${Math.round(time * 10) / 10} seconds...`);
+
+            // Clear the canvas with a white background color. This is required as we are
+            // reusing the canvas with every frame
+            this.canvasContext.fillStyle = "#ffffff";
+            this.canvasContext.fillRect(0, 0, this.canvas.width, this.canvas.height);
+
+            // Grab a frame from our input videos
+            const image1 = await this.videosReaders?.[0]();
+            const image2 = await this.videosReaders?.[1]();
+            const image3 = await this.videosReaders?.[2]();
+
+            if (!image1 || !image2 || !image3) {
+                break;
+            }
+
+            this.sceneService.renderScenes(
+                { image1, image2, image3, logo },
+                { width: this.size.width, height: this.size.height, time }
+            );
+
+            // Store the image in the directory where it can be found by FFmpeg
+            const output = this.canvas.toBuffer("image/png");
+            const paddedNumber = String(i).padStart(4, "0");
+            await fs.promises.writeFile(
+                getAssetsPath(`tmp/output/frame-${paddedNumber}.png`),
+                output
+            );
+        }
+
+        this.finishRenderVideo();
+    }
+
+    private async initRenderVideo() {
         console.log("Extracting frames from video 1...");
         const getVideo1Frame = await getVideoFrameReader(
             getAssetsPath("pexels-4782135.mp4"),
@@ -70,41 +117,10 @@ export class VideoService {
             this.frameRate
         );
 
-        const logo = await loadImage(getAssetsPath("logo.svg"));
+        this.videosReaders = [getVideo1Frame, getVideo2Frame, getVideo3Frame];
+    }
 
-        const scene = new SceneService(this.canvasContext);
-
-        // Render each frame
-        for (let i = 0; i < this.frameCount; i++) {
-            const time = i / this.frameRate;
-
-            // eslint-disable-next-line no-console
-            console.log(`Rendering frame ${i} at ${Math.round(time * 10) / 10} seconds...`);
-
-            // Clear the canvas with a white background color. This is required as we are
-            // reusing the canvas with every frame
-            this.canvasContext.fillStyle = "#ffffff";
-            this.canvasContext.fillRect(0, 0, this.canvas.width, this.canvas.height);
-
-            // Grab a frame from our input videos
-            const image1 = await getVideo1Frame();
-            const image2 = await getVideo2Frame();
-            const image3 = await getVideo3Frame();
-
-            scene.renderScenes(
-                { image1, image2, image3, logo },
-                { width: this.size.width, height: this.size.height, time }
-            );
-
-            // Store the image in the directory where it can be found by FFmpeg
-            const output = this.canvas.toBuffer("image/png");
-            const paddedNumber = String(i).padStart(4, "0");
-            await fs.promises.writeFile(
-                getAssetsPath(`tmp/output/frame-${paddedNumber}.png`),
-                output
-            );
-        }
-
+    private async finishRenderVideo() {
         // Merge all frames together with FFmpeg
         await mergeFrames(
             getAssetsPath("tmp/output/frame-%04d.png"),

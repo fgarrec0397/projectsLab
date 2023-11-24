@@ -1,28 +1,21 @@
 import ffmpeg from "fluent-ffmpeg";
 
-export const mergeFrames = async (
-    framesFilepath: string,
-    soundtrackFilePath: string,
-    outputFilepath: string,
-    duration: number,
-    frameRate: number
-) => {
+import { VideoAsset, VideoConfig } from "../controllers/v1/videoController";
+
+export const mergeFrames = async (assets: VideoAsset[], config: VideoConfig) => {
+    const ffmpegCommand = ffmpeg();
+
     await new Promise<void>((resolve, reject) => {
-        ffmpeg()
-            // Tell FFmpeg to stitch all images together in the provided directory
-            .input(framesFilepath)
-            .inputOptions([
-                // Set input frame rate
-                `-framerate ${frameRate}`,
-            ])
+        assets.forEach((x) => {
+            const asset = x(config);
+            if (asset.options) {
+                return ffmpegCommand.input(asset.path).inputOptions(asset.options);
+            }
 
-            // Add the soundtrack
-            .input(soundtrackFilePath)
-            .audioFilters([
-                // Fade out the volume 2 seconds before the end
-                `afade=out:st=${duration - 2}:d=2`,
-            ])
+            ffmpegCommand.input(asset.path);
+        });
 
+        ffmpegCommand
             .videoCodec("libx264")
             .outputOptions([
                 // YUV color space with 4:2:0 chroma subsampling for maximum compatibility with
@@ -33,12 +26,12 @@ export const mergeFrames = async (
             // Set the output duration. It is required because FFmpeg would otherwise
             // automatically set the duration to the longest input, and the soundtrack might
             // be longer than the desired video length
-            .duration(duration)
+            .duration(config.duration)
             // Set output frame rate
-            .fps(frameRate)
+            .fps(config.frameRate)
 
             // Resolve or reject (throw an error) the Promise once FFmpeg completes
-            .saveToFile(outputFilepath)
+            .saveToFile(config.outputFilePath)
             .on("end", () => resolve())
             .on("error", (error) => reject(new Error(error)));
     });

@@ -7,6 +7,8 @@ import { getAssetsPath } from "../../core/utils/getAssetsPath";
 import { VideoAssetDictionary, VideoConfig } from "../controllers/v1/videoController";
 import { filterAssetsType } from "../utils/filterAssetsType";
 import { getVideoFrameReader } from "../utils/getVideoFrameReader";
+import { mapReadersToAssets } from "../utils/mappers/mapReadersToAssets";
+import { mapVideoConfigToSceneConfig } from "../utils/mappers/mapVideoConfigToSceneConfig";
 import { mergeFrames } from "../utils/mergeFrames";
 import { SceneService } from "./sceneService";
 
@@ -24,6 +26,11 @@ export type VideoOptions = {
     size: VideoSize;
 };
 
+export type VideoReader = {
+    slug: string;
+    callback: () => Promise<Image>;
+};
+
 export class VideoService {
     inVideoAssets: VideoAssetDictionary;
 
@@ -37,7 +44,7 @@ export class VideoService {
 
     sceneService: SceneService;
 
-    videosReaders?: (() => Promise<Image>)[];
+    videosReaders?: VideoReader[];
 
     constructor(config: VideoConfig, assets: VideoAssetDictionary) {
         this.finalAssets = filterAssetsType(assets, config, "final-render");
@@ -59,29 +66,21 @@ export class VideoService {
 
         // Render each frame
         for (let i = 0; i < this.config.frameCount; i++) {
-            const time = i / this.config.frameRate;
+            const currentTime = i / this.config.frameRate;
 
             // eslint-disable-next-line no-console
-            console.log(`Rendering frame ${i} at ${Math.round(time * 10) / 10} seconds...`);
+            console.log(`Rendering frame ${i} at ${Math.round(currentTime * 10) / 10} seconds...`);
 
             // Clear the canvas with a white background color. This is required as we are
             // reusing the canvas with every frame
             this.canvasContext.fillStyle = "#ffffff";
             this.canvasContext.fillRect(0, 0, this.canvas.width, this.canvas.height);
 
-            // Grab a frame from our input videos
-            const image1 = await this.videosReaders?.[0]();
-            const image2 = await this.videosReaders?.[1]();
-            const image3 = await this.videosReaders?.[2]();
+            // Extract all the assets from their according readers
+            const assets = await mapReadersToAssets(this.videosReaders);
+            const scenesConfig = mapVideoConfigToSceneConfig(this.config, currentTime);
 
-            if (!image1 || !image2 || !image3) {
-                break;
-            }
-
-            this.sceneService.renderScenes(
-                { image1, image2, image3, logo },
-                { width: this.config.size.width, height: this.config.size.height, time }
-            );
+            this.sceneService.renderScenes({ ...assets, logo }, scenesConfig);
 
             // Store the image in the directory where it can be found by FFmpeg
             const output = this.canvas.toBuffer("image/png");
@@ -109,7 +108,7 @@ export class VideoService {
                 this.config.frameRate
             );
 
-            this.videosReaders.push(getVideoFrame);
+            this.videosReaders.push({ slug: asset.slug, callback: getVideoFrame });
         }
     }
 

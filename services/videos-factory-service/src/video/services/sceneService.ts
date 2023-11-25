@@ -4,9 +4,9 @@ import { renderOutro } from "../compositions/renderOutro";
 import { renderThreePictures } from "../compositions/renderThreePictures";
 import { interpolateKeyframes } from "../utils/interpolateKeyFrames";
 
-export type Scene = (assets: SceneAssets, config: SceneConfig) => Scene[] | Scene | void;
+export type Scene = (assets: SceneAssetsDictionary, config: SceneConfig) => Scene[] | Scene | void;
 
-export type SceneAssets = {
+export type SceneAssetsDictionary = {
     image1: Image;
     image2: Image;
     image3: Image;
@@ -30,7 +30,7 @@ export class SceneService {
         this.scenes = this.initScenes(context);
     }
 
-    renderScenes(assets: SceneAssets, config: SceneConfig) {
+    renderScenes(assets: SceneAssetsDictionary, config: SceneConfig) {
         const callScenesRecursively = (scenes: Scene[]) => {
             scenes.forEach((scene) => {
                 const result = scene(assets, config);
@@ -45,7 +45,10 @@ export class SceneService {
     }
 
     private initScenes(context: CanvasRenderingContext2D) {
-        const mainScene = (mainSceneAssets: SceneAssets, mainSceneConfig: SceneConfig) => {
+        const mainScene = (
+            mainSceneAssets: SceneAssetsDictionary,
+            mainSceneConfig: SceneConfig
+        ) => {
             const slideProgress = interpolateKeyframes(
                 [
                     { time: 6.59, value: 0 },
@@ -54,7 +57,7 @@ export class SceneService {
                 mainSceneConfig.time
             );
 
-            const scene1 = (assets: SceneAssets, config: SceneConfig) => {
+            const scene1 = (assets: SceneAssetsDictionary, config: SceneConfig) => {
                 context.save();
                 context.translate(0.25 * config.width * -slideProgress, 0);
                 context.globalAlpha = 1 - slideProgress;
@@ -73,7 +76,7 @@ export class SceneService {
                 context.restore();
             };
 
-            const scene2 = (assets: SceneAssets, config: SceneConfig) => {
+            const scene2 = (assets: SceneAssetsDictionary, config: SceneConfig) => {
                 context.save();
                 context.translate(0.25 * config.width * (1 - slideProgress), 0);
                 context.globalAlpha = slideProgress;

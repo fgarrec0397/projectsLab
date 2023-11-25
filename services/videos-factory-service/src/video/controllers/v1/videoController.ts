@@ -24,6 +24,7 @@ export type VideoAssetDTO = PartialBy<VideoAsset, "id">;
 
 export type VideoAsset = {
     id: string;
+    slug: string;
     name: string;
     type: "in-video" | "final-render";
     path: string;
@@ -44,22 +45,26 @@ class VideoController {
 
         const videoAssetsDTO: VideoAssetCallback[] = [
             () => ({
-                name: "image 1",
+                slug: "image1",
+                name: "Image 1",
                 type: "in-video",
                 path: getAssetsPath("pexels-4782135.mp4"),
             }),
             () => ({
-                name: "image 2",
+                slug: "image2",
+                name: "Image 2",
                 type: "in-video",
                 path: getAssetsPath("pexels-3576378.mp4"),
             }),
             () => ({
-                name: "image 3",
+                slug: "image3",
+                name: "Image 3",
                 type: "in-video",
                 path: getAssetsPath("pexels-2829177.mp4"),
             }),
             (config) => ({
-                name: "final frames",
+                slug: "finalFrames",
+                name: "Final frames",
                 type: "final-render",
                 path: getAssetsPath("tmp/output/frame-%04d.png"),
                 options: [
@@ -68,7 +73,8 @@ class VideoController {
                 ],
             }),
             (config) => ({
-                name: "soundtrack",
+                slug: "soundtrack",
+                name: "Soundtrack",
                 type: "final-render",
                 path: getAssetsPath("catch-up-loop-119712.mp3"),
                 audioFilters: [

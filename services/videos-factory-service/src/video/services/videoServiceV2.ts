@@ -57,9 +57,6 @@ export class VideoService {
         await this.initRenderVideo();
         const logo = await loadImage(getAssetsPath("logo.svg"));
 
-        console.log(this.videosReaders, "this.videosReaders");
-        console.log(this.videosReaders?.[0], "this.videosReaders[0]");
-
         // Render each frame
         for (let i = 0; i < this.config.frameCount; i++) {
             const time = i / this.config.frameRate;
@@ -114,40 +111,6 @@ export class VideoService {
 
             this.videosReaders.push(getVideoFrame);
         }
-        // this.inVideoAssets.forEach(async (x, index) => {
-        //     const asset = x(this.config);
-
-        //     console.log(`Extracting frames from ${asset.name}...`);
-
-        //     const getVideoFrame = await getVideoFrameReader(
-        //         asset.path,
-        //         `tmp/${asset.name}-${index}`,
-        //         this.config.frameRate
-        //     );
-
-        //     this.videosReaders?.push(getVideoFrame);
-        // });
-        // const getVideo1Frame = await getVideoFrameReader(
-        //     getAssetsPath("pexels-4782135.mp4"),
-        //     getAssetsPath("tmp/video-1"),
-        //     this.config.frameRate
-        // );
-
-        // console.log("Extracting frames from video 2...");
-        // const getVideo2Frame = await getVideoFrameReader(
-        //     getAssetsPath("pexels-3576378.mp4"),
-        //     getAssetsPath("tmp/video-2"),
-        //     this.config.frameRate
-        // );
-
-        // console.log("Extracting frames from video 3...");
-        // const getVideo3Frame = await getVideoFrameReader(
-        //     getAssetsPath("pexels-2829177.mp4"),
-        //     getAssetsPath("tmp/video-3"),
-        //     this.config.frameRate
-        // );
-
-        // this.videosReaders = [getVideo1Frame, getVideo2Frame, getVideo3Frame];
     }
 
     private async finishRenderVideo() {

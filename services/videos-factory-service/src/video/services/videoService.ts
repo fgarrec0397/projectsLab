@@ -4,7 +4,7 @@ import { setFfmpegPath } from "fluent-ffmpeg";
 import fs from "fs";
 
 import { getAssetsPath } from "../../core/utils/getAssetsPath";
-import { VideoAsset, VideoConfig } from "../controllers/v1/videoController";
+import { VideoAssetDictionary, VideoConfig } from "../controllers/v1/videoController";
 import { filterAssetsType } from "../utils/filterAssetsType";
 import { getVideoFrameReader } from "../utils/getVideoFrameReader";
 import { mergeFrames } from "../utils/mergeFrames";
@@ -25,9 +25,9 @@ export type VideoOptions = {
 };
 
 export class VideoService {
-    inVideoAssets: VideoAsset[];
+    inVideoAssets: VideoAssetDictionary;
 
-    finalAssets: VideoAsset[];
+    finalAssets: VideoAssetDictionary;
 
     canvas: Canvas;
 
@@ -39,7 +39,7 @@ export class VideoService {
 
     videosReaders?: (() => Promise<Image>)[];
 
-    constructor(config: VideoConfig, assets: VideoAsset[]) {
+    constructor(config: VideoConfig, assets: VideoAssetDictionary) {
         this.finalAssets = filterAssetsType(assets, config, "final-render");
         this.inVideoAssets = filterAssetsType(assets, config, "in-video");
         this.config = config;
@@ -98,14 +98,14 @@ export class VideoService {
     private async initRenderVideo() {
         this.videosReaders = [];
 
-        for (const [index, assetFunc] of this.inVideoAssets.entries()) {
-            const asset = assetFunc(this.config);
+        for (const key of Object.keys(this.inVideoAssets)) {
+            const asset = this.inVideoAssets[key](this.config);
 
             console.log(`Extracting frames from ${asset.name}...`);
 
             const getVideoFrame = await getVideoFrameReader(
                 asset.path,
-                getAssetsPath(`tmp/${asset.name}-${index}`),
+                getAssetsPath(`tmp/${asset.name}-${key}`),
                 this.config.frameRate
             );
 

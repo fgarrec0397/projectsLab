@@ -1,7 +1,9 @@
+import { Dictionary, PartialBy } from "@projectslab/helpers";
 import { Request, Response } from "express";
 
 import { getAssetsPath } from "../../../core/utils/getAssetsPath";
-import { VideoService } from "../../services/videoServiceV2";
+import { VideoService } from "../../services/videoService";
+import { videosAssetsMapper } from "../../utils/mappers/videosAssetsMapper";
 
 export type VideoConfig = {
     duration: number;
@@ -14,7 +16,14 @@ export type VideoConfig = {
     };
 };
 
-export type VideoAsset = (config: VideoConfig) => {
+export type VideoAssetDictionary = Dictionary<VideoAssetCallback>;
+
+export type VideoAssetCallback = (config: VideoConfig) => VideoAssetDTO;
+
+export type VideoAssetDTO = PartialBy<VideoAsset, "id">;
+
+export type VideoAsset = {
+    id: string;
     name: string;
     type: "in-video" | "final-render";
     path: string;
@@ -33,7 +42,7 @@ class VideoController {
             size: { width: 1280, height: 720 },
         };
 
-        const videoAssets: VideoAsset[] = [
+        const videoAssetsDTO: VideoAssetCallback[] = [
             () => ({
                 name: "image 1",
                 type: "in-video",
@@ -69,7 +78,9 @@ class VideoController {
             }),
         ];
 
-        const video = new VideoService(videoConfig, videoAssets);
+        const videosAssets = videosAssetsMapper(videoAssetsDTO, videoConfig);
+
+        const video = new VideoService(videoConfig, videosAssets);
 
         await video.renderVideo();
 

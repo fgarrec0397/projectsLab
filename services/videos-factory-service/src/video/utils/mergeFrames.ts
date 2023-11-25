@@ -1,13 +1,13 @@
 import ffmpeg from "fluent-ffmpeg";
 
-import { VideoAsset, VideoConfig } from "../controllers/v1/videoController";
+import { VideoAssetDictionary, VideoConfig } from "../controllers/v1/videoController";
 
-export const mergeFrames = async (assets: VideoAsset[], config: VideoConfig) => {
+export const mergeFrames = async (assets: VideoAssetDictionary, config: VideoConfig) => {
     const ffmpegCommand = ffmpeg();
 
     await new Promise<void>((resolve, reject) => {
-        assets.forEach((x) => {
-            const asset = x(config);
+        Object.keys(assets).forEach((x) => {
+            const asset = assets[x](config);
 
             if (!asset.options || !asset.audioFilters) {
                 ffmpegCommand.input(asset.path);

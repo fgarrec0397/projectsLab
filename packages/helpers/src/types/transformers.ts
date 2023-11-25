@@ -19,7 +19,6 @@ export type DeepNullable<T> = {
 };
 
 /**
- * Remove specific property from a type object or interface
+ * Set a single key or a set of keys from type Type to optional
  */
-export type SetOptionalPropertyFrom<Type, Key extends keyof Type> = Omit<Type, Key> &
-    Partial<Pick<Type, Key>>;
+export type PartialBy<Type, Key extends keyof Type> = Omit<Type, Key> & Partial<Pick<Type, Key>>;

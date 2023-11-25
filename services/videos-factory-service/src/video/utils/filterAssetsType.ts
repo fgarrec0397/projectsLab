@@ -1,12 +1,23 @@
-import { VideoAsset, VideoConfig } from "../controllers/v1/videoController";
+import { VideoAssetDictionary, VideoConfig } from "../controllers/v1/videoController";
 
 export const filterAssetsType = (
-    assets: VideoAsset[],
+    assets: VideoAssetDictionary,
     config: VideoConfig,
     type: "in-video" | "final-render"
-) =>
-    assets.filter((x) => {
-        const asset = x(config);
+) => {
+    const filteredAssets: VideoAssetDictionary = {};
 
-        return asset.type === type;
+    Object.keys(assets).forEach((x) => {
+        const asset = assets[x](config);
+
+        if (!asset.id) {
+            return;
+        }
+
+        if (asset.type === type) {
+            filteredAssets[asset.id] = () => asset;
+        }
     });
+
+    return filteredAssets;
+};

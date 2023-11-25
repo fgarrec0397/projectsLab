@@ -108,7 +108,7 @@ export class VideoService {
 
             const getVideoFrame = await getVideoFrameReader(
                 asset.path,
-                `tmp/${asset.name}-${index}`,
+                getAssetsPath(`tmp/${asset.name}-${index}`),
                 this.config.frameRate
             );
 

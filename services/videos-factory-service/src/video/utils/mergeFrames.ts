@@ -8,11 +8,20 @@ export const mergeFrames = async (assets: VideoAsset[], config: VideoConfig) => 
     await new Promise<void>((resolve, reject) => {
         assets.forEach((x) => {
             const asset = x(config);
-            if (asset.options) {
-                return ffmpegCommand.input(asset.path).inputOptions(asset.options);
+
+            console.log(asset, "asset");
+
+            if (!asset.options || !asset.audioFilters) {
+                ffmpegCommand.input(asset.path);
             }
 
-            ffmpegCommand.input(asset.path);
+            if (asset.options) {
+                ffmpegCommand.inputOptions(asset.options);
+            }
+
+            if (asset.audioFilters) {
+                ffmpegCommand.audioFilters(asset.audioFilters);
+            }
         });
 
         ffmpegCommand

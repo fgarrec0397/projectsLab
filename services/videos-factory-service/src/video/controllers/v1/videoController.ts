@@ -19,14 +19,16 @@ export type VideoAsset = (config: VideoConfig) => {
     type: "in-video" | "final-render";
     path: string;
     options?: string[];
+    audioFilters?: string[];
 };
 
 class VideoController {
     async get(request: Request, result: Response) {
+        const duration = 9;
         const videoConfig: VideoConfig = {
-            duration: 9,
+            duration,
             frameRate: 60,
-            frameCount: Math.floor(9 * 60),
+            frameCount: Math.floor(duration * 60),
             outputFilePath: getAssetsPath("out/video.mp4"),
             size: { width: 1280, height: 720 },
         };
@@ -60,7 +62,7 @@ class VideoController {
                 name: "soundtrack",
                 type: "final-render",
                 path: getAssetsPath("catch-up-loop-119712.mp3"),
-                options: [
+                audioFilters: [
                     // Set input frame rate
                     `afade=out:st=${config.duration - 2}:d=2`,
                 ],

@@ -5,13 +5,14 @@ import fs from "fs";
 
 import { getAssetsPath } from "../../core/utils/getAssetsPath";
 import { VideoAssetDictionary, VideoConfig } from "../controllers/v1/videoController";
-import { filterAssets } from "../utils/filterAssets";
+import { templates } from "../templates/templates";
+import { filterAssets } from "../utils/filters/filterAssets";
 import { getVideoFrameReader } from "../utils/getVideoFrameReader";
 import { mapAssetsToImages } from "../utils/mappers/mapAssetsToImages";
 import { mapReadersToAssets } from "../utils/mappers/mapReadersToAssets";
 import { mapVideoConfigToSceneConfig } from "../utils/mappers/mapVideoConfigToSceneConfig";
 import { mergeFrames } from "../utils/mergeFrames";
-import { SceneService } from "./sceneService";
+import { TemplateService } from "./templateService";
 
 // Tell fluent-ffmpeg where it can find FFmpeg
 setFfmpegPath(ffmpegStatic || "");
@@ -45,7 +46,7 @@ export class VideoService {
 
     config: VideoConfig;
 
-    sceneService: SceneService;
+    templateService: TemplateService;
 
     videosReaders?: VideoReader[];
 
@@ -59,7 +60,7 @@ export class VideoService {
         this.canvas = new Canvas(config.size.width, config.size.height);
         this.canvasContext = this.canvas.getContext("2d");
 
-        this.sceneService = new SceneService(this.canvasContext);
+        this.templateService = new TemplateService(templates.tutorialTemplate(this.canvasContext));
 
         this.cleanUpDirectories();
         this.registerFonts();
@@ -85,7 +86,7 @@ export class VideoService {
             const assets = await mapReadersToAssets(this.videosReaders);
             const scenesConfig = mapVideoConfigToSceneConfig(this.config, currentTime);
 
-            this.sceneService.renderScenes({ ...assets, ...images }, scenesConfig);
+            this.templateService.renderTemplates({ ...assets, ...images }, scenesConfig);
 
             // Store the image in the directory where it can be found by FFmpeg
             const output = this.canvas.toBuffer("image/png");

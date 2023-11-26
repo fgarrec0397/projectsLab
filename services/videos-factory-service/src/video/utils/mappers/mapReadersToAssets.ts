@@ -1,4 +1,4 @@
-import { SceneAssetsDictionary } from "../../services/sceneService";
+import { TemplateAssetsDictionary } from "../../services/templateService";
 import { VideoReader } from "../../services/videoService";
 
 /**
@@ -6,17 +6,17 @@ import { VideoReader } from "../../services/videoService";
  * of scenes assets
  */
 export const mapReadersToAssets = async (videoReaders: VideoReader[] | undefined) => {
-    const assets: Partial<SceneAssetsDictionary> = {};
+    const assets: Partial<TemplateAssetsDictionary> = {};
 
     if (!videoReaders) {
-        return assets as SceneAssetsDictionary;
+        return assets as TemplateAssetsDictionary;
     }
 
     for (const reader of videoReaders) {
         const asset = await reader.callback();
 
-        assets[reader.slug as keyof SceneAssetsDictionary] = asset;
+        assets[reader.slug as keyof TemplateAssetsDictionary] = asset;
     }
 
-    return assets as SceneAssetsDictionary;
+    return assets as TemplateAssetsDictionary;
 };

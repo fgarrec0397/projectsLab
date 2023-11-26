@@ -1,6 +1,6 @@
 import { CanvasRenderingContext2D, Image } from "canvas";
 
-import { drawImageCoverFit } from "../utils/drawImageCoverFit";
+import { drawImageCoverFit } from "../../../utils/drawImageCoverFit";
 
 export function renderPolaroidPicture(
     context: CanvasRenderingContext2D,

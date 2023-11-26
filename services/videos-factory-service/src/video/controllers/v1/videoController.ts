@@ -36,10 +36,11 @@ export type VideoAsset = {
 class VideoController {
     async get(request: Request, result: Response) {
         const duration = 9;
+        const frameRate = 60;
         const videoConfig: VideoConfig = {
             duration,
-            frameRate: 60,
-            frameCount: Math.floor(duration * 60),
+            frameRate,
+            frameCount: Math.floor(duration * frameRate),
             outputFilePath: getAssetsPath("out/video.mp4"),
             size: { width: 1280, height: 720 },
         };

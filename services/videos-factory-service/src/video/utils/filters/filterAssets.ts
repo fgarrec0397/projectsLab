@@ -1,6 +1,10 @@
 import { isMatch } from "@projectslab/helpers";
 
-import { VideoAsset, VideoAssetDictionary, VideoConfig } from "../controllers/v1/videoController";
+import {
+    VideoAsset,
+    VideoAssetDictionary,
+    VideoConfig,
+} from "../../controllers/v1/videoController";
 
 /**
  *

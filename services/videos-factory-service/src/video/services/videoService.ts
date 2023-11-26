@@ -1,12 +1,13 @@
-import { Canvas, CanvasRenderingContext2D, Image, loadImage, registerFont } from "canvas";
+import { Canvas, CanvasRenderingContext2D, Image, registerFont } from "canvas";
 import ffmpegStatic from "ffmpeg-static";
 import { setFfmpegPath } from "fluent-ffmpeg";
 import fs from "fs";
 
 import { getAssetsPath } from "../../core/utils/getAssetsPath";
 import { VideoAssetDictionary, VideoConfig } from "../controllers/v1/videoController";
-import { filterAssetsType } from "../utils/filterAssetsType";
+import { filterAssets } from "../utils/filterAssets";
 import { getVideoFrameReader } from "../utils/getVideoFrameReader";
+import { mapAssetsToImages } from "../utils/mappers/mapAssetsToImages";
 import { mapReadersToAssets } from "../utils/mappers/mapReadersToAssets";
 import { mapVideoConfigToSceneConfig } from "../utils/mappers/mapVideoConfigToSceneConfig";
 import { mergeFrames } from "../utils/mergeFrames";
@@ -32,9 +33,11 @@ export type VideoReader = {
 };
 
 export class VideoService {
-    inVideoAssets: VideoAssetDictionary;
-
     finalAssets: VideoAssetDictionary;
+
+    videosAssets: VideoAssetDictionary;
+
+    imagesAssets: VideoAssetDictionary;
 
     canvas: Canvas;
 
@@ -47,8 +50,10 @@ export class VideoService {
     videosReaders?: VideoReader[];
 
     constructor(config: VideoConfig, assets: VideoAssetDictionary) {
-        this.finalAssets = filterAssetsType(assets, config, "final-render");
-        this.inVideoAssets = filterAssetsType(assets, config, "in-video");
+        this.finalAssets = filterAssets(assets, config, { lengthType: "final-render" });
+        this.videosAssets = filterAssets(assets, config, { lengthType: "in-video", type: "video" });
+        this.imagesAssets = filterAssets(assets, config, { lengthType: "in-video", type: "image" });
+
         this.config = config;
 
         this.canvas = new Canvas(config.size.width, config.size.height);
@@ -62,7 +67,7 @@ export class VideoService {
 
     async renderVideo() {
         await this.initRenderVideo();
-        const logo = await loadImage(getAssetsPath("logo.svg"));
+        const images = await mapAssetsToImages(this.config, this.imagesAssets);
 
         // Render each frame
         for (let i = 0; i < this.config.frameCount; i++) {
@@ -80,7 +85,7 @@ export class VideoService {
             const assets = await mapReadersToAssets(this.videosReaders);
             const scenesConfig = mapVideoConfigToSceneConfig(this.config, currentTime);
 
-            this.sceneService.renderScenes({ ...assets, logo }, scenesConfig);
+            this.sceneService.renderScenes({ ...assets, ...images }, scenesConfig);
 
             // Store the image in the directory where it can be found by FFmpeg
             const output = this.canvas.toBuffer("image/png");
@@ -97,8 +102,8 @@ export class VideoService {
     private async initRenderVideo() {
         this.videosReaders = [];
 
-        for (const key of Object.keys(this.inVideoAssets)) {
-            const asset = this.inVideoAssets[key](this.config);
+        for (const key of Object.keys(this.videosAssets)) {
+            const asset = this.videosAssets[key](this.config);
 
             console.log(`Extracting frames from ${asset.name}...`);
 

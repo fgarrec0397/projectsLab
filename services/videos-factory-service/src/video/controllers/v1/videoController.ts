@@ -26,7 +26,8 @@ export type VideoAsset = {
     id: string;
     slug: string;
     name: string;
-    type: "in-video" | "final-render";
+    type: "image" | "audio" | "video";
+    lengthType: "in-video" | "final-render";
     path: string;
     options?: string[];
     audioFilters?: string[];
@@ -47,25 +48,36 @@ class VideoController {
             () => ({
                 slug: "image1",
                 name: "Image 1",
-                type: "in-video",
+                type: "video",
+                lengthType: "in-video",
                 path: getAssetsPath("pexels-4782135.mp4"),
             }),
             () => ({
                 slug: "image2",
                 name: "Image 2",
-                type: "in-video",
+                type: "video",
+                lengthType: "in-video",
                 path: getAssetsPath("pexels-3576378.mp4"),
             }),
             () => ({
                 slug: "image3",
                 name: "Image 3",
-                type: "in-video",
+                type: "video",
+                lengthType: "in-video",
                 path: getAssetsPath("pexels-2829177.mp4"),
+            }),
+            () => ({
+                slug: "logo",
+                name: "Logo",
+                type: "image",
+                lengthType: "in-video",
+                path: getAssetsPath("logo.svg"),
             }),
             (config) => ({
                 slug: "finalFrames",
                 name: "Final frames",
-                type: "final-render",
+                type: "video",
+                lengthType: "final-render",
                 path: getAssetsPath("tmp/output/frame-%04d.png"),
                 options: [
                     // Set input frame rate
@@ -75,7 +87,8 @@ class VideoController {
             (config) => ({
                 slug: "soundtrack",
                 name: "Soundtrack",
-                type: "final-render",
+                type: "video",
+                lengthType: "final-render",
                 path: getAssetsPath("catch-up-loop-119712.mp3"),
                 audioFilters: [
                     // Set input frame rate

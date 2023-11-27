@@ -100,7 +100,7 @@ class VideoController {
 
         const videosAssets = videosAssetsMapper(videoAssetsDTO, videoConfig);
 
-        const video = new VideoService(videoConfig, videosAssets);
+        const video = new VideoService("tutorialTemplate", videoConfig, videosAssets);
 
         await video.renderVideo();
 

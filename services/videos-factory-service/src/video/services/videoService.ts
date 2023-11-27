@@ -50,7 +50,11 @@ export class VideoService {
 
     videosReaders?: VideoReader[];
 
-    constructor(config: VideoConfig, assets: VideoAssetDictionary) {
+    constructor(
+        templateKey: keyof typeof templates,
+        config: VideoConfig,
+        assets: VideoAssetDictionary
+    ) {
         this.finalAssets = filterAssets(assets, config, { lengthType: "final-render" });
         this.videosAssets = filterAssets(assets, config, { lengthType: "in-video", type: "video" });
         this.imagesAssets = filterAssets(assets, config, { lengthType: "in-video", type: "image" });
@@ -60,7 +64,7 @@ export class VideoService {
         this.canvas = new Canvas(config.size.width, config.size.height);
         this.canvasContext = this.canvas.getContext("2d");
 
-        this.templateService = new TemplateService(templates.tutorialTemplate(this.canvasContext));
+        this.templateService = new TemplateService(templates[templateKey](this.canvasContext));
 
         this.cleanUpDirectories();
         this.registerFonts();

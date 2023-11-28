@@ -1,10 +1,16 @@
 import { Dictionary } from "@projectslab/helpers";
 import { CanvasRenderingContext2D } from "canvas";
 
+import { VideoAssetCallback, VideoConfig } from "../controllers/v1/videoController";
 import { TemplateScene } from "../services/templateService";
 import { tutorialTemplate } from "./tutorialTemplate/tutorialTemplate";
 
-type TemplatesDictionary = Dictionary<(context: CanvasRenderingContext2D) => TemplateScene[]>;
+export type TemplatesDictionary = Dictionary<TemplateDictionaryItem>;
+export type TemplateDictionaryItem = {
+    config: VideoConfig;
+    assets: VideoAssetCallback[];
+    scenes: (context: CanvasRenderingContext2D) => TemplateScene[];
+};
 
 export const templates: TemplatesDictionary = {
     tutorialTemplate,

@@ -1,9 +1,8 @@
 import { Dictionary, PartialBy } from "@projectslab/helpers";
 import { Request, Response } from "express";
 
-import { getAssetsPath } from "../../../core/utils/getAssetsPath";
 import { VideoService } from "../../services/videoService";
-import { videosAssetsMapper } from "../../utils/mappers/videosAssetsMapper";
+import { templates } from "../../templates/templates";
 
 export type VideoConfig = {
     duration: number;
@@ -35,72 +34,11 @@ export type VideoAsset = {
 
 class VideoController {
     async get(request: Request, result: Response) {
-        const duration = 9;
-        const frameRate = 60;
-        const videoConfig: VideoConfig = {
-            duration,
-            frameRate,
-            frameCount: Math.floor(duration * frameRate),
-            outputFilePath: getAssetsPath("out/video.mp4"),
-            size: { width: 1280, height: 720 },
-        };
+        const templateKey = "tutorialTemplate";
 
-        const videoAssetsDTO: VideoAssetCallback[] = [
-            () => ({
-                slug: "image1",
-                name: "Image 1",
-                type: "video",
-                lengthType: "in-video",
-                path: getAssetsPath("pexels-4782135.mp4"),
-            }),
-            () => ({
-                slug: "image2",
-                name: "Image 2",
-                type: "video",
-                lengthType: "in-video",
-                path: getAssetsPath("pexels-3576378.mp4"),
-            }),
-            () => ({
-                slug: "image3",
-                name: "Image 3",
-                type: "video",
-                lengthType: "in-video",
-                path: getAssetsPath("pexels-2829177.mp4"),
-            }),
-            () => ({
-                slug: "logo",
-                name: "Logo",
-                type: "image",
-                lengthType: "in-video",
-                path: getAssetsPath("logo.svg"),
-            }),
-            (config) => ({
-                slug: "finalFrames",
-                name: "Final frames",
-                type: "video",
-                lengthType: "final-render",
-                path: getAssetsPath("tmp/output/frame-%04d.png"),
-                options: [
-                    // Set input frame rate
-                    `-framerate ${config.frameRate}`,
-                ],
-            }),
-            (config) => ({
-                slug: "soundtrack",
-                name: "Soundtrack",
-                type: "video",
-                lengthType: "final-render",
-                path: getAssetsPath("catch-up-loop-119712.mp3"),
-                audioFilters: [
-                    // Set input frame rate
-                    `afade=out:st=${config.duration - 2}:d=2`,
-                ],
-            }),
-        ];
+        const template = templates[templateKey];
 
-        const videosAssets = videosAssetsMapper(videoAssetsDTO, videoConfig);
-
-        const video = new VideoService("tutorialTemplate", videoConfig, videosAssets);
+        const video = new VideoService(template);
 
         await video.renderVideo();
 

@@ -2,16 +2,6 @@ import { CanvasRenderingContext2D } from "canvas";
 
 import { interpolateKeyframes } from "../../../utils/interpolateKeyFrames";
 
-/**
- *
- * @param context The canvas context
- * @param text
- * @param font
- * @param x
- * @param y
- * @param time
- * @returns
- */
 export const renderAnimatedText = (
     context: CanvasRenderingContext2D,
     text: string,

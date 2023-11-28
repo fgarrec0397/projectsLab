@@ -1,27 +1,75 @@
 import { CanvasRenderingContext2D } from "canvas";
 
+import { getAssetsPath } from "../../../core/utils/getAssetsPath";
 import {
     TemplateAssetsDictionary,
     TemplateConfig,
     TemplateScene,
 } from "../../services/templateService";
-import { interpolateKeyframes } from "../../utils/interpolateKeyFrames";
+import { TemplateDictionaryItem } from "../templates";
 import { renderOutro } from "./compositions/renderOutro";
 import { renderThreePictures } from "./compositions/renderThreePictures";
 
-export const tutorialTemplate = (context: CanvasRenderingContext2D): TemplateScene[] => {
-    const mainScene = (
-        mainSceneAssets: TemplateAssetsDictionary,
-        mainSceneConfig: TemplateConfig
-    ) => {
-        const slideProgress = interpolateKeyframes(
-            [
-                { time: 6.59, value: 0 },
-                { time: 7.63, value: 1, easing: "cubic-in-out" },
-            ],
-            mainSceneConfig.time
-        );
+const seconds = 13;
+const minutes = 1;
 
+const duration = minutes * 60 + seconds;
+const frameRate = 60;
+
+export const funFactsTemplate: TemplateDictionaryItem = {
+    config: {
+        duration,
+        frameRate,
+        frameCount: Math.floor(duration * frameRate),
+        outputFilePath: getAssetsPath("out/video.mp4"),
+        size: { width: 1080, height: 1920 },
+    },
+    assets: [
+        () => ({
+            slug: "video1",
+            name: "Video 1",
+            type: "video",
+            lengthType: "in-video",
+            path: getAssetsPath("pexels-4782135.mp4"),
+        }),
+        () => ({
+            slug: "video2",
+            name: "Video 2",
+            type: "video",
+            lengthType: "in-video",
+            path: getAssetsPath("pexels-3576378.mp4"),
+        }),
+        () => ({
+            slug: "video3",
+            name: "Video 3",
+            type: "video",
+            lengthType: "in-video",
+            path: getAssetsPath("pexels-2829177.mp4"),
+        }),
+        (config) => ({
+            slug: "finalFrames",
+            name: "Final frames",
+            type: "video",
+            lengthType: "final-render",
+            path: getAssetsPath("tmp/output/frame-%04d.png"),
+            options: [
+                // Set input frame rate
+                `-framerate ${config.frameRate}`,
+            ],
+        }),
+        (config) => ({
+            slug: "voiceover",
+            name: "Voiceover",
+            type: "audio",
+            lengthType: "final-render",
+            path: getAssetsPath("catch-up-loop-119712.mp3"),
+            audioFilters: [
+                // Set input frame rate
+                `afade=out:st=${config.duration - 2}:d=2`,
+            ],
+        }),
+    ],
+    scenes: (context: CanvasRenderingContext2D): TemplateScene[] => {
         const scene1 = (assets: TemplateAssetsDictionary, config: TemplateConfig) => {
             context.save();
             context.translate(0.25 * config.width * -slideProgress, 0);
@@ -53,7 +101,5 @@ export const tutorialTemplate = (context: CanvasRenderingContext2D): TemplateSce
         };
 
         return [scene1, scene2];
-    };
-
-    return [mainScene];
+    },
 };

@@ -54,7 +54,7 @@ export const tutorialTemplate: TemplateDictionaryItem = {
         (config) => ({
             slug: "finalFrames",
             name: "Final frames",
-            type: "video",
+            type: "audio",
             lengthType: "final-render",
             path: getAssetsPath("tmp/output/frame-%04d.png"),
             options: [

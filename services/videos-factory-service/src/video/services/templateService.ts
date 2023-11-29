@@ -1,18 +1,14 @@
+import { Dictionary } from "@projectslab/helpers";
 import { CanvasRenderingContext2D, Image } from "canvas";
 
-export type Template = (context: CanvasRenderingContext2D) => TemplateScene[];
+export type Template<TemplateAssets extends Dictionary<Image>> = (
+    context: CanvasRenderingContext2D
+) => TemplateScene<TemplateAssets>[];
 
-export type TemplateScene = (
-    assets: TemplateAssetsDictionary,
+export type TemplateScene<TemplateAssets extends Dictionary<Image> = any> = (
+    assets: TemplateAssets,
     config: TemplateConfig
-) => TemplateScene[] | TemplateScene | void;
-
-export type TemplateAssetsDictionary = {
-    image1: Image;
-    image2: Image;
-    image3: Image;
-    logo: Image;
-};
+) => TemplateScene<TemplateAssets>[] | TemplateScene<TemplateAssets> | void;
 
 export type TemplateConfig = {
     width: number;
@@ -20,15 +16,15 @@ export type TemplateConfig = {
     time: number;
 };
 
-export class TemplateService {
-    templateScenes: TemplateScene[];
+export class TemplateService<TemplateAssets extends Dictionary<Image> = any> {
+    templateScenes: TemplateScene<TemplateAssets>[];
 
-    constructor(templateScenes: TemplateScene[]) {
+    constructor(templateScenes: TemplateScene<TemplateAssets>[]) {
         this.templateScenes = templateScenes;
     }
 
-    renderTemplates(assets: TemplateAssetsDictionary, config: TemplateConfig) {
-        const callTemplatesRecursively = (templateScenes: TemplateScene[]) => {
+    renderTemplates(assets: TemplateAssets, config: TemplateConfig) {
+        const callTemplatesRecursively = (templateScenes: TemplateScene<TemplateAssets>[]) => {
             templateScenes.forEach((template) => {
                 const result = template(assets, config);
 

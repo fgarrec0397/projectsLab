@@ -1,11 +1,7 @@
-import { CanvasRenderingContext2D } from "canvas";
+import { CanvasRenderingContext2D, Image } from "canvas";
 
 import { getAssetsPath } from "../../../core/utils/getAssetsPath";
-import {
-    TemplateAssetsDictionary,
-    TemplateConfig,
-    TemplateScene,
-} from "../../services/templateService";
+import { TemplateConfig, TemplateScene } from "../../services/templateService";
 import { interpolateKeyframes } from "../../utils/interpolateKeyFrames";
 import { TemplateDictionaryItem } from "../templates";
 import { renderOutro } from "./compositions/renderOutro";
@@ -13,6 +9,13 @@ import { renderThreePictures } from "./compositions/renderThreePictures";
 
 const duration = 9;
 const frameRate = 60;
+
+export type TutorialAssets = {
+    image1: Image;
+    image2: Image;
+    image3: Image;
+    logo: Image;
+};
 
 export const tutorialTemplate: TemplateDictionaryItem = {
     config: {
@@ -74,11 +77,8 @@ export const tutorialTemplate: TemplateDictionaryItem = {
             ],
         }),
     ],
-    scenes: (context: CanvasRenderingContext2D): TemplateScene[] => {
-        const mainScene = (
-            mainSceneAssets: TemplateAssetsDictionary,
-            mainSceneConfig: TemplateConfig
-        ) => {
+    scenes: (context: CanvasRenderingContext2D): TemplateScene<TutorialAssets>[] => {
+        const mainScene = (mainSceneAssets: TutorialAssets, mainSceneConfig: TemplateConfig) => {
             const slideProgress = interpolateKeyframes(
                 [
                     { time: 6.59, value: 0 },
@@ -87,7 +87,7 @@ export const tutorialTemplate: TemplateDictionaryItem = {
                 mainSceneConfig.time
             );
 
-            const scene1 = (assets: TemplateAssetsDictionary, config: TemplateConfig) => {
+            const scene1 = (assets: TutorialAssets, config: TemplateConfig) => {
                 context.save();
                 context.translate(0.25 * config.width * -slideProgress, 0);
                 context.globalAlpha = 1 - slideProgress;
@@ -106,7 +106,7 @@ export const tutorialTemplate: TemplateDictionaryItem = {
                 context.restore();
             };
 
-            const scene2 = (assets: TemplateAssetsDictionary, config: TemplateConfig) => {
+            const scene2 = (assets: TutorialAssets, config: TemplateConfig) => {
                 context.save();
                 context.translate(0.25 * config.width * (1 - slideProgress), 0);
                 context.globalAlpha = slideProgress;

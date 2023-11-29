@@ -3,6 +3,7 @@ import { CanvasRenderingContext2D } from "canvas";
 
 import { VideoAssetCallback, VideoConfig } from "../controllers/v1/videoController";
 import { TemplateScene } from "../services/templateService";
+import { funFactsTemplate } from "./funFactsTemplate/funFactsTemplate";
 import { tutorialTemplate } from "./tutorialTemplate/tutorialTemplate";
 
 export type TemplatesDictionary = Dictionary<TemplateDictionaryItem>;
@@ -14,4 +15,5 @@ export type TemplateDictionaryItem = {
 
 export const templates: TemplatesDictionary = {
     tutorialTemplate,
+    funFactsTemplate,
 };

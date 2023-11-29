@@ -34,7 +34,7 @@ export type VideoAsset = {
 
 class VideoController {
     async get(request: Request, result: Response) {
-        const templateKey = "tutorialTemplate";
+        const templateKey = "funFactsTemplate";
 
         const template = templates[templateKey];
 

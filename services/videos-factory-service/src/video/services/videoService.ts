@@ -5,7 +5,7 @@ import fs from "fs";
 
 import { getAssetsPath } from "../../core/utils/getAssetsPath";
 import { VideoAssetDictionary, VideoConfig } from "../controllers/v1/videoController";
-import { TemplateDictionaryItem } from "../templates/templates";
+import { TemplateModule } from "../modules/TemplateModule";
 import { filterAssets } from "../utils/filters/filterAssets";
 import { getVideoFrameReader } from "../utils/getVideoFrameReader";
 import { mapAssetsToImages } from "../utils/mappers/mapAssetsToImages";
@@ -13,7 +13,6 @@ import { mapReadersToAssets } from "../utils/mappers/mapReadersToAssets";
 import { mapVideoConfigToSceneConfig } from "../utils/mappers/mapVideoConfigToSceneConfig";
 import { videosAssetsMapper } from "../utils/mappers/videosAssetsMapper";
 import { mergeFrames } from "../utils/mergeFrames";
-import { TemplateService } from "./templateService";
 
 // Tell fluent-ffmpeg where it can find FFmpeg
 setFfmpegPath(ffmpegStatic || "");
@@ -47,29 +46,32 @@ export class VideoService {
 
     config: VideoConfig;
 
-    templateService: TemplateService;
+    templateModule: TemplateModule;
 
     videosReaders?: VideoReader[];
 
-    constructor({ assets, config, scenes }: TemplateDictionaryItem) {
-        const videosAssets = videosAssetsMapper(assets, config);
+    constructor(templateModule: TemplateModule) {
+        this.templateModule = templateModule;
+        this.config = templateModule.template.config;
+        this.canvas = templateModule.canvas;
+        this.canvasContext = templateModule.canvasContext;
 
-        this.finalAssets = filterAssets(videosAssets, config, { lengthType: "final-render" });
-        this.videosAssets = filterAssets(videosAssets, config, {
+        const videosAssets = videosAssetsMapper(
+            templateModule.template.assets,
+            templateModule.template.config
+        );
+
+        this.finalAssets = filterAssets(videosAssets, this.config, {
+            lengthType: "final-render",
+        });
+        this.videosAssets = filterAssets(videosAssets, this.config, {
             lengthType: "in-video",
             type: "video",
         });
-        this.imagesAssets = filterAssets(videosAssets, config, {
+        this.imagesAssets = filterAssets(videosAssets, this.config, {
             lengthType: "in-video",
             type: "image",
         });
-
-        this.config = config;
-
-        this.canvas = new Canvas(config.size.width, config.size.height);
-        this.canvasContext = this.canvas.getContext("2d");
-
-        this.templateService = new TemplateService(scenes(this.canvasContext));
 
         this.cleanUpDirectories();
         this.registerFonts();
@@ -95,7 +97,7 @@ export class VideoService {
             const assets = await mapReadersToAssets(this.videosReaders);
             const scenesConfig = mapVideoConfigToSceneConfig(this.config, currentTime);
 
-            this.templateService.renderTemplates({ ...assets, ...images }, scenesConfig);
+            this.templateModule.renderTemplates({ ...assets, ...images }, scenesConfig);
 
             // Store the image in the directory where it can be found by FFmpeg
             const output = this.canvas.toBuffer("image/png");

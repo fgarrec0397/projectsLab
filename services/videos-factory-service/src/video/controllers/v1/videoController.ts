@@ -1,8 +1,8 @@
 import { Dictionary, PartialBy } from "@projectslab/helpers";
 import { Request, Response } from "express";
 
+import { TemplateModule } from "../../modules/TemplateModule";
 import { VideoService } from "../../services/videoService";
-import { templates } from "../../templates/templates";
 
 export type VideoConfig = {
     duration: number;
@@ -36,9 +36,9 @@ class VideoController {
     async get(request: Request, result: Response) {
         const templateKey = "funFactsTemplate";
 
-        const template = templates[templateKey];
+        const templateModule = new TemplateModule(templateKey);
 
-        const video = new VideoService(template);
+        const video = new VideoService(templateModule);
 
         await video.renderVideo();
 

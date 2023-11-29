@@ -1,5 +1,7 @@
 import { Dictionary } from "@projectslab/helpers";
-import { CanvasRenderingContext2D, Image } from "canvas";
+import { Canvas, CanvasRenderingContext2D, Image } from "canvas";
+
+import { TemplateDictionaryItem, templates, TemplatesDictionary } from "../templates/templates";
 
 export type Template<TemplateAssets extends Dictionary<Image>> = (
     context: CanvasRenderingContext2D
@@ -16,11 +18,17 @@ export type TemplateConfig = {
     time: number;
 };
 
-export class TemplateService<TemplateAssets extends Dictionary<Image> = any> {
-    templateScenes: TemplateScene<TemplateAssets>[];
+export class TemplateModule<TemplateAssets extends Dictionary<Image> = any> {
+    canvas: Canvas;
 
-    constructor(templateScenes: TemplateScene<TemplateAssets>[]) {
-        this.templateScenes = templateScenes;
+    canvasContext: CanvasRenderingContext2D;
+
+    template: TemplateDictionaryItem;
+
+    constructor(templateKey: keyof TemplatesDictionary) {
+        this.template = templates[templateKey];
+        this.canvas = new Canvas(this.template.config.size.width, this.template.config.size.height);
+        this.canvasContext = this.canvas.getContext("2d");
     }
 
     renderTemplates(assets: TemplateAssets, config: TemplateConfig) {
@@ -34,6 +42,6 @@ export class TemplateService<TemplateAssets extends Dictionary<Image> = any> {
             });
         };
 
-        callTemplatesRecursively(this.templateScenes);
+        callTemplatesRecursively(this.template.scenes(this.canvasContext));
     }
 }

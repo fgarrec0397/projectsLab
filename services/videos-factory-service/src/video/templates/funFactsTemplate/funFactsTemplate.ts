@@ -1,7 +1,7 @@
 import { CanvasRenderingContext2D, Image } from "canvas";
 
 import { getAssetsPath } from "../../../core/utils/getAssetsPath";
-import { TemplateConfig, TemplateScene } from "../../services/templateService";
+import { TemplateConfig, TemplateScene } from "../../modules/TemplateModule";
 import { cropVideo } from "../../utils/cropVideo";
 import { TemplateDictionaryItem } from "../templates";
 

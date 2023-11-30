@@ -17,7 +17,7 @@ const input = `Did you know that honey can last for thousands of years? Archaeol
 Did you know the Eiffel Tower grows in summer? It can get 15 cm taller because of the heat expanding the iron. Think there are more stars in the Milky Way or trees on Earth? Earth wins with over 3 trillion trees! Cows have best friends too, and they get stressed if separated. Here's a wild one: the guy who invented the Frisbee turned into one after he died – his ashes were made into a Frisbee in 2010. Lastly, a jiffy isn't just quick, it's a real time unit, exactly 1/100th of a second. Bet you didn't know all of these!`;
 
 const get = async (request: Request, result: Response) => {
-    const videoControllerActivated = false;
+    const videoControllerActivated = true;
 
     if (videoControllerActivated) {
         const speechFile = path.resolve("./assets/speech.mp3");

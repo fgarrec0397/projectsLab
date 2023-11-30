@@ -1,8 +1,12 @@
+import { google } from "@google-cloud/speech/build/protos/protos";
 import { Dictionary, PartialBy } from "@projectslab/helpers";
 import { Request, Response } from "express";
 
+import { getAssetsPath } from "../../../core/utils/getAssetsPath";
+import { loadJson } from "../../../core/utils/loadJson";
 import { TemplateModule } from "../../modules/TemplateModule";
 import { VideoService } from "../../services/videoService";
+import { mapSubtitles } from "../../utils/mappers/mapSubtitles";
 
 export type VideoConfig = {
     duration: number;
@@ -35,6 +39,15 @@ export type VideoAsset = {
 class VideoController {
     async get(request: Request, result: Response) {
         const templateKey = "funFactsTemplate";
+
+        const timedSubtitles = loadJson<[google.cloud.speech.v1.IRecognizeResponse]>(
+            getAssetsPath("mock-voiceover-subtitles.json")
+        );
+
+        console.log(timedSubtitles, "timedSubtitles");
+        const data = mapSubtitles(timedSubtitles?.[0]);
+
+        console.log(JSON.stringify(data), "data");
 
         const templateModule = new TemplateModule(templateKey);
 

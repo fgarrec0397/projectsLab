@@ -1,14 +1,8 @@
-import { FilterSpecification } from "fluent-ffmpeg";
-
 import { Subtitle } from "../mappers/mapSubtitles";
 import { nanosToSeconds } from "../nanosToSeconds";
 
-const isFalse = <TValue>(value: TValue) => {
-    return value === false || value === undefined || value === null;
-};
-
 export const buildSubtitlesFilter = (subtitles?: Subtitle[]) => {
-    const filters: FilterSpecification[] = [];
+    const filters: Array<string> = [];
 
     if (!subtitles) {
         return filters;
@@ -16,28 +10,16 @@ export const buildSubtitlesFilter = (subtitles?: Subtitle[]) => {
 
     return subtitles
         .map((subtitle, index) => {
-            console.log(index, "index");
+            const startTime = nanosToSeconds(subtitle.startTime!.nanos!);
+            const endTime = nanosToSeconds(subtitle.endTime!.nanos!);
 
-            if (
-                isFalse(subtitle.startTime?.nanos) ||
-                isFalse(subtitle.endTime?.nanos) ||
-                !subtitle.word
-            ) {
-                return;
-            }
-
-            const startTime = nanosToSeconds(subtitle.startTime?.nanos!);
-            const endTime = nanosToSeconds(subtitle.endTime?.nanos!);
             const inputLabel = index === 0 ? "[0:v]" : `[tmp${index - 1}]`;
-            const outputLabel = index === subtitles.length - 1 ? "[out]" : `[tmp${index}]`;
+            const subtitleInput = `[${index + 1}:v]`;
+            const outputLabel = index === subtitles.length - 1 ? undefined : `[tmp${index}]`;
 
-            return {
-                filter: "overlay",
-                options: { x: 10, y: 10 * index }, // Adjust Y position for each subtitle
-                inputs: `${inputLabel}[text${index}]`,
-                outputs: outputLabel,
-                enable: `between(t,${startTime},${endTime})`,
-            };
+            return `${inputLabel}${subtitleInput}overlay=x=10:y=10:enable='between(t,${startTime},${endTime})'${
+                outputLabel ? `${outputLabel}` : ""
+            }`;
         })
-        .filter((filter) => filter !== undefined) as FilterSpecification[];
+        .filter((filter) => filter !== undefined);
 };

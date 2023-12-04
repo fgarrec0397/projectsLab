@@ -116,7 +116,6 @@ export class VideoService {
         for (let i = 0; i < this.config.frameCount; i++) {
             const currentTime = i / this.config.frameRate;
 
-            // eslint-disable-next-line no-console
             console.log(`Rendering frame ${i} at ${Math.round(currentTime * 10) / 10} seconds...`);
 
             // Clear the canvas with a white background color. This is required as we are
@@ -148,12 +147,8 @@ export class VideoService {
         this.subtitles.forEach((subtitle, index) => {
             if (subtitle.word) {
                 console.log(`Rendering subtitle: ${subtitle.word}`);
-                const paddedNumber = String(index).padStart(4, "0");
 
-                createTextImage(
-                    subtitle.word,
-                    getAssetsPath(`tmp/output/text-${paddedNumber}.png`)
-                );
+                createTextImage(subtitle.word, getAssetsPath(`tmp/output/text-${index}.png`));
             }
         });
     }

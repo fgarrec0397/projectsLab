@@ -41,17 +41,16 @@ class VideoController {
         const templateKey = "funFactsTemplate";
 
         const timedSubtitles = loadJson<[google.cloud.speech.v1.IRecognizeResponse]>(
-            getAssetsPath("mock-voiceover-subtitles.json")
+            getAssetsPath("POC-mock-voiceover-subtitles.json")
         );
 
-        console.log(timedSubtitles, "timedSubtitles");
-        const data = mapSubtitles(timedSubtitles?.[0]);
+        const subtitles = mapSubtitles(timedSubtitles?.[0]);
 
-        console.log(JSON.stringify(data), "data");
+        const templateModule = new TemplateModule(templateKey, subtitles);
 
-        const templateModule = new TemplateModule(templateKey);
-
-        const video = new VideoService(templateModule);
+        // TODO - give the mapped subtitles to constructor and should have
+        //        a complete different function that will render the subtitles
+        const video = new VideoService(templateModule, subtitles);
 
         await video.renderVideo();
 

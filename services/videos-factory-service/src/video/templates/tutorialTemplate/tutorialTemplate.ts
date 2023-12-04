@@ -3,6 +3,7 @@ import { CanvasRenderingContext2D, Image } from "canvas";
 import { getAssetsPath } from "../../../core/utils/getAssetsPath";
 import { TemplateConfig, TemplateScene } from "../../modules/TemplateModule";
 import { interpolateKeyframes } from "../../utils/interpolateKeyFrames";
+import { Subtitle } from "../../utils/mappers/mapSubtitles";
 import { TemplateDictionaryItem } from "../templates";
 import { renderOutro } from "./compositions/renderOutro";
 import { renderThreePictures } from "./compositions/renderThreePictures";
@@ -78,7 +79,10 @@ export const tutorialTemplate: TemplateDictionaryItem = {
         }),
     ],
     scenes: (context: CanvasRenderingContext2D): TemplateScene<TutorialAssets>[] => {
-        const mainScene = (mainSceneAssets: TutorialAssets, mainSceneConfig: TemplateConfig) => {
+        const mainScene = <TData = Subtitle[]>(
+            mainSceneAssets: TutorialAssets,
+            mainSceneConfig: TemplateConfig
+        ) => {
             const slideProgress = interpolateKeyframes(
                 [
                     { time: 6.59, value: 0 },

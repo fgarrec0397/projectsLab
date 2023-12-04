@@ -3,6 +3,7 @@ import { CanvasRenderingContext2D, Image } from "canvas";
 import { getAssetsPath } from "../../../core/utils/getAssetsPath";
 import { TemplateConfig, TemplateScene } from "../../modules/TemplateModule";
 import { cropVideo } from "../../utils/cropVideo";
+import { Subtitle } from "../../utils/mappers/mapSubtitles";
 import { TemplateDictionaryItem } from "../templates";
 
 export type FunFactsAssets = {
@@ -67,7 +68,11 @@ export const funFactsTemplate: TemplateDictionaryItem = {
         }),
     ],
     scenes: (context: CanvasRenderingContext2D): TemplateScene<FunFactsAssets>[] => {
-        const scene1 = (assets: FunFactsAssets, config: TemplateConfig) => {
+        const scene1 = <TData = Subtitle[]>(
+            assets: FunFactsAssets,
+            config: TemplateConfig,
+            data: TData
+        ) => {
             context.save();
 
             // context.drawImage((assets as any).video1, 0, 0, config.width, config.height);

@@ -84,6 +84,7 @@ export class VideoService {
 
     async renderVideo() {
         await this.initRenderVideo();
+
         await this.renderFrames();
 
         this.renderSubtitles();

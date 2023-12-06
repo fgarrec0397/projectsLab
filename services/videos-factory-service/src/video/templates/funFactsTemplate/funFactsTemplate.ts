@@ -3,8 +3,13 @@ import { CanvasRenderingContext2D, Image } from "canvas";
 import { getAssetsPath } from "../../../core/utils/getAssetsPath";
 import { TemplateConfig, TemplateScene } from "../../modules/TemplateModule";
 import { cropVideo } from "../../utils/cropVideo";
-import { Subtitle } from "../../utils/mappers/mapSubtitles";
 import { TemplateDictionaryItem } from "../templates";
+
+export type FunFactsTemplateData = {
+    asset: "video1";
+    startTime: number;
+    endTime: number;
+}[];
 
 export type FunFactsAssets = {
     video1: Image;
@@ -12,7 +17,7 @@ export type FunFactsAssets = {
     video3: Image;
 };
 
-const seconds = 1; // 13
+const seconds = 3; // 13
 const minutes = 0; // 1
 
 const duration = minutes * 60 + seconds;
@@ -67,20 +72,53 @@ export const funFactsTemplate: TemplateDictionaryItem = {
             path: getAssetsPath("speech.mp3"),
         }),
     ],
-    scenes: (context: CanvasRenderingContext2D): TemplateScene<FunFactsAssets>[] => {
-        const scene1 = <TData = Subtitle[]>(
+    scenes: (
+        context: CanvasRenderingContext2D
+    ): TemplateScene<FunFactsAssets, FunFactsTemplateData>[] => {
+        const mainScene = <TData extends FunFactsTemplateData>(
             assets: FunFactsAssets,
             config: TemplateConfig,
             data: TData
         ) => {
-            context.save();
+            const scenes: TemplateScene<FunFactsAssets>[] = [];
 
+            // const keyframes = data.map((x) => {
+            //     return {
+            //         time: x.duration,
+            //     };
+            // });
+            // const slideProgress = interpolateKeyframes(
+            //     [
+            //         { time: 6.59, value: 0 },
+            //         { time: 7.63, value: 1, easing: "cubic-in-out" },
+            //     ],
+            //     config.time
+            // );
+
+            data.forEach((item) => {
+                scenes.push(
+                    (sceneAsset: FunFactsAssets, sceneConfig: TemplateConfig, sceneData: TData) => {
+                        context.save();
+
+                        if (config.time < item.endTime) {
+                            context.globalAlpha = 0;
+                        }
+
+                        // data.forEach;
+
+                        // context.drawImage((assets as any).video1, 0, 0, config.width, config.height);
+                        cropVideo(context, assets[item.asset], 0, 0, config.width, config.height);
+
+                        context.restore();
+                    }
+                );
+            });
+
+            return scenes;
             // context.drawImage((assets as any).video1, 0, 0, config.width, config.height);
-            cropVideo(context, (assets as any).video1, 0, 0, config.width, config.height);
-
-            context.restore();
+            // cropVideo(context, assets.video1, 0, 0, config.width, config.height);
         };
 
-        return [scene1];
+        return [mainScene];
     },
 };

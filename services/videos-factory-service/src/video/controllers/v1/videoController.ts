@@ -44,12 +44,23 @@ class VideoController {
             getAssetsPath("POC-mock-voiceover-subtitles.json")
         );
 
+        const videoData = [
+            {
+                asset: "video1",
+                startTime: 0,
+                endTime: 1,
+            },
+            {
+                asset: "video2",
+                startTime: 1,
+                endTime: 2,
+            },
+        ];
+
         const subtitles = mapSubtitles(timedSubtitles?.[0]);
 
-        const templateModule = new TemplateModule(templateKey, subtitles);
+        const templateModule = new TemplateModule(templateKey, videoData);
 
-        // TODO - give the mapped subtitles to constructor and should have
-        //        a complete different function that will render the subtitles
         const video = new VideoService(templateModule, subtitles);
 
         await video.renderVideo();

@@ -2,7 +2,6 @@ import { Dictionary } from "@projectslab/helpers";
 import { Canvas, CanvasRenderingContext2D, Image } from "canvas";
 
 import { TemplateDictionaryItem, templates, TemplatesDictionary } from "../templates/templates";
-import { Subtitle } from "../utils/mappers/mapSubtitles";
 
 export type Template<TemplateAssets extends Dictionary<Image>> = (
     context: CanvasRenderingContext2D
@@ -10,11 +9,11 @@ export type Template<TemplateAssets extends Dictionary<Image>> = (
 
 export type TemplateScene<
     TemplateAssets extends Dictionary<Image> = any,
-    TemplateData = Subtitle[],
+    TData extends Dictionary<any> = any,
 > = (
     assets: TemplateAssets,
     config: TemplateConfig,
-    data: TemplateData
+    data: TData
 ) => TemplateScene<TemplateAssets>[] | TemplateScene<TemplateAssets> | void;
 
 export type TemplateConfig = {
@@ -25,7 +24,7 @@ export type TemplateConfig = {
 
 export class TemplateModule<
     TemplateAssets extends Dictionary<Image> = any,
-    TData extends Subtitle[] = Subtitle[],
+    TData extends Dictionary<any> = Dictionary<any>,
 > {
     canvas: Canvas;
 

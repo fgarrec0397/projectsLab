@@ -1,6 +1,6 @@
 import { CanvasRenderingContext2D, Image } from "canvas";
 
-import { drawImageCoverFit } from "../utils/drawImageCoverFit";
+import { cropVideo } from "../../../utils/cropVideo";
 
 export function renderPolaroidPicture(
     context: CanvasRenderingContext2D,
@@ -24,14 +24,7 @@ export function renderPolaroidPicture(
     context.restore();
 
     // Draw the image and make sure it fits in the available space
-    drawImageCoverFit(
-        context,
-        image,
-        0.054 * width,
-        0.0466 * height,
-        0.8921 * width,
-        0.8048 * height
-    );
+    cropVideo(context, image, 0.054 * width, 0.0466 * height, 0.8921 * width, 0.8048 * height);
 
     // Draw the caption
     context.font = `${0.09 * height}px 'Caveat'`;

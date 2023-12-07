@@ -1,36 +1,24 @@
-import { Canvas, CanvasRenderingContext2D, Image, registerFont } from "canvas";
+import { Canvas, CanvasRenderingContext2D, registerFont } from "canvas";
 import ffmpegStatic from "ffmpeg-static";
 import { setFfmpegPath } from "fluent-ffmpeg";
 import fs from "fs";
 
 import { getAssetsPath } from "../../core/utils/getAssetsPath";
 import { VideoAssetDictionary, VideoConfig } from "../controllers/v1/videoController";
-import { filterAssets } from "../utils/filterAssets";
+import { TemplateModule } from "../modules/TemplateModule";
+import { createTextImage } from "../utils/createTextImage";
+import { filterAssets } from "../utils/filters/filterAssets";
 import { getVideoFrameReader } from "../utils/getVideoFrameReader";
 import { mapAssetsToImages } from "../utils/mappers/mapAssetsToImages";
 import { mapReadersToAssets } from "../utils/mappers/mapReadersToAssets";
+import { Subtitle } from "../utils/mappers/mapSubtitles";
 import { mapVideoConfigToSceneConfig } from "../utils/mappers/mapVideoConfigToSceneConfig";
+import { mapVideosAssets } from "../utils/mappers/mapVideosAssets";
 import { mergeFrames } from "../utils/mergeFrames";
-import { SceneService } from "./sceneService";
+import { VideoReader } from "./servicesTypes";
 
 // Tell fluent-ffmpeg where it can find FFmpeg
 setFfmpegPath(ffmpegStatic || "");
-
-export type VideoSize = {
-    width: number;
-    height: number;
-};
-
-export type VideoOptions = {
-    duration: number;
-    frameRate: number;
-    size: VideoSize;
-};
-
-export type VideoReader = {
-    slug: string;
-    callback: () => Promise<Image>;
-};
 
 export class VideoService {
     finalAssets: VideoAssetDictionary;
@@ -45,21 +33,35 @@ export class VideoService {
 
     config: VideoConfig;
 
-    sceneService: SceneService;
+    subtitles: Subtitle[];
+
+    templateModule: TemplateModule;
 
     videosReaders?: VideoReader[];
 
-    constructor(config: VideoConfig, assets: VideoAssetDictionary) {
-        this.finalAssets = filterAssets(assets, config, { lengthType: "final-render" });
-        this.videosAssets = filterAssets(assets, config, { lengthType: "in-video", type: "video" });
-        this.imagesAssets = filterAssets(assets, config, { lengthType: "in-video", type: "image" });
+    constructor(templateModule: TemplateModule, subtitles: Subtitle[]) {
+        this.templateModule = templateModule;
+        this.config = templateModule.template.config;
+        this.canvas = templateModule.canvas;
+        this.canvasContext = templateModule.canvasContext;
+        this.subtitles = subtitles;
 
-        this.config = config;
+        const videosAssets = mapVideosAssets(
+            templateModule.template.assets,
+            templateModule.template.config
+        );
 
-        this.canvas = new Canvas(config.size.width, config.size.height);
-        this.canvasContext = this.canvas.getContext("2d");
-
-        this.sceneService = new SceneService(this.canvasContext);
+        this.finalAssets = filterAssets(videosAssets, this.config, {
+            lengthType: "final-render",
+        });
+        this.videosAssets = filterAssets(videosAssets, this.config, {
+            lengthType: "in-video",
+            type: "video",
+        });
+        this.imagesAssets = filterAssets(videosAssets, this.config, {
+            lengthType: "in-video",
+            type: "image",
+        });
 
         this.cleanUpDirectories();
         this.registerFonts();
@@ -67,34 +69,10 @@ export class VideoService {
 
     async renderVideo() {
         await this.initRenderVideo();
-        const images = await mapAssetsToImages(this.config, this.imagesAssets);
 
-        // Render each frame
-        for (let i = 0; i < this.config.frameCount; i++) {
-            const currentTime = i / this.config.frameRate;
+        await this.renderFrames();
 
-            // eslint-disable-next-line no-console
-            console.log(`Rendering frame ${i} at ${Math.round(currentTime * 10) / 10} seconds...`);
-
-            // Clear the canvas with a white background color. This is required as we are
-            // reusing the canvas with every frame
-            this.canvasContext.fillStyle = "#ffffff";
-            this.canvasContext.fillRect(0, 0, this.canvas.width, this.canvas.height);
-
-            // Extract all the assets from their according readers
-            const assets = await mapReadersToAssets(this.videosReaders);
-            const scenesConfig = mapVideoConfigToSceneConfig(this.config, currentTime);
-
-            this.sceneService.renderScenes({ ...assets, ...images }, scenesConfig);
-
-            // Store the image in the directory where it can be found by FFmpeg
-            const output = this.canvas.toBuffer("image/png");
-            const paddedNumber = String(i).padStart(4, "0");
-            await fs.promises.writeFile(
-                getAssetsPath(`tmp/output/frame-${paddedNumber}.png`),
-                output
-            );
-        }
+        this.renderSubtitles();
 
         this.finishRenderVideo();
     }
@@ -117,9 +95,53 @@ export class VideoService {
         }
     }
 
+    private async renderFrames() {
+        const images = await mapAssetsToImages(this.config, this.imagesAssets);
+
+        // Render each frame
+        for (let i = 0; i < this.config.frameCount; i++) {
+            const currentTime = i / this.config.frameRate;
+
+            console.log(`Rendering frame ${i} at ${Math.round(currentTime * 10) / 10} seconds...`);
+
+            // Clear the canvas with a white background color. This is required as we are
+            // reusing the canvas with every frame
+            this.canvasContext.fillStyle = "#ffffff";
+            this.canvasContext.fillRect(0, 0, this.canvas.width, this.canvas.height);
+
+            // Extract all the assets from their according readers
+            const assets = await mapReadersToAssets(this.videosReaders);
+            const scenesConfig = mapVideoConfigToSceneConfig(this.config, currentTime);
+
+            this.templateModule.renderTemplates({ ...assets, ...images }, scenesConfig);
+
+            // Store the image in the directory where it can be found by FFmpeg
+            const output = this.canvas.toBuffer("image/png");
+            const paddedNumber = String(i).padStart(4, "0");
+            await fs.promises.writeFile(
+                getAssetsPath(`tmp/output/frame-${paddedNumber}.png`),
+                output
+            );
+        }
+    }
+
+    private renderSubtitles() {
+        if (!this.subtitles.length) {
+            return console.log("No subtitles to render. Moving forward!");
+        }
+
+        this.subtitles.forEach((subtitle, index) => {
+            if (subtitle.word) {
+                console.log(`Rendering subtitle: ${subtitle.word}`);
+
+                createTextImage(subtitle.word, getAssetsPath(`tmp/output/text-${index}.png`));
+            }
+        });
+    }
+
     private async finishRenderVideo() {
         // Merge all frames together with FFmpeg
-        await mergeFrames(this.finalAssets, this.config);
+        await mergeFrames(this.finalAssets, this.config, this.subtitles);
     }
 
     /**

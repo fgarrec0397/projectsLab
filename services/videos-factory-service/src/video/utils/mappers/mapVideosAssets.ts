@@ -6,10 +6,7 @@ import {
     VideoConfig,
 } from "../../controllers/v1/videoController";
 
-export const videosAssetsMapper = (
-    videosAssetsArray: VideoAssetCallback[],
-    config: VideoConfig
-) => {
+export const mapVideosAssets = (videosAssetsArray: VideoAssetCallback[], config: VideoConfig) => {
     const assetsDictionary: VideoAssetDictionary = {};
 
     videosAssetsArray.forEach((assetCallback) => {

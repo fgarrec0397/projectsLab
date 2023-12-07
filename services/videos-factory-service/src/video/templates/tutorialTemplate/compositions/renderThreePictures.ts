@@ -1,6 +1,6 @@
 import { CanvasRenderingContext2D, Image } from "canvas";
 
-import { interpolateKeyframes } from "../utils/interpolateKeyFrames";
+import { interpolateKeyframes } from "../../../utils/interpolateKeyFrames";
 import { renderPolaroidPicture } from "./renderPolaroidPicture";
 
 export function renderThreePictures(

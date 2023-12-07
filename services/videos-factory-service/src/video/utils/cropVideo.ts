@@ -1,6 +1,6 @@
 import { CanvasRenderingContext2D, Image } from "canvas";
 
-export function drawImageCoverFit(
+export function cropVideo(
     context: CanvasRenderingContext2D,
     image: Image,
     x: number,

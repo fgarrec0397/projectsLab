@@ -1,7 +1,7 @@
 import { CanvasRenderingContext2D, Image } from "canvas";
 
 import { getAssetsPath } from "../../../core/utils/getAssetsPath";
-import { TemplateConfig, TemplateScene } from "../../modules/TemplateModule";
+import { TemplateConfig, TemplateScene } from "../../modules/modulesTypes";
 import { interpolateKeyframes } from "../../utils/interpolateKeyFrames";
 import { TemplateDictionaryItem } from "../templateTypes";
 import { renderOutro } from "./compositions/renderOutro";

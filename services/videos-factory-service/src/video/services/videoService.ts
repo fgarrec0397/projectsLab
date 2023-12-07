@@ -1,4 +1,4 @@
-import { Canvas, CanvasRenderingContext2D, Image, registerFont } from "canvas";
+import { Canvas, CanvasRenderingContext2D, registerFont } from "canvas";
 import ffmpegStatic from "ffmpeg-static";
 import { setFfmpegPath } from "fluent-ffmpeg";
 import fs from "fs";
@@ -15,25 +15,10 @@ import { Subtitle } from "../utils/mappers/mapSubtitles";
 import { mapVideoConfigToSceneConfig } from "../utils/mappers/mapVideoConfigToSceneConfig";
 import { mapVideosAssets } from "../utils/mappers/mapVideosAssets";
 import { mergeFrames } from "../utils/mergeFrames";
+import { VideoReader } from "./servicesTypes";
 
 // Tell fluent-ffmpeg where it can find FFmpeg
 setFfmpegPath(ffmpegStatic || "");
-
-export type VideoSize = {
-    width: number;
-    height: number;
-};
-
-export type VideoOptions = {
-    duration: number;
-    frameRate: number;
-    size: VideoSize;
-};
-
-export type VideoReader = {
-    slug: string;
-    callback: () => Promise<Image>;
-};
 
 export class VideoService {
     finalAssets: VideoAssetDictionary;

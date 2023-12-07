@@ -1,7 +1,7 @@
 import { Dictionary } from "@projectslab/helpers";
 import { Image } from "canvas";
 
-import { VideoReader } from "../../services/videoService";
+import { VideoReader } from "../../services/servicesTypes";
 
 /**
  * Extract frames for all the passed readers and returns a dictionary

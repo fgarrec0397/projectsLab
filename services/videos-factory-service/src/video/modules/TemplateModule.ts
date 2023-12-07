@@ -1,7 +1,8 @@
 import { Dictionary } from "@projectslab/helpers";
 import { Canvas, CanvasRenderingContext2D, Image } from "canvas";
 
-import { TemplateDictionaryItem, templates, TemplatesDictionary } from "../templates/templates";
+import { templates } from "../templates/templates";
+import { TemplateDictionaryItem, TemplatesDictionary } from "../templates/templateTypes";
 
 export type Template<TemplateAssets extends Dictionary<Image>> = (
     context: CanvasRenderingContext2D

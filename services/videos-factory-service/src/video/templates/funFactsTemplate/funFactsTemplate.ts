@@ -3,7 +3,7 @@ import { CanvasRenderingContext2D, Image } from "canvas";
 import { getAssetsPath } from "../../../core/utils/getAssetsPath";
 import { TemplateConfig, TemplateScene } from "../../modules/TemplateModule";
 import { cropVideo } from "../../utils/cropVideo";
-import { TemplateDictionaryItem } from "../templates";
+import { TemplateDictionaryItem } from "../templateTypes";
 
 export type FunFactsTemplateData = {
     asset: "video1";
@@ -82,41 +82,23 @@ export const funFactsTemplate: TemplateDictionaryItem = {
         ) => {
             const scenes: TemplateScene<FunFactsAssets>[] = [];
 
-            // const keyframes = data.map((x) => {
-            //     return {
-            //         time: x.duration,
-            //     };
-            // });
-            // const slideProgress = interpolateKeyframes(
-            //     [
-            //         { time: 6.59, value: 0 },
-            //         { time: 7.63, value: 1, easing: "cubic-in-out" },
-            //     ],
-            //     config.time
-            // );
-
             data.forEach((item) => {
-                scenes.push(
-                    (sceneAsset: FunFactsAssets, sceneConfig: TemplateConfig, sceneData: TData) => {
-                        context.save();
+                scenes.push(() => {
+                    context.save();
 
-                        if (config.time < item.endTime) {
-                            context.globalAlpha = 0;
-                        }
+                    console.log({ time: config.time, endTime: item.endTime });
 
-                        // data.forEach;
-
-                        // context.drawImage((assets as any).video1, 0, 0, config.width, config.height);
-                        cropVideo(context, assets[item.asset], 0, 0, config.width, config.height);
-
-                        context.restore();
+                    if (config.time < item.startTime || config.time > item.endTime) {
+                        context.globalAlpha = 0;
                     }
-                );
+
+                    cropVideo(context, assets[item.asset], 0, 0, config.width, config.height);
+
+                    context.restore();
+                });
             });
 
             return scenes;
-            // context.drawImage((assets as any).video1, 0, 0, config.width, config.height);
-            // cropVideo(context, assets.video1, 0, 0, config.width, config.height);
         };
 
         return [mainScene];

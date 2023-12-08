@@ -17,8 +17,8 @@ export type FunFactsAssets = {
     video3: Image;
 };
 
-const seconds = 3; // 13
-const minutes = 0; // 1
+const seconds = 13;
+const minutes = 1;
 
 const duration = minutes * 60 + seconds;
 const frameRate = 60;
@@ -37,21 +37,7 @@ export const funFactsTemplate: TemplateDictionaryItem = {
             name: "Video 1",
             type: "video",
             lengthType: "in-video",
-            path: getAssetsPath("pexels-4782135.mp4"),
-        }),
-        () => ({
-            slug: "video2",
-            name: "Video 2",
-            type: "video",
-            lengthType: "in-video",
-            path: getAssetsPath("pexels-3576378.mp4"),
-        }),
-        () => ({
-            slug: "video3",
-            name: "Video 3",
-            type: "video",
-            lengthType: "in-video",
-            path: getAssetsPath("pexels-2829177.mp4"),
+            path: getAssetsPath("video1.mp4"),
         }),
         (config) => ({
             slug: "finalFrames",
@@ -70,6 +56,13 @@ export const funFactsTemplate: TemplateDictionaryItem = {
             type: "audio",
             lengthType: "final-render",
             path: getAssetsPath("speech.mp3"),
+        }),
+        () => ({
+            slug: "backgroundMusic",
+            name: "Background Music",
+            type: "audio",
+            lengthType: "final-render",
+            path: getAssetsPath("background-music-Blade-Runner2049.mp3"),
         }),
     ],
     scenes: (

@@ -41,19 +41,54 @@ class VideoController {
         const templateKey = "funFactsTemplate";
 
         const timedSubtitles = loadJson<[google.cloud.speech.v1.IRecognizeResponse]>(
-            getAssetsPath("POC-mock-voiceover-subtitles.json")
+            getAssetsPath("mock-voiceover-subtitles.json")
         );
 
         const videoData = [
             {
                 asset: "video1",
                 startTime: 0,
-                endTime: 1,
+                endTime: 4,
             },
             {
                 asset: "video2",
-                startTime: 1,
-                endTime: 2,
+                startTime: 4,
+                endTime: 14,
+            },
+            {
+                asset: "video3",
+                startTime: 14,
+                endTime: 24,
+            },
+            {
+                asset: "video4",
+                startTime: 24,
+                endTime: 27,
+            },
+            {
+                asset: "video5",
+                startTime: 27,
+                endTime: 31,
+            },
+            {
+                asset: "video6",
+                startTime: 31,
+                endTime: 59,
+            },
+            {
+                asset: "video7",
+                startTime: 59,
+                endTime: 63,
+            },
+            {
+                asset: "video8",
+                startTime: 63,
+                endTime: 98,
+            },
+            {
+                asset: "video9",
+                startTime: 98,
+                endTime: 111,
             },
         ];
 

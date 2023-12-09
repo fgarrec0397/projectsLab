@@ -39,6 +39,69 @@ export const funFactsTemplate: TemplateDictionaryItem = {
             lengthType: "in-video",
             path: getAssetsPath("video1.mp4"),
         }),
+        () => ({
+            slug: "video2",
+            name: "Video 2",
+            type: "video",
+            lengthType: "in-video",
+            path: getAssetsPath("video2.mp4"),
+        }),
+        () => ({
+            slug: "video3",
+            name: "Video 3",
+            type: "video",
+            lengthType: "in-video",
+            path: getAssetsPath("video3.mp4"),
+        }),
+        () => ({
+            slug: "video4",
+            name: "Video 4",
+            type: "video",
+            lengthType: "in-video",
+            path: getAssetsPath("video4.mp4"),
+        }),
+        () => ({
+            slug: "video5",
+            name: "Video 5",
+            type: "video",
+            lengthType: "in-video",
+            path: getAssetsPath("video5.mp4"),
+        }),
+        () => ({
+            slug: "video6",
+            name: "Video 6",
+            type: "video",
+            lengthType: "in-video",
+            path: getAssetsPath("video6.mp4"),
+        }),
+        () => ({
+            slug: "video7",
+            name: "Video 7",
+            type: "video",
+            lengthType: "in-video",
+            path: getAssetsPath("video7.mp4"),
+        }),
+        () => ({
+            slug: "video8",
+            name: "Video 8",
+            type: "video",
+            lengthType: "in-video",
+            path: getAssetsPath("video8.mp4"),
+        }),
+        () => ({
+            slug: "video9",
+            name: "Video 9",
+            type: "video",
+            lengthType: "in-video",
+            path: getAssetsPath("video9.mp4"),
+        }),
+        () => ({
+            slug: "video10",
+            name: "Video 10",
+            type: "video",
+            lengthType: "in-video",
+            path: getAssetsPath("video10.mp4"),
+        }),
         (config) => ({
             slug: "finalFrames",
             name: "Final frames",
@@ -78,8 +141,6 @@ export const funFactsTemplate: TemplateDictionaryItem = {
             data.forEach((item) => {
                 scenes.push(() => {
                     context.save();
-
-                    console.log({ time: config.time, endTime: item.endTime });
 
                     if (config.time < item.startTime || config.time > item.endTime) {
                         context.globalAlpha = 0;

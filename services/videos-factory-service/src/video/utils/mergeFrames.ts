@@ -13,7 +13,6 @@ export const mergeSubtitlesToVideo = async (subtitles: Subtitle[], config: Video
 
     subtitles.forEach((_, index) => {
         const subtitlePath = getAssetsPath(`tmp/output/text-${index}.png`);
-        console.log(`Adding input file: ${subtitlePath}`);
         ffmpegCommand.input(subtitlePath);
     });
 

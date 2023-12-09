@@ -70,11 +70,11 @@ export class VideoService {
     async renderVideo() {
         await this.initRenderVideo();
 
-        await this.renderFrames();
+        // await this.renderFrames();
 
-        this.renderSubtitles();
+        // this.renderSubtitles();
 
-        this.finishRenderVideo();
+        // this.finishRenderVideo();
     }
 
     private async initRenderVideo() {
@@ -102,7 +102,9 @@ export class VideoService {
         for (let i = 0; i < this.config.frameCount; i++) {
             const currentTime = i / this.config.frameRate;
 
+            console.time("logFrame");
             console.log(`Rendering frame ${i} at ${Math.round(currentTime * 10) / 10} seconds...`);
+            console.timeEnd("logFrame");
 
             // Clear the canvas with a white background color. This is required as we are
             // reusing the canvas with every frame
@@ -110,11 +112,18 @@ export class VideoService {
             this.canvasContext.fillRect(0, 0, this.canvas.width, this.canvas.height);
 
             // Extract all the assets from their according readers
+            console.time("mapReaders");
             const assets = await mapReadersToAssets(this.videosReaders);
+            console.timeEnd("mapReaders");
+            console.time("mapConfig");
             const scenesConfig = mapVideoConfigToSceneConfig(this.config, currentTime);
+            console.timeEnd("mapConfig");
 
+            console.time("renderTemplates");
             this.templateModule.renderTemplates({ ...assets, ...images }, scenesConfig);
+            console.timeEnd("renderTemplates");
 
+            console.time("writeFile");
             // Store the image in the directory where it can be found by FFmpeg
             const output = this.canvas.toBuffer("image/png");
             const paddedNumber = String(i).padStart(4, "0");
@@ -122,6 +131,7 @@ export class VideoService {
                 getAssetsPath(`tmp/output/frame-${paddedNumber}.png`),
                 output
             );
+            console.timeEnd("writeFile");
         }
     }
 

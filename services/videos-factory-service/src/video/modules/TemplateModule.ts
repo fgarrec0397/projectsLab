@@ -27,7 +27,9 @@ export class TemplateModule<
     renderTemplates(assets: TemplateAssets, config: TemplateConfig) {
         const callTemplatesRecursively = (templateScenes: TemplateScene<TemplateAssets>[]) => {
             templateScenes.forEach((template) => {
+                console.time("template-executed");
                 const result = template(assets, config, this.data);
+                console.timeEnd("template-executed");
 
                 if (Array.isArray(result)) {
                     callTemplatesRecursively(result);

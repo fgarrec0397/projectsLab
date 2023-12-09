@@ -46,62 +46,62 @@ export const funFactsTemplate: TemplateDictionaryItem = {
             lengthType: "in-video",
             path: getAssetsPath("video2.mp4"),
         }),
-        () => ({
-            slug: "video3",
-            name: "Video 3",
-            type: "video",
-            lengthType: "in-video",
-            path: getAssetsPath("video3.mp4"),
-        }),
-        () => ({
-            slug: "video4",
-            name: "Video 4",
-            type: "video",
-            lengthType: "in-video",
-            path: getAssetsPath("video4.mp4"),
-        }),
-        () => ({
-            slug: "video5",
-            name: "Video 5",
-            type: "video",
-            lengthType: "in-video",
-            path: getAssetsPath("video5.mp4"),
-        }),
-        () => ({
-            slug: "video6",
-            name: "Video 6",
-            type: "video",
-            lengthType: "in-video",
-            path: getAssetsPath("video6.mp4"),
-        }),
-        () => ({
-            slug: "video7",
-            name: "Video 7",
-            type: "video",
-            lengthType: "in-video",
-            path: getAssetsPath("video7.mp4"),
-        }),
-        () => ({
-            slug: "video8",
-            name: "Video 8",
-            type: "video",
-            lengthType: "in-video",
-            path: getAssetsPath("video8.mp4"),
-        }),
-        () => ({
-            slug: "video9",
-            name: "Video 9",
-            type: "video",
-            lengthType: "in-video",
-            path: getAssetsPath("video9.mp4"),
-        }),
-        () => ({
-            slug: "video10",
-            name: "Video 10",
-            type: "video",
-            lengthType: "in-video",
-            path: getAssetsPath("video10.mp4"),
-        }),
+        // () => ({
+        //     slug: "video3",
+        //     name: "Video 3",
+        //     type: "video",
+        //     lengthType: "in-video",
+        //     path: getAssetsPath("video3.mp4"),
+        // }),
+        // () => ({
+        //     slug: "video4",
+        //     name: "Video 4",
+        //     type: "video",
+        //     lengthType: "in-video",
+        //     path: getAssetsPath("video4.mp4"),
+        // }),
+        // () => ({
+        //     slug: "video5",
+        //     name: "Video 5",
+        //     type: "video",
+        //     lengthType: "in-video",
+        //     path: getAssetsPath("video5.mp4"),
+        // }),
+        // () => ({
+        //     slug: "video6",
+        //     name: "Video 6",
+        //     type: "video",
+        //     lengthType: "in-video",
+        //     path: getAssetsPath("video6.mp4"),
+        // }),
+        // () => ({
+        //     slug: "video7",
+        //     name: "Video 7",
+        //     type: "video",
+        //     lengthType: "in-video",
+        //     path: getAssetsPath("video7.mp4"),
+        // }),
+        // () => ({
+        //     slug: "video8",
+        //     name: "Video 8",
+        //     type: "video",
+        //     lengthType: "in-video",
+        //     path: getAssetsPath("video8.mp4"),
+        // }),
+        // () => ({
+        //     slug: "video9",
+        //     name: "Video 9",
+        //     type: "video",
+        //     lengthType: "in-video",
+        //     path: getAssetsPath("video9.mp4"),
+        // }),
+        // () => ({
+        //     slug: "video10",
+        //     name: "Video 10",
+        //     type: "video",
+        //     lengthType: "in-video",
+        //     path: getAssetsPath("video10.mp4"),
+        // }),
         (config) => ({
             slug: "finalFrames",
             name: "Final frames",
@@ -131,29 +131,32 @@ export const funFactsTemplate: TemplateDictionaryItem = {
     scenes: (
         context: CanvasRenderingContext2D
     ): TemplateScene<FunFactsAssets, FunFactsTemplateData>[] => {
+        console.time("scenes");
         const mainScene = <TData extends FunFactsTemplateData>(
             assets: FunFactsAssets,
             config: TemplateConfig,
             data: TData
         ) => {
-            const scenes: TemplateScene<FunFactsAssets>[] = [];
+            // const scenes: TemplateScene<FunFactsAssets>[] = [];
 
             data.forEach((item) => {
-                scenes.push(() => {
-                    context.save();
+                context.save();
 
-                    if (config.time < item.startTime || config.time > item.endTime) {
-                        context.globalAlpha = 0;
-                    }
+                if (config.time < item.startTime || config.time > item.endTime) {
+                    context.globalAlpha = 0;
+                }
 
-                    cropVideo(context, assets[item.asset], 0, 0, config.width, config.height);
+                cropVideo(context, assets[item.asset], 0, 0, config.width, config.height);
 
-                    context.restore();
-                });
+                context.restore();
+                // scenes.push(() => {
+                // });
             });
 
-            return scenes;
+            // return scenes;
         };
+
+        console.timeEnd("scenes");
 
         return [mainScene];
     },

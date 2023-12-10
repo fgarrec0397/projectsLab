@@ -9,6 +9,7 @@ export const funFactsTemplate = new VideoFactory.Template({
     height: 1920,
     elements: [
         new VideoFactory.Composition({
+            name: "Comp 1",
             track: 1,
             elements: [
                 new VideoFactory.Audio({
@@ -22,6 +23,7 @@ export const funFactsTemplate = new VideoFactory.Template({
             ],
         }),
         new VideoFactory.Composition({
+            name: "Comp 2",
             track: 1,
             elements: [
                 new VideoFactory.Audio({
@@ -35,6 +37,7 @@ export const funFactsTemplate = new VideoFactory.Template({
             ],
         }),
         new VideoFactory.Composition({
+            name: "Comp 3",
             track: 1,
             elements: [
                 new VideoFactory.Audio({

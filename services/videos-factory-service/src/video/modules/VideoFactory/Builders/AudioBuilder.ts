@@ -1,11 +1,18 @@
-import { BaseElementBuilder, BaseElementBuilderConfig } from "./BaseElementBuilder";
+import { BaseElementBuilder, BaseElementBuilderConfig, ElementType } from "./BaseElementBuilder";
 
 type AudioBuilderConfig = BaseElementBuilderConfig & {
     sourcePath: string;
 };
 
-export class AudioBuilder implements BaseElementBuilder<AudioBuilderConfig> {
+export class AudioBuilder extends BaseElementBuilder {
+    type: ElementType;
+
+    sourcePath: string;
+
     constructor(config: AudioBuilderConfig) {
-        console.log(config, "AudioBuilder constructor");
+        super(config);
+
+        this.type = "audio";
+        this.sourcePath = config.sourcePath;
     }
 }

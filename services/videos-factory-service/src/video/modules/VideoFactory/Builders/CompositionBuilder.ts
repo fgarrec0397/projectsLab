@@ -1,11 +1,18 @@
-import { BaseElementBuilder, BaseElementBuilderConfig } from "./BaseElementBuilder";
+import { BaseElementBuilder, BaseElementBuilderConfig, ElementType } from "./BaseElementBuilder";
 
 type CompositionBuilderConfig = BaseElementBuilderConfig & {
-    elements: BaseElementBuilder<any>[];
+    elements: BaseElementBuilder[];
 };
 
-export class CompositionBuilder implements BaseElementBuilder<CompositionBuilderConfig> {
+export class CompositionBuilder extends BaseElementBuilder {
+    type: ElementType;
+
+    elements: BaseElementBuilder[];
+
     constructor(config: CompositionBuilderConfig) {
-        console.log(config, "CompositionBuilder constructor");
+        super(config);
+
+        this.type = "composition";
+        this.elements = config.elements;
     }
 }

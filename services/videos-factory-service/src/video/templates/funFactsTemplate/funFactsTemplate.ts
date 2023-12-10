@@ -1,7 +1,7 @@
 import { getAssetsPath } from "../../../core/utils/getAssetsPath";
 import { VideoFactory } from "../../modules/VideoFactory/VideoFactory";
 
-export const funFactsTemplate = new VideoFactory.Template({
+export const funFactsTemplate = {
     duration: 10,
     fps: 60,
     outputFormat: "mp4",
@@ -55,6 +55,4 @@ export const funFactsTemplate = new VideoFactory.Template({
             sourcePath: getAssetsPath("background-music-Blade-Runner2049.mp3"),
         }),
     ],
-});
-
-const test = funFactsTemplate;
+};

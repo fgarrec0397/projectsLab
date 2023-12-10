@@ -2,8 +2,15 @@ import ffmpeg from "fluent-ffmpeg";
 import { existsSync, mkdirSync } from "fs";
 import path from "path";
 
-// Example usage: await extractFramesFromVideo('video.mp4', 'frame-%04d.png', 60);
-
+/**
+ * Extracts frames from the given video.
+ *
+ * @param inputFilepath - The path of the video to extract the frames from
+ * @param outputFilepath - The path to store the extracted frames
+ * @param frameRate - The number of frames per seconds
+ *
+ * @example await extractFramesFromVideo('video.mp4', 'frame-%04d.png', 60);
+ */
 export const extractFramesFromVideo = async (
     inputFilepath: string,
     outputFilepath: string,

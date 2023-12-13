@@ -34,9 +34,10 @@ export type VideoAsset = {
 
 class VideoController {
     async get(request: Request, result: Response) {
-        result.status(200).json({ result: "video controller GET" });
+        const videoFactory = new VideoFactory(funFactsTemplate);
 
-        new VideoFactory(funFactsTemplate);
+        await videoFactory.render();
+        result.status(200).json({ result: "video controller GET" });
     }
 }
 

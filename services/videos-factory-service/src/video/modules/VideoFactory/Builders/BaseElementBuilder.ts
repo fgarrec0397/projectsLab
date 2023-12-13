@@ -20,7 +20,7 @@ export type BaseElementBuilderConfig = Partial<BaseElementBuilderInterface>;
 
 export interface BaseElementBuilderInterface {
     id: string;
-    name?: string;
+    name: string;
     type?: ElementType;
     track?: number;
     start?: number;
@@ -30,7 +30,7 @@ export interface BaseElementBuilderInterface {
 export abstract class BaseElementBuilder implements BaseElementBuilderInterface {
     id: string;
 
-    name?: string;
+    name: string;
 
     type: ElementType;
 
@@ -42,7 +42,7 @@ export abstract class BaseElementBuilder implements BaseElementBuilderInterface 
 
     constructor(config: BaseElementBuilderConfig) {
         this.id = uidGenerator();
-        this.name = config.name;
+        this.name = config.name || this.id;
         this.start = config.start;
         this.end = config.end;
         this.type = config.type || "none";

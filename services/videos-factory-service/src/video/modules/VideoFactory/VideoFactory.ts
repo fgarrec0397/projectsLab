@@ -1,6 +1,8 @@
 import fs from "fs";
+import { join } from "path";
 
 import { getAssetsPath } from "../../../core/utils/getAssetsPath";
+import { extractFramesFromVideo } from "../../utils/extractFramesFromVideo";
 import { AudioBuilder } from "./Builders/AudioBuilder";
 import {
     BaseElementBuilder,
@@ -21,6 +23,7 @@ type Template = {
 
 type TemplateAsset = {
     id: string;
+    name: string;
     type: ElementAssetType;
     sourcePath: string;
     decompressedPath?: string;
@@ -42,14 +45,16 @@ export class VideoFactory {
 
         this.assets = this.mapTemplateToAssets(template);
 
-        console.log(this.assets, "this.assets");
-
         this.cleanUpDirectories();
-        // this.decompressAssets();
+        this.decompressAssets();
     }
+
+    public async render() {}
 
     private mapTemplateToAssets(template: Template) {
         const assets: TemplateAsset[] = [];
+
+        console.log(`Mapping assets`);
 
         const recursivelyMapAssets = (elements: BaseElementBuilder[]) => {
             if (!elements.length) {
@@ -64,6 +69,7 @@ export class VideoFactory {
                 if (elementAssetTypes[x.type as ElementAssetType]) {
                     const asset: TemplateAsset = {
                         id: x.id,
+                        name: x.name,
                         type: x.type as ElementAssetType,
                         sourcePath: (x as any).sourcePath, // TODO fix this any
                     };
@@ -82,25 +88,19 @@ export class VideoFactory {
         return assets;
     }
 
-    // private async decompressAssets() {
-    //     this.videosReaders = [];
+    private async decompressAssets() {
+        console.log(`Extracting frames from videos...`);
+        const videos = this.assets.filter((x) => x.type === "video");
 
-    //     for (const key of Object.keys(this.videosAssets)) {
-    //         const asset = this.videosAssets[key](this.config);
-
-    //         console.log(`Extracting frames from ${asset.name}...`);
-
-    //         await extractFramesFromVideo(asset.path);
-
-    //         const getVideoFrame = await getVideoFrameReader(
-    //             asset.path,
-    //             getAssetsPath(`tmp/${asset.name}-${key}`),
-    //             this.config.frameRate
-    //         );
-
-    //         this.videosReaders.push({ slug: asset.slug, callback: getVideoFrame });
-    //     }
-    // }
+        for (const asset of videos) {
+            await extractFramesFromVideo(
+                asset.sourcePath,
+                join(getAssetsPath(`tmp/${asset.name}-${asset.id}`), "frame-%04d.png"),
+                this.template.fps
+            );
+        }
+        console.log("Videos frames extracted");
+    }
 
     /**
      * Clean up the temporary directories

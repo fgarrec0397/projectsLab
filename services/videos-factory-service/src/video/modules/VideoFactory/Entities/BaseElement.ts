@@ -1,24 +1,18 @@
 import { uidGenerator } from "@projectslab/helpers";
 
-export const elementAssetTypes = {
-    video: "video",
-    image: "image",
-    audio: "audio",
-};
+import { renderableElementTypes } from "./RenderableElement";
 
 export const elementTypes = {
-    ...elementAssetTypes,
+    ...renderableElementTypes,
     composition: "composition",
     none: "none",
 };
 
-export type ElementAssetType = keyof typeof elementAssetTypes;
-
 export type ElementType = keyof typeof elementTypes;
 
-export type BaseElementBuilderConfig = Partial<BaseElementBuilderInterface>;
+export type BaseElementConfig = Partial<BaseElementInterface>;
 
-export interface BaseElementBuilderInterface {
+export interface BaseElementInterface {
     id: string;
     name: string;
     type?: ElementType;
@@ -27,7 +21,7 @@ export interface BaseElementBuilderInterface {
     end?: number;
 }
 
-export abstract class BaseElementBuilder implements BaseElementBuilderInterface {
+export abstract class BaseElement implements BaseElementInterface {
     id: string;
 
     name: string;
@@ -40,7 +34,7 @@ export abstract class BaseElementBuilder implements BaseElementBuilderInterface 
 
     track: number;
 
-    constructor(config: BaseElementBuilderConfig) {
+    constructor(config: BaseElementConfig) {
         this.id = uidGenerator();
         this.name = config.name || this.id;
         this.start = config.start;

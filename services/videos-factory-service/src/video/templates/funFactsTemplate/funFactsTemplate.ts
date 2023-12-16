@@ -2,11 +2,12 @@ import { getAssetsPath } from "../../../core/utils/getAssetsPath";
 import { Template, VideoFactory } from "../../modules/VideoFactory/VideoFactory";
 
 export const funFactsTemplate: Template = {
-    duration: 4 * 60,
+    duration: 40,
     fps: 60,
     outputFormat: "mp4",
     width: 1080,
     height: 1920,
+    // useFrames: true,
     elements: [
         new VideoFactory.Video({
             name: "video1",

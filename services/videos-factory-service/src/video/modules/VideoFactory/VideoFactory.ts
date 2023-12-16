@@ -16,6 +16,7 @@ export type Template = {
     outputFormat: string;
     width: number;
     height: number;
+    useFrames?: boolean;
     elements: BaseElement[];
 };
 
@@ -40,48 +41,71 @@ export class VideoFactory {
         this.assets = this.mapTemplateToAssets();
 
         this.cleanUpDirectories();
-        // this.decompressVideos();
     }
 
     public async render() {
-        await this.decompressVideos();
+        if (this.template.useFrames) {
+            await this.decompressVideos();
+        }
 
         console.log("Rendering frames...");
 
         const ffmpegCommand = ffmpeg();
+        const filterComplex: string[] = [];
+        let inputIndex = 0;
 
         const processElement = (element: BaseElement, track: number) => {
             if (element instanceof Composition && element.elements?.length) {
-                // It's a Composition
                 element.elements.forEach((subElement) => {
                     processElement(subElement, element.track); // Recursive call
                 });
             } else {
-                // It's a VideoElement or AudioElement
                 if (element instanceof Video) {
                     const video = this.assets.find((x) => element.id === x.id);
                     console.log(video, "video");
 
-                    if (video?.decompressPath) {
-                        ffmpegCommand.input(video.decompressPath);
+                    if (!video) {
+                        return;
                     }
-                    // Add specific handling based on track, type, etc.
+
+                    if (this.template.useFrames) {
+                        if (video.decompressPath) {
+                            ffmpegCommand.input(video.decompressPath);
+                        }
+                        // Process as frame sequences
+                        ffmpegCommand.inputOptions(["-framerate", this.template.fps.toString()]);
+                        filterComplex.push(`[${inputIndex}:v:0]`);
+                    } else {
+                        ffmpegCommand.input(video.sourcePath);
+                        // Process as regular video files
+                        filterComplex.push(`[${inputIndex}:v:0] [${inputIndex}:a:0]`);
+                    }
+                    inputIndex++;
                 }
             }
         };
 
-        console.log(this.template.elements, "this.template.elements");
-
-        // Start processing the top-level elements
         this.template.elements.forEach((element) => {
             processElement(element, 1); // Assuming default track is 1
         });
 
-        // Set output options
+        if (filterComplex.length > 0) {
+            const concatFilter = this.template.useFrames
+                ? filterComplex.join(" ") + `concat=n=${inputIndex}:v=1:a=0 [v]`
+                : filterComplex.join(" ") + `concat=n=${inputIndex}:v=1:a=1 [v] [a]`;
+
+            ffmpegCommand.complexFilter(concatFilter, this.template.useFrames ? ["v"] : ["v", "a"]);
+        }
+
+        console.log(
+            "Constructed FFmpeg command:",
+            ffmpegCommand._getArguments().join(" "),
+            "ffmpegCommand"
+        );
+
         ffmpegCommand
             .videoCodec("libx264")
             .outputOptions(["-pix_fmt yuv420p"])
-            .duration(this.template.duration)
             .fps(this.template.fps)
             .on("end", () => console.log("Video rendered"))
             .on("error", (err: Error) => console.log("Error: " + err.message))
@@ -119,10 +143,11 @@ export class VideoFactory {
     }
 
     private async decompressVideos() {
-        console.log(`Extracting frames from videos...`);
         const videos = this.assets.filter((x) => x.type === "video");
 
         for (const [index, asset] of videos.entries()) {
+            console.log(`Extracting frames from video ${asset.name}`);
+
             const outputPath = join(
                 getAssetsPath(`tmp/${asset.name}-${asset.id}`),
                 "frame-%04d.png"

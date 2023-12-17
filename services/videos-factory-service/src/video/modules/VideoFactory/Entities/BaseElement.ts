@@ -19,6 +19,7 @@ export interface BaseElementInterface {
     track?: number;
     start?: number;
     end?: number;
+    duration?: number;
 }
 
 export abstract class BaseElement implements BaseElementInterface {
@@ -28,11 +29,13 @@ export abstract class BaseElement implements BaseElementInterface {
 
     type: ElementType;
 
+    track: number;
+
     start?: number;
 
     end?: number;
 
-    track: number;
+    duration?: number;
 
     constructor(config: BaseElementConfig) {
         this.id = uidGenerator();
@@ -41,5 +44,6 @@ export abstract class BaseElement implements BaseElementInterface {
         this.end = config.end;
         this.type = config.type || "none";
         this.track = config.track || 1;
+        this.duration = config.duration;
     }
 }

@@ -11,7 +11,7 @@ import { RenderableElement } from "./Entities/RenderableElement";
 import { Video } from "./Entities/Video";
 
 export type Template = {
-    duration: number;
+    duration?: number;
     fps: number;
     outputFormat: string;
     width: number;
@@ -44,6 +44,11 @@ export class VideoFactory {
     }
 
     public async render() {
+        const numberOfVideos = this.assets.length;
+        const durationPerVideo = this.template.duration
+            ? this.template.duration / numberOfVideos
+            : undefined;
+
         if (this.template.useFrames) {
             await this.decompressVideos();
         }
@@ -68,15 +73,39 @@ export class VideoFactory {
                         return;
                     }
 
+                    const getVideoDurationCommand = () => {
+                        if (video.duration) {
+                            return ["-t", video.duration.toString()];
+                        }
+
+                        if (video.start && video.end) {
+                            const duration = video.end - video.start;
+
+                            return ["-t", duration.toString()];
+                        }
+
+                        if (!durationPerVideo) {
+                            return [];
+                        }
+
+                        return ["-t", durationPerVideo.toString()];
+                    };
+
                     if (this.template.useFrames) {
                         if (video.decompressPath) {
                             ffmpegCommand.input(video.decompressPath);
                         }
+
                         // Process as frame sequences
-                        ffmpegCommand.inputOptions(["-framerate", this.template.fps.toString()]);
+                        ffmpegCommand.inputOptions([
+                            "-framerate",
+                            this.template.fps.toString(),
+                            ...getVideoDurationCommand(),
+                        ]);
                         filterComplex.push(`[${inputIndex}:v:0]`);
                     } else {
                         ffmpegCommand.input(video.sourcePath);
+                        ffmpegCommand.inputOptions([...getVideoDurationCommand()]);
                         // Process as regular video files
                         filterComplex.push(`[${inputIndex}:v:0] [${inputIndex}:a:0]`);
                     }

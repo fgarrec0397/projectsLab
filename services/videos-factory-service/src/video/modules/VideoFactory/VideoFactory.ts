@@ -59,10 +59,10 @@ export class VideoFactory {
         const filterComplex: string[] = [];
         let inputIndex = 0;
 
-        const processElement = (element: BaseElement, track: number) => {
+        const processElement = (element: BaseElement) => {
             if (element instanceof Composition && element.elements?.length) {
                 element.elements.forEach((subElement) => {
-                    processElement(subElement, element.track); // Recursive call
+                    processElement(subElement); // Recursive call
                 });
             } else {
                 if (element instanceof Video) {
@@ -73,12 +73,16 @@ export class VideoFactory {
                         return;
                     }
 
+                    console.log(
+                        `Processing video: ${video.sourcePath}, Start: ${video.start}, End: ${video.end}`
+                    );
+
                     const getVideoDurationCommand = () => {
                         if (video.duration) {
                             return ["-t", video.duration.toString()];
                         }
 
-                        if (video.start && video.end) {
+                        if (video.start !== undefined && video.end !== undefined) {
                             const duration = video.end - video.start;
 
                             return ["-t", duration.toString()];
@@ -91,31 +95,49 @@ export class VideoFactory {
                         return ["-t", durationPerVideo.toString()];
                     };
 
+                    // Init input options
+                    const inputOptions = [...getVideoDurationCommand()];
+
                     if (this.template.useFrames) {
                         if (video.decompressPath) {
                             ffmpegCommand.input(video.decompressPath);
                         }
 
                         // Process as frame sequences
-                        ffmpegCommand.inputOptions([
-                            "-framerate",
-                            this.template.fps.toString(),
-                            ...getVideoDurationCommand(),
-                        ]);
+                        inputOptions.push("-framerate", this.template.fps.toString());
                         filterComplex.push(`[${inputIndex}:v:0]`);
                     } else {
+                        // Process as video concatenation
                         ffmpegCommand.input(video.sourcePath);
-                        ffmpegCommand.inputOptions([...getVideoDurationCommand()]);
-                        // Process as regular video files
                         filterComplex.push(`[${inputIndex}:v:0] [${inputIndex}:a:0]`);
                     }
+
+                    ffmpegCommand.inputOptions(inputOptions);
+
                     inputIndex++;
+                }
+
+                if (element instanceof Audio) {
+                    const audio = this.assets.find((x) => element.id === x.id);
+
+                    if (!audio) {
+                        return;
+                    }
+
+                    ffmpegCommand.input(audio.sourcePath);
+
+                    if (audio.start !== undefined) {
+                        ffmpegCommand.inputOptions(["-ss", audio.start.toString()]);
+                        filterComplex.push(`[${inputIndex}:a]`);
+
+                        inputIndex++;
+                    }
                 }
             }
         };
 
         this.template.elements.forEach((element) => {
-            processElement(element, 1); // Assuming default track is 1
+            processElement(element);
         });
 
         if (filterComplex.length > 0) {
@@ -126,11 +148,8 @@ export class VideoFactory {
             ffmpegCommand.complexFilter(concatFilter, this.template.useFrames ? ["v"] : ["v", "a"]);
         }
 
-        console.log(
-            "Constructed FFmpeg command:",
-            ffmpegCommand._getArguments().join(" "),
-            "ffmpegCommand"
-        );
+        console.log("FFmpeg filter complex:", filterComplex.join(" "));
+        console.log("Constructed FFmpeg command:", ffmpegCommand._getArguments().join(" "));
 
         ffmpegCommand
             .videoCodec("libx264")

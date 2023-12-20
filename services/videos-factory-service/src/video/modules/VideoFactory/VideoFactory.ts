@@ -57,7 +57,9 @@ export class VideoFactory {
 
         const ffmpegCommand = ffmpeg();
         const filterComplex: string[] = [];
-        let inputIndex = 0;
+        const audioFilterComplex: string[] = [];
+        let videoInputIndex = 0;
+        let audioInputCount = 0;
 
         const processElement = (element: BaseElement) => {
             if (element instanceof Composition && element.elements?.length) {
@@ -105,33 +107,27 @@ export class VideoFactory {
 
                         // Process as frame sequences
                         inputOptions.push("-framerate", this.template.fps.toString());
-                        filterComplex.push(`[${inputIndex}:v:0]`);
+                        filterComplex.push(`[${videoInputIndex}:v:0]`);
+                        // filterComplex.push(`[${videoInputIndex}:a:0]`); // TODO - check if we need to handle that
                     } else {
                         // Process as video concatenation
                         ffmpegCommand.input(video.sourcePath);
-                        filterComplex.push(`[${inputIndex}:v:0] [${inputIndex}:a:0]`);
+                        filterComplex.push(`[${videoInputIndex}:v:0] [${videoInputIndex}:a:0]`);
                     }
 
                     ffmpegCommand.inputOptions(inputOptions);
-
-                    inputIndex++;
+                    videoInputIndex++;
                 }
 
                 if (element instanceof Audio) {
                     const audio = this.assets.find((x) => element.id === x.id);
-
                     if (!audio) {
                         return;
                     }
 
                     ffmpegCommand.input(audio.sourcePath);
-
-                    if (audio.start !== undefined) {
-                        ffmpegCommand.inputOptions(["-ss", audio.start.toString()]);
-                        filterComplex.push(`[${inputIndex}:a]`);
-
-                        inputIndex++;
-                    }
+                    audioFilterComplex.push(`[${audioInputCount}:a]`);
+                    audioInputCount++;
                 }
             }
         };
@@ -140,12 +136,34 @@ export class VideoFactory {
             processElement(element);
         });
 
-        if (filterComplex.length > 0) {
-            const concatFilter = this.template.useFrames
-                ? filterComplex.join(" ") + `concat=n=${inputIndex}:v=1:a=0 [v]`
-                : filterComplex.join(" ") + `concat=n=${inputIndex}:v=1:a=1 [v] [a]`;
+        const finalComplexFilter = [];
 
-            ffmpegCommand.complexFilter(concatFilter, this.template.useFrames ? ["v"] : ["v", "a"]);
+        if (videoInputIndex > 0) {
+            const videoConcatFilter = this.template.useFrames
+                ? filterComplex.join(" ") + `concat=n=${videoInputIndex}:v=1:a=0 [v]`
+                : filterComplex.join(" ") + `concat=n=${videoInputIndex}:v=1:a=1 [v] [a]`;
+
+            // ffmpegCommand.complexFilter(videoConcatFilter, this.template.useFrames ? ["v"] : ["v", "a"]);
+            console.log(videoConcatFilter, "videoConcatFilter");
+
+            finalComplexFilter.push(videoConcatFilter);
+        }
+
+        if (audioInputCount > 0) {
+            const audioConcatFilter =
+                audioFilterComplex.join("") + `amix=inputs=${audioInputCount}[a]`;
+
+            finalComplexFilter.push(audioConcatFilter);
+        }
+
+        // ffmpeg -t 10 -i [video1 path] -t 15 -i [video2 path] -t 10 -i [video3 path] -t 10 -i [video4 path] -i [audio path]
+        //-filter_complex "[0:v:0] [1:v:0] [2:v:0] [3:v:0] concat=n=4:v=1:a=1 [v] [tempa]; [tempa][4:a] amix=inputs=2 [a]" -map "[v]" -map "[a]" -c:v libx264 -c:a aac -shortest output.mp4
+
+        if (finalComplexFilter.length) {
+            ffmpegCommand.complexFilter(
+                finalComplexFilter,
+                this.template.useFrames ? ["v"] : ["v", "a"]
+            );
         }
 
         console.log("FFmpeg filter complex:", filterComplex.join(" "));

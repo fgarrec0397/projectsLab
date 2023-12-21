@@ -42,5 +42,9 @@ export const funFactsTemplate: Template = {
             name: "audio1",
             sourcePath: getAssetsPath("background-music-Blade-Runner2049.mp3"),
         }),
+        new VideoFactory.Audio({
+            name: "audio1",
+            sourcePath: getAssetsPath("speech.mp3"),
+        }),
     ],
 };

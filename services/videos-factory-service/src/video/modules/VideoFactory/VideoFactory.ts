@@ -59,6 +59,7 @@ export class VideoFactory {
         const filterComplex: string[] = [];
         const audioFilterComplex: string[] = [];
         let videoInputIndex = 0;
+        let videoAudioInputIndex = 0;
         let audioInputCount = 0;
 
         const processElement = (element: BaseElement) => {
@@ -113,6 +114,7 @@ export class VideoFactory {
                         // Process as video concatenation
                         ffmpegCommand.input(video.sourcePath);
                         filterComplex.push(`[${videoInputIndex}:v:0] [${videoInputIndex}:a:0]`);
+                        videoAudioInputIndex++;
                     }
 
                     ffmpegCommand.inputOptions(inputOptions);
@@ -150,19 +152,24 @@ export class VideoFactory {
         }
 
         if (audioInputCount > 0) {
-            const audioConcatFilter =
-                audioFilterComplex.join("") + `amix=inputs=${audioInputCount}[a]`;
+            const adjustedAudioComplexFilter = audioFilterComplex.map(
+                (_, index) => `[${index + videoInputIndex}:a]`
+            );
+            const audioConcatFilter = `[a]${adjustedAudioComplexFilter.join("")}amix=inputs=${
+                adjustedAudioComplexFilter.length + 1
+            }[a_out]`;
 
             finalComplexFilter.push(audioConcatFilter);
         }
 
-        // ffmpeg -t 10 -i [video1 path] -t 15 -i [video2 path] -t 10 -i [video3 path] -t 10 -i [video4 path] -i [audio path]
-        //-filter_complex "[0:v:0] [1:v:0] [2:v:0] [3:v:0] concat=n=4:v=1:a=1 [v] [tempa]; [tempa][4:a] amix=inputs=2 [a]" -map "[v]" -map "[a]" -c:v libx264 -c:a aac -shortest output.mp4
+        // What I should have - it works
+        // ffmpeg -t 10 -i C:\Users\fgarr\Documents\lab\projectsLab\services\videos-factory-service\assets\poc\video1.mp4 -t 15 -i C:\Users\fgarr\Documents\lab\projectsLab\services\videos-factory-service\assets\poc\video2.mp4 -t 10 -i C:\Users\fgarr\Documents\lab\projectsLab\services\videos-factory-service\assets\poc\video3.mp4 -t 10 -i C:\Users\fgarr\Documents\lab\projectsLab\services\videos-factory-service\assets\poc\video4.mp4 -i C:\Users\fgarr\Documents\lab\projectsLab\services\videos-factory-service\assets\poc\background-music-Blade-Runner2049.mp3 -i C:\Users\fgarr\Documents\lab\projectsLab\services\videos-factory-service\assets\poc\speech.mp3
+        // -filter_complex "[0:v][0:a][1:v][1:a][2:v][2:a][3:v][3:a]concat=n=4:v=1:a=1[v][a]; [a][4:a][5:a]amix=inputs=3:duration=longest[a_out]" -map "[v]" -map "[a_out]" output.mp4
 
         if (finalComplexFilter.length) {
             ffmpegCommand.complexFilter(
                 finalComplexFilter,
-                this.template.useFrames ? ["v"] : ["v", "a"]
+                this.template.useFrames ? ["v"] : ["v", "a_out"]
             );
         }
 

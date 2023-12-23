@@ -162,10 +162,6 @@ export class VideoFactory {
             finalComplexFilter.push(audioConcatFilter);
         }
 
-        // What I should have - it works
-        // ffmpeg -t 10 -i C:\Users\fgarr\Documents\lab\projectsLab\services\videos-factory-service\assets\poc\video1.mp4 -t 15 -i C:\Users\fgarr\Documents\lab\projectsLab\services\videos-factory-service\assets\poc\video2.mp4 -t 10 -i C:\Users\fgarr\Documents\lab\projectsLab\services\videos-factory-service\assets\poc\video3.mp4 -t 10 -i C:\Users\fgarr\Documents\lab\projectsLab\services\videos-factory-service\assets\poc\video4.mp4 -i C:\Users\fgarr\Documents\lab\projectsLab\services\videos-factory-service\assets\poc\background-music-Blade-Runner2049.mp3 -i C:\Users\fgarr\Documents\lab\projectsLab\services\videos-factory-service\assets\poc\speech.mp3
-        // -filter_complex "[0:v][0:a][1:v][1:a][2:v][2:a][3:v][3:a]concat=n=4:v=1:a=1[v][a]; [a][4:a][5:a]amix=inputs=3:duration=longest[a_out]" -map "[v]" -map "[a_out]" output.mp4
-
         if (finalComplexFilter.length) {
             ffmpegCommand.complexFilter(
                 finalComplexFilter,
@@ -184,6 +180,21 @@ export class VideoFactory {
             .on("error", (err: Error) => console.log("Error: " + err.message))
             .save(getAssetsPath("out/refactor-video.mp4"));
     }
+
+    // TODO - use the same process as the legacy feature as it is pretty fast to render substiles
+    // private renderSubtitles() {
+    //     if (!this.subtitles.length) {
+    //         return console.log("No subtitles to render. Moving forward!");
+    //     }
+
+    //     this.subtitles.forEach((subtitle, index) => {
+    //         if (subtitle.word) {
+    //             console.log(`Rendering subtitle: ${subtitle.word}`);
+
+    //             createTextImage(subtitle.word, getAssetsPath(`tmp/output/text-${index}.png`));
+    //         }
+    //     });
+    // }
 
     private mapTemplateToAssets() {
         const assets: RenderableElement[] = [];

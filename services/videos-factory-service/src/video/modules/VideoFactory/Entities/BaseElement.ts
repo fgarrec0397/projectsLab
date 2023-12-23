@@ -5,6 +5,7 @@ import { renderableElementTypes } from "./RenderableElement";
 export const elementTypes = {
     ...renderableElementTypes,
     composition: "composition",
+    text: "text",
     none: "none",
 };
 

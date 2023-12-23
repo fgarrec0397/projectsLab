@@ -60,5 +60,9 @@ export const funFactsTemplate: Template = {
             name: "audio1",
             sourcePath: getAssetsPath("speech.mp3"),
         }),
+        new VideoFactory.Text({
+            name: "text",
+            value: "My text",
+        }),
     ],
 };

@@ -1,20 +1,16 @@
-import {
-    RenderableElement,
-    RenderableElementConfig,
-    RenderableElementTypes,
-} from "./RenderableElement";
+import { BaseElement, BaseElementConfig } from "./BaseElement";
 
-type TextConfig = RenderableElementConfig;
+type TextConfig = BaseElementConfig & {
+    value: string;
+};
 
-export class Text extends RenderableElement {
-    type: RenderableElementTypes;
-
-    sourcePath: string;
+export class Text extends BaseElement {
+    value: string;
 
     constructor(config: TextConfig) {
         super(config);
 
         this.type = "text";
-        this.sourcePath = config.sourcePath;
+        this.value = config.value;
     }
 }

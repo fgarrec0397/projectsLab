@@ -3,12 +3,16 @@ import fs from "fs";
 import { join } from "path";
 
 import { getAssetsPath } from "../../../core/utils/getAssetsPath";
+import { createTextImage } from "../../utils/createTextImage";
 import { extractFramesFromVideo } from "../../utils/extractFramesFromVideo";
+import { ComplexFilterBuilder } from "./Builders/ComplexFilterBuilder";
 import { Audio } from "./Entities/Audio";
 import { BaseElement } from "./Entities/BaseElement";
 import { Composition } from "./Entities/Composition";
 import { RenderableElement } from "./Entities/RenderableElement";
+import { Text } from "./Entities/Text";
 import { Video } from "./Entities/Video";
+import { TemplateMapper } from "./Mappers/TemplateMapper";
 
 export type Template = {
     duration?: number;
@@ -24,43 +28,53 @@ export type TemplateAsset = RenderableElement & {
     decompressPath?: string;
 };
 
+export type TemplateText = Text;
+
 export class VideoFactory {
     static Audio = Audio;
 
     static Composition = Composition;
 
+    static Text = Text;
+
     static Video = Video;
 
     assets: TemplateAsset[];
+
+    ffmpegCommand: ffmpeg.FfmpegCommand;
+
+    durationPerVideo?: number;
+
+    texts: TemplateText[];
 
     template: Template;
 
     constructor(template: Template) {
         this.template = template;
 
-        this.assets = this.mapTemplateToAssets();
+        this.ffmpegCommand = ffmpeg();
+
+        const templateMapper = new TemplateMapper(this.template);
+
+        this.assets = templateMapper.mapTemplateToAssets();
+
+        this.texts = templateMapper.mapTemplateToTexts();
+
+        this.durationPerVideo = templateMapper.mapDurationPerVideo();
 
         this.cleanUpDirectories();
     }
 
-    public async render() {
-        const numberOfVideos = this.assets.length;
-        const durationPerVideo = this.template.duration
-            ? this.template.duration / numberOfVideos
-            : undefined;
-
+    public async initRender() {
         if (this.template.useFrames) {
             await this.decompressVideos();
         }
+        this.buildCommand();
+        this.render();
+    }
 
-        console.log("Rendering frames...");
-
-        const ffmpegCommand = ffmpeg();
-        const filterComplex: string[] = [];
-        const audioFilterComplex: string[] = [];
-        let videoInputIndex = 0;
-        let videoAudioInputIndex = 0;
-        let audioInputCount = 0;
+    private buildCommand() {
+        const complexFilterBuilder = new ComplexFilterBuilder();
 
         const processElement = (element: BaseElement) => {
             if (element instanceof Composition && element.elements?.length) {
@@ -70,15 +84,10 @@ export class VideoFactory {
             } else {
                 if (element instanceof Video) {
                     const video = this.assets.find((x) => element.id === x.id);
-                    console.log(video, "video");
 
                     if (!video) {
                         return;
                     }
-
-                    console.log(
-                        `Processing video: ${video.sourcePath}, Start: ${video.start}, End: ${video.end}`
-                    );
 
                     const getVideoDurationCommand = () => {
                         if (video.duration) {
@@ -91,11 +100,11 @@ export class VideoFactory {
                             return ["-t", duration.toString()];
                         }
 
-                        if (!durationPerVideo) {
+                        if (!this.durationPerVideo) {
                             return [];
                         }
 
-                        return ["-t", durationPerVideo.toString()];
+                        return ["-t", this.durationPerVideo.toString()];
                     };
 
                     // Init input options
@@ -103,22 +112,19 @@ export class VideoFactory {
 
                     if (this.template.useFrames) {
                         if (video.decompressPath) {
-                            ffmpegCommand.input(video.decompressPath);
+                            this.ffmpegCommand.input(video.decompressPath);
                         }
 
                         // Process as frame sequences
                         inputOptions.push("-framerate", this.template.fps.toString());
-                        filterComplex.push(`[${videoInputIndex}:v:0]`);
-                        // filterComplex.push(`[${videoInputIndex}:a:0]`); // TODO - check if we need to handle that
+                        complexFilterBuilder.addVideo();
                     } else {
                         // Process as video concatenation
-                        ffmpegCommand.input(video.sourcePath);
-                        filterComplex.push(`[${videoInputIndex}:v:0] [${videoInputIndex}:a:0]`);
-                        videoAudioInputIndex++;
+                        this.ffmpegCommand.input(video.sourcePath);
+                        complexFilterBuilder.addVideoWithAudio();
                     }
 
-                    ffmpegCommand.inputOptions(inputOptions);
-                    videoInputIndex++;
+                    this.ffmpegCommand.inputOptions(inputOptions);
                 }
 
                 if (element instanceof Audio) {
@@ -127,9 +133,8 @@ export class VideoFactory {
                         return;
                     }
 
-                    ffmpegCommand.input(audio.sourcePath);
-                    audioFilterComplex.push(`[${audioInputCount}:a]`);
-                    audioInputCount++;
+                    this.ffmpegCommand.input(audio.sourcePath);
+                    complexFilterBuilder.addAudio();
                 }
             }
         };
@@ -138,92 +143,43 @@ export class VideoFactory {
             processElement(element);
         });
 
-        const finalComplexFilter = [];
+        const complexFilterCommand = complexFilterBuilder.build();
+        const complexFilterMapping = complexFilterBuilder.getMapping();
 
-        if (videoInputIndex > 0) {
-            const videoConcatFilter = this.template.useFrames
-                ? filterComplex.join(" ") + `concat=n=${videoInputIndex}:v=1:a=0 [v]`
-                : filterComplex.join(" ") + `concat=n=${videoInputIndex}:v=1:a=1 [v] [a]`;
+        this.ffmpegCommand.complexFilter(complexFilterCommand, complexFilterMapping);
 
-            // ffmpegCommand.complexFilter(videoConcatFilter, this.template.useFrames ? ["v"] : ["v", "a"]);
-            console.log(videoConcatFilter, "videoConcatFilter");
+        console.log("Constructed FFmpeg command:", this.ffmpegCommand._getArguments().join(" "));
+    }
 
-            finalComplexFilter.push(videoConcatFilter);
-        }
-
-        if (audioInputCount > 0) {
-            const adjustedAudioComplexFilter = audioFilterComplex.map(
-                (_, index) => `[${index + videoInputIndex}:a]`
-            );
-            const audioConcatFilter = `[a]${adjustedAudioComplexFilter.join("")}amix=inputs=${
-                adjustedAudioComplexFilter.length + 1
-            }[a_out]`;
-
-            finalComplexFilter.push(audioConcatFilter);
-        }
-
-        if (finalComplexFilter.length) {
-            ffmpegCommand.complexFilter(
-                finalComplexFilter,
-                this.template.useFrames ? ["v"] : ["v", "a_out"]
-            );
-        }
-
-        console.log("FFmpeg filter complex:", filterComplex.join(" "));
-        console.log("Constructed FFmpeg command:", ffmpegCommand._getArguments().join(" "));
-
-        ffmpegCommand
+    private render() {
+        console.log("Rendering started...");
+        console.time("Rendering finished");
+        this.ffmpegCommand
             .videoCodec("libx264")
             .outputOptions(["-pix_fmt yuv420p"])
             .fps(this.template.fps)
-            .on("end", () => console.log("Video rendered"))
+            .on("end", () => console.timeEnd("Rendering finished"))
             .on("error", (err: Error) => console.log("Error: " + err.message))
             .save(getAssetsPath("out/refactor-video.mp4"));
     }
 
     // TODO - use the same process as the legacy feature as it is pretty fast to render substiles
-    // private renderSubtitles() {
-    //     if (!this.subtitles.length) {
-    //         return console.log("No subtitles to render. Moving forward!");
-    //     }
+    private renderText() {
+        if (!this.texts.length) {
+            return console.log("No texts to render. Moving forward!");
+        }
 
-    //     this.subtitles.forEach((subtitle, index) => {
-    //         if (subtitle.word) {
-    //             console.log(`Rendering subtitle: ${subtitle.word}`);
+        if (this.texts.length === 1) {
+            createTextImage(this.texts[0].value, getAssetsPath(`tmp/output/text-0.png`));
+        }
 
-    //             createTextImage(subtitle.word, getAssetsPath(`tmp/output/text-${index}.png`));
-    //         }
-    //     });
-    // }
+        this.texts.forEach((text, index) => {
+            if (text.value) {
+                console.log(`Rendering text: ${text.value}`);
 
-    private mapTemplateToAssets() {
-        const assets: RenderableElement[] = [];
-
-        console.log(`Mapping assets`);
-
-        const recursivelyMapAssets = (elements: BaseElement[]) => {
-            if (!elements.length) {
-                return;
+                createTextImage(text.value, getAssetsPath(`tmp/output/text-${index}.png`));
             }
-
-            elements.forEach((x) => {
-                if (!(x instanceof BaseElement)) {
-                    return;
-                }
-
-                if (x instanceof RenderableElement) {
-                    assets.push(x);
-                }
-
-                if (x instanceof Composition && x.elements?.length) {
-                    recursivelyMapAssets(x.elements);
-                }
-            });
-        };
-
-        recursivelyMapAssets(this.template.elements);
-
-        return assets;
+        });
     }
 
     private async decompressVideos() {

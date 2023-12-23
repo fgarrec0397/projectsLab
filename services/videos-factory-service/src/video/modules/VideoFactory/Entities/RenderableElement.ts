@@ -4,7 +4,6 @@ export const renderableElementTypes = {
     video: "video",
     image: "image",
     audio: "audio",
-    text: "text",
 };
 
 export type RenderableElementTypes = keyof typeof renderableElementTypes;

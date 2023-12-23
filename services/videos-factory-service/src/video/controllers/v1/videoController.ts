@@ -36,7 +36,7 @@ class VideoController {
     async get(request: Request, result: Response) {
         const videoFactory = new VideoFactory(funFactsTemplate);
 
-        await videoFactory.render();
+        await videoFactory.initRender();
         result.status(200).json({ result: "video controller GET" });
     }
 }

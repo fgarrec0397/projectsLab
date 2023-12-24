@@ -1,22 +1,17 @@
 import ffmpeg from "fluent-ffmpeg";
 
-import { ComplexFilterBuilder } from "../Builders/ComplexFilterBuilder";
 import { Audio } from "../Entities/Audio";
-import { IElementComponent } from "./IElementComponent";
+import { BaseComponent, IElementComponent } from "./BaseComponent";
 
-export class AudioComponent implements IElementComponent {
-    audio: Audio;
+export class AudioComponent extends BaseComponent<Audio> implements IElementComponent {
+    process(ffmpegCommand: ffmpeg.FfmpegCommand): void {
+        const audio = this.element;
 
-    constructor(audio: Audio) {
-        this.audio = audio;
-    }
-
-    process(ffmpegCommand: ffmpeg.FfmpegCommand, complexFilterBuilder: ComplexFilterBuilder): void {
-        if (!this.audio) {
+        if (!audio) {
             return;
         }
 
-        ffmpegCommand.input(this.audio.sourcePath);
-        complexFilterBuilder.addAudio();
+        ffmpegCommand.input(audio.sourcePath);
+        this.complexFilterBuilder.addAudio();
     }
 }

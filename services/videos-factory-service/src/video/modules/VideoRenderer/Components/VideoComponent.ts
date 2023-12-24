@@ -1,34 +1,28 @@
 import ffmpeg from "fluent-ffmpeg";
 
-import { ComplexFilterBuilder } from "../Builders/ComplexFilterBuilder";
 import { Video } from "../Entities/Video";
 import { Template } from "../VideoRenderer";
-import { IElementComponent } from "./IElementComponent";
+import { BaseComponent, IElementComponent } from "./BaseComponent";
 
-export class VideoComponent implements IElementComponent {
-    video: Video;
-
-    constructor(video: Video) {
-        this.video = video;
-    }
-
+export class VideoComponent extends BaseComponent<Video> implements IElementComponent {
     process(
         ffmpegCommand: ffmpeg.FfmpegCommand,
-        complexFilterBuilder: ComplexFilterBuilder,
         template: Template,
         durationPerVideo?: number
     ): void {
-        if (!this.video) {
+        const video = this.element;
+
+        if (!video) {
             return;
         }
 
         const getVideoDurationCommand = () => {
-            if (this.video.duration) {
-                return ["-t", this.video.duration.toString()];
+            if (video.duration) {
+                return ["-t", video.duration.toString()];
             }
 
-            if (this.video.start !== undefined && this.video.end !== undefined) {
-                const duration = this.video.end - this.video.start;
+            if (video.start !== undefined && video.end !== undefined) {
+                const duration = video.end - video.start;
 
                 return ["-t", duration.toString()];
             }
@@ -44,17 +38,17 @@ export class VideoComponent implements IElementComponent {
         const inputOptions = [...getVideoDurationCommand()];
 
         if (template.useFrames) {
-            if (this.video.decompressPath) {
-                ffmpegCommand.input(this.video.decompressPath);
+            if (video.decompressPath) {
+                ffmpegCommand.input(video.decompressPath);
             }
 
             // Process as frame sequences
             inputOptions.push("-framerate", template.fps.toString());
-            complexFilterBuilder.addVideo();
+            this.complexFilterBuilder.addVideo();
         } else {
             // Process as video concatenation
-            ffmpegCommand.input(this.video.sourcePath);
-            complexFilterBuilder.addVideoWithAudio();
+            ffmpegCommand.input(video.sourcePath);
+            this.complexFilterBuilder.addVideoWithAudio();
         }
 
         ffmpegCommand.inputOptions(inputOptions);

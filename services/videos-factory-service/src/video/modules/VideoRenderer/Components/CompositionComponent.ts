@@ -1,24 +1,30 @@
 import ffmpeg from "fluent-ffmpeg";
 
 import { ComplexFilterBuilder } from "../Builders/ComplexFilterBuilder";
+import { Composition } from "../Entities/Composition";
 import { Template } from "../VideoRenderer";
-import { IElementComponent } from "./IElementComponent";
+import { BaseComponent, IElementComponent } from "./BaseComponent";
 
-export class CompositionComponent implements IElementComponent {
-    private elements: IElementComponent[];
+export class CompositionComponent extends BaseComponent<Composition> implements IElementComponent {
+    childrenComponents: IElementComponent[];
 
-    constructor(elements: IElementComponent[]) {
-        this.elements = elements;
+    constructor(
+        element: Composition,
+        childrenComponents: IElementComponent[],
+        complexFilterBuilder: ComplexFilterBuilder
+    ) {
+        super(element, complexFilterBuilder);
+
+        this.childrenComponents = childrenComponents;
     }
 
     process(
         ffmpegCommand: ffmpeg.FfmpegCommand,
-        complexFilterBuilder: ComplexFilterBuilder,
         template: Template,
         durationPerVideo?: number
     ): void {
-        this.elements.forEach((element) => {
-            element.process(ffmpegCommand, complexFilterBuilder, template, durationPerVideo);
+        this.childrenComponents.forEach((component) => {
+            component.process(ffmpegCommand, template, durationPerVideo);
         });
     }
 }

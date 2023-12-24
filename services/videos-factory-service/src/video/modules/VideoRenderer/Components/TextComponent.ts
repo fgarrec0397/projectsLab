@@ -1,21 +1,14 @@
-import ffmpeg from "fluent-ffmpeg";
-
-import { ComplexFilterBuilder } from "../Builders/ComplexFilterBuilder";
 import { Text } from "../Entities/Text";
-import { IElementComponent } from "./IElementComponent";
+import { BaseComponent, IElementComponent } from "./BaseComponent";
 
-export class TextComponent implements IElementComponent {
-    text: Text;
+export class TextComponent extends BaseComponent<Text> implements IElementComponent {
+    process(): void {
+        const text = this.element;
 
-    constructor(text: Text) {
-        this.text = text;
-    }
-
-    process(ffmpegCommand: ffmpeg.FfmpegCommand, complexFilterBuilder: ComplexFilterBuilder): void {
-        if (!this.text) {
+        if (!text) {
             return;
         }
 
-        console.log(this.text, "this.text");
+        console.log(text, "text");
     }
 }

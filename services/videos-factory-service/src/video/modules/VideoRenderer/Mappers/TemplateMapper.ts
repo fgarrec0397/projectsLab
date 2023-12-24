@@ -2,6 +2,7 @@ import { BaseElement } from "../Entities/BaseElement";
 import { Composition } from "../Entities/Composition";
 import { RenderableElement } from "../Entities/RenderableElement";
 import { Text } from "../Entities/Text";
+import { ElementComponentFactory } from "../Factories/ElementComponentFactory";
 import { Template, TemplateAsset, TemplateText } from "../VideoRenderer";
 
 export class TemplateMapper {
@@ -76,6 +77,10 @@ export class TemplateMapper {
     mapDurationPerVideo() {
         const numberOfVideos = this.getAssets().length;
         return this.template.duration ? this.template.duration / numberOfVideos : undefined;
+    }
+
+    mapTemplateToElements(elementsFactory: ElementComponentFactory) {
+        return this.template.elements.map(elementsFactory.createElementComponent);
     }
 
     private getAssets() {

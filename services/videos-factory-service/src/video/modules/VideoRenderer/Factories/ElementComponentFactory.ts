@@ -1,6 +1,7 @@
+import { ComplexFilterBuilder } from "../Builders/ComplexFilterBuilder";
 import { AudioComponent } from "../Components/AudioComponent";
+import { IElementComponent } from "../Components/BaseComponent";
 import { CompositionComponent } from "../Components/CompositionComponent";
-import { IElementComponent } from "../Components/IElementComponent";
 import { TextComponent } from "../Components/TextComponent";
 import { VideoComponent } from "../Components/VideoComponent";
 import { Audio } from "../Entities/Audio";
@@ -10,18 +11,23 @@ import { Text } from "../Entities/Text";
 import { Video } from "../Entities/Video";
 
 export class ElementComponentFactory {
-    static createElementComponent(element: BaseElement): IElementComponent {
+    complexFilterBuilder: ComplexFilterBuilder;
+
+    constructor(complexFilterBuilder: ComplexFilterBuilder) {
+        this.complexFilterBuilder = complexFilterBuilder;
+    }
+
+    createElementComponent(element: BaseElement): IElementComponent {
         if (element instanceof Composition) {
-            const childComponents = element.elements.map(
-                ElementComponentFactory.createElementComponent
-            );
-            return new CompositionComponent(childComponents);
+            // TODO - the issue is here
+            const childComponents = element.elements.map(this.createElementComponent);
+            return new CompositionComponent(element, childComponents, this.complexFilterBuilder);
         } else if (element instanceof Video) {
-            return new VideoComponent(element);
+            return new VideoComponent(element, this.complexFilterBuilder);
         } else if (element instanceof Audio) {
-            return new AudioComponent(element);
+            return new AudioComponent(element, this.complexFilterBuilder);
         } else if (element instanceof Text) {
-            return new TextComponent(element);
+            return new TextComponent(element, this.complexFilterBuilder);
         }
         throw new Error("Unknown element type");
     }

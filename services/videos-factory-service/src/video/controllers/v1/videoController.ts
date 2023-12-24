@@ -1,7 +1,7 @@
 import { Dictionary, PartialBy } from "@projectslab/helpers";
 import { Request, Response } from "express";
 
-import { VideoFactory } from "../../modules/VideoFactory/VideoFactory";
+import { VideoRenderer } from "../../modules/VideoRenderer/VideoRenderer";
 import { funFactsTemplate } from "../../templates/funFactsTemplate/funFactsTemplate";
 
 export type VideoConfig = {
@@ -34,7 +34,7 @@ export type VideoAsset = {
 
 class VideoController {
     async get(request: Request, result: Response) {
-        const videoFactory = new VideoFactory(funFactsTemplate);
+        const videoFactory = new VideoRenderer(funFactsTemplate);
 
         await videoFactory.initRender();
         result.status(200).json({ result: "video controller GET" });

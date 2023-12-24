@@ -6,12 +6,14 @@ import { getAssetsPath } from "../../../core/utils/getAssetsPath";
 import { createTextImage } from "../../utils/createTextImage";
 import { extractFramesFromVideo } from "../../utils/extractFramesFromVideo";
 import { ComplexFilterBuilder } from "./Builders/ComplexFilterBuilder";
+import { IElementComponent } from "./Components/IElementComponent";
 import { Audio } from "./Entities/Audio";
 import { BaseElement } from "./Entities/BaseElement";
 import { Composition } from "./Entities/Composition";
 import { RenderableElement } from "./Entities/RenderableElement";
 import { Text } from "./Entities/Text";
 import { Video } from "./Entities/Video";
+import { ElementComponentFactory } from "./Factories/ElementComponentFactory";
 import { TemplateMapper } from "./Mappers/TemplateMapper";
 
 export type Template = {
@@ -30,7 +32,7 @@ export type TemplateAsset = RenderableElement & {
 
 export type TemplateText = Text;
 
-export class VideoFactory {
+export class VideoRenderer {
     static Audio = Audio;
 
     static Composition = Composition;
@@ -76,72 +78,85 @@ export class VideoFactory {
     private buildCommand() {
         const complexFilterBuilder = new ComplexFilterBuilder();
 
-        const processElement = (element: BaseElement) => {
-            if (element instanceof Composition && element.elements?.length) {
-                element.elements.forEach((subElement) => {
-                    processElement(subElement); // Recursive call
-                });
-            } else {
-                if (element instanceof Video) {
-                    const video = this.assets.find((x) => element.id === x.id);
+        const elementComponents: IElementComponent[] = this.template.elements.map(
+            ElementComponentFactory.createElementComponent
+        );
 
-                    if (!video) {
-                        return;
-                    }
-
-                    const getVideoDurationCommand = () => {
-                        if (video.duration) {
-                            return ["-t", video.duration.toString()];
-                        }
-
-                        if (video.start !== undefined && video.end !== undefined) {
-                            const duration = video.end - video.start;
-
-                            return ["-t", duration.toString()];
-                        }
-
-                        if (!this.durationPerVideo) {
-                            return [];
-                        }
-
-                        return ["-t", this.durationPerVideo.toString()];
-                    };
-
-                    // Init input options
-                    const inputOptions = [...getVideoDurationCommand()];
-
-                    if (this.template.useFrames) {
-                        if (video.decompressPath) {
-                            this.ffmpegCommand.input(video.decompressPath);
-                        }
-
-                        // Process as frame sequences
-                        inputOptions.push("-framerate", this.template.fps.toString());
-                        complexFilterBuilder.addVideo();
-                    } else {
-                        // Process as video concatenation
-                        this.ffmpegCommand.input(video.sourcePath);
-                        complexFilterBuilder.addVideoWithAudio();
-                    }
-
-                    this.ffmpegCommand.inputOptions(inputOptions);
-                }
-
-                if (element instanceof Audio) {
-                    const audio = this.assets.find((x) => element.id === x.id);
-                    if (!audio) {
-                        return;
-                    }
-
-                    this.ffmpegCommand.input(audio.sourcePath);
-                    complexFilterBuilder.addAudio();
-                }
-            }
-        };
-
-        this.template.elements.forEach((element) => {
-            processElement(element);
+        // Process each element with the composite pattern
+        elementComponents.forEach((element) => {
+            element.process(
+                this.ffmpegCommand,
+                complexFilterBuilder,
+                this.template,
+                this.durationPerVideo
+            );
         });
+        // const processElement = (element: BaseElement) => {
+        //     if (element instanceof Composition && element.elements?.length) {
+        //         element.elements.forEach((subElement) => {
+        //             processElement(subElement); // Recursive call
+        //         });
+        //     } else {
+        //         if (element instanceof Video) {
+        //             const video = this.assets.find((x) => element.id === x.id);
+
+        //             if (!video) {
+        //                 return;
+        //             }
+
+        //             const getVideoDurationCommand = () => {
+        //                 if (video.duration) {
+        //                     return ["-t", video.duration.toString()];
+        //                 }
+
+        //                 if (video.start !== undefined && video.end !== undefined) {
+        //                     const duration = video.end - video.start;
+
+        //                     return ["-t", duration.toString()];
+        //                 }
+
+        //                 if (!this.durationPerVideo) {
+        //                     return [];
+        //                 }
+
+        //                 return ["-t", this.durationPerVideo.toString()];
+        //             };
+
+        //             // Init input options
+        //             const inputOptions = [...getVideoDurationCommand()];
+
+        //             if (this.template.useFrames) {
+        //                 if (video.decompressPath) {
+        //                     this.ffmpegCommand.input(video.decompressPath);
+        //                 }
+
+        //                 // Process as frame sequences
+        //                 inputOptions.push("-framerate", this.template.fps.toString());
+        //                 complexFilterBuilder.addVideo();
+        //             } else {
+        //                 // Process as video concatenation
+        //                 this.ffmpegCommand.input(video.sourcePath);
+        //                 complexFilterBuilder.addVideoWithAudio();
+        //             }
+
+        //             this.ffmpegCommand.inputOptions(inputOptions);
+        //         }
+
+        //         if (element instanceof Audio) {
+        //             const audio = this.assets.find((x) => element.id === x.id);
+        //             if (!audio) {
+        //                 return;
+        //             }
+
+        //             this.ffmpegCommand.input(audio.sourcePath);
+        //             complexFilterBuilder.addAudio();
+        //         }
+        //     }
+        // };
+
+        // this.template.elements.forEach((element) => {
+        //     processElement(element);
+        // });
 
         const complexFilterCommand = complexFilterBuilder.build();
         const complexFilterMapping = complexFilterBuilder.getMapping();

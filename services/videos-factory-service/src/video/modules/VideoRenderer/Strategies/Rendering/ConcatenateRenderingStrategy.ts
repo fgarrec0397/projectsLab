@@ -1,5 +1,7 @@
+import ffmpeg from "fluent-ffmpeg";
+
 import { BaseElement } from "../../Entities/BaseElement";
-import { Template } from "../../VideoFactory";
+import { Template } from "../../VideoRenderer";
 import { IElementProcessingStrategy } from "./IRenderingStrategy";
 
 class ConcatenateProcessingStrategy implements IElementProcessingStrategy {

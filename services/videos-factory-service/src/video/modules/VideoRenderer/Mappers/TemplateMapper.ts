@@ -2,7 +2,7 @@ import { BaseElement } from "../Entities/BaseElement";
 import { Composition } from "../Entities/Composition";
 import { RenderableElement } from "../Entities/RenderableElement";
 import { Text } from "../Entities/Text";
-import { Template, TemplateAsset, TemplateText } from "../VideoFactory";
+import { Template, TemplateAsset, TemplateText } from "../VideoRenderer";
 
 export class TemplateMapper {
     template: Template;

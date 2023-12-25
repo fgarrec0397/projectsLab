@@ -41,7 +41,7 @@ export class VideoRenderer {
 
     static Video = Video;
 
-    assets: TemplateAsset[];
+    assets: TemplateAsset[] = [];
 
     complexFilterBuilder: ComplexFilterBuilder;
 
@@ -49,35 +49,25 @@ export class VideoRenderer {
 
     elementsFactory: ElementComponentFactory;
 
-    elements: IElementComponent[];
+    elements: IElementComponent[] = [];
 
     ffmpegCommand: ffmpeg.FfmpegCommand;
 
     durationPerVideo?: number;
 
-    texts: TemplateText[];
+    texts: TemplateText[] = [];
 
     template: Template;
 
     constructor(template: Template) {
         this.template = template;
-
         this.ffmpegCommand = ffmpeg();
 
-        this.templateMapper = new TemplateMapper(this.template);
-
         this.complexFilterBuilder = new ComplexFilterBuilder();
-
         this.elementsFactory = new ElementComponentFactory(this.complexFilterBuilder);
+        this.templateMapper = new TemplateMapper(this.template, this.elementsFactory);
 
-        this.assets = this.templateMapper.mapTemplateToAssets();
-
-        this.texts = this.templateMapper.mapTemplateToTexts();
-
-        this.durationPerVideo = this.templateMapper.mapDurationPerVideo();
-
-        this.elements = this.templateMapper.mapTemplateToElements(this.elementsFactory);
-
+        this.mapTemplate();
         this.cleanUpDirectories();
     }
 
@@ -149,6 +139,16 @@ export class VideoRenderer {
             this.assets[index].decompressPath = outputPath;
         }
         console.log("Videos frames extracted");
+    }
+
+    private mapTemplate() {
+        this.assets = this.templateMapper.mapTemplateToAssets();
+
+        this.texts = this.templateMapper.mapTemplateToTexts();
+
+        this.durationPerVideo = this.templateMapper.mapDurationPerVideo();
+
+        this.elements = this.templateMapper.mapTemplateToElements();
     }
 
     /**

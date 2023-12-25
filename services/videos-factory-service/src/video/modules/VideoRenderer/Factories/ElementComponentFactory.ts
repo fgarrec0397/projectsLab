@@ -19,16 +19,22 @@ export class ElementComponentFactory {
 
     createElementComponent(element: BaseElement): IElementComponent {
         if (element instanceof Composition) {
-            // TODO - the issue is here
-            const childComponents = element.elements.map(this.createElementComponent);
+            const childComponents = element.elements.map(this.createElementComponent.bind(this));
             return new CompositionComponent(element, childComponents, this.complexFilterBuilder);
-        } else if (element instanceof Video) {
+        }
+
+        if (element instanceof Video) {
             return new VideoComponent(element, this.complexFilterBuilder);
-        } else if (element instanceof Audio) {
+        }
+
+        if (element instanceof Audio) {
             return new AudioComponent(element, this.complexFilterBuilder);
-        } else if (element instanceof Text) {
+        }
+
+        if (element instanceof Text) {
             return new TextComponent(element, this.complexFilterBuilder);
         }
+
         throw new Error("Unknown element type");
     }
 }

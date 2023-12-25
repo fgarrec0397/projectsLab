@@ -8,10 +8,13 @@ import { Template, TemplateAsset, TemplateText } from "../VideoRenderer";
 export class TemplateMapper {
     template: Template;
 
+    elementsFactory: ElementComponentFactory;
+
     assets?: TemplateAsset[];
 
-    constructor(template: Template) {
+    constructor(template: Template, elementsFactory: ElementComponentFactory) {
         this.template = template;
+        this.elementsFactory = elementsFactory;
     }
 
     mapTemplateToAssets() {
@@ -47,7 +50,7 @@ export class TemplateMapper {
     mapTemplateToTexts() {
         const texts: TemplateText[] = [];
 
-        console.log(`Mapping assets`);
+        console.log(`Mapping Text`);
 
         const recursivelyMapAssets = (elements: BaseElement[]) => {
             if (!elements.length) {
@@ -79,8 +82,10 @@ export class TemplateMapper {
         return this.template.duration ? this.template.duration / numberOfVideos : undefined;
     }
 
-    mapTemplateToElements(elementsFactory: ElementComponentFactory) {
-        return this.template.elements.map(elementsFactory.createElementComponent);
+    mapTemplateToElements() {
+        return this.template.elements.map((element) =>
+            this.elementsFactory.createElementComponent(element)
+        );
     }
 
     private getAssets() {

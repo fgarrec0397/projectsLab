@@ -1,3 +1,4 @@
+import { CanvasRenderer } from "../../CanvasRenderer/CanvasRenderer";
 import { ComplexFilterBuilder } from "../Builders/ComplexFilterBuilder";
 import { AudioComponent } from "../Components/AudioComponent";
 import { IElementComponent } from "../Components/BaseComponent";
@@ -11,10 +12,13 @@ import { Text } from "../Entities/Text";
 import { Video } from "../Entities/Video";
 
 export class ElementComponentFactory {
+    canvasRenderer: CanvasRenderer;
+
     complexFilterBuilder: ComplexFilterBuilder;
 
-    constructor(complexFilterBuilder: ComplexFilterBuilder) {
+    constructor(complexFilterBuilder: ComplexFilterBuilder, canvasRenderer: CanvasRenderer) {
         this.complexFilterBuilder = complexFilterBuilder;
+        this.canvasRenderer = canvasRenderer;
     }
 
     createElementComponent(element: BaseElement): IElementComponent {
@@ -32,7 +36,7 @@ export class ElementComponentFactory {
         }
 
         if (element instanceof Text) {
-            return new TextComponent(element, this.complexFilterBuilder);
+            return new TextComponent(element, this.complexFilterBuilder, this.canvasRenderer);
         }
 
         throw new Error("Unknown element type");

@@ -2,8 +2,8 @@ import { google } from "@google-cloud/speech/build/protos/protos";
 
 export type Subtitle = {
     word: string | null | undefined;
-    startTime: google.protobuf.IDuration | null | undefined;
-    endTime: google.protobuf.IDuration | null | undefined;
+    start?: number;
+    end?: number;
 };
 
 export const mapSubtitles = (data?: google.cloud.speech.v1.IRecognizeResponse): Subtitle[] => {
@@ -15,8 +15,8 @@ export const mapSubtitles = (data?: google.cloud.speech.v1.IRecognizeResponse): 
 
             return alternatives[0].words.map(({ word, startTime, endTime }) => ({
                 word,
-                startTime,
-                endTime,
+                start: startTime,
+                end: endTime,
             }));
         })
         .filter((x) => x !== undefined || x !== null) as Subtitle[];

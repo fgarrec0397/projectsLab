@@ -5,6 +5,7 @@ import { join } from "path";
 import { getAssetsPath } from "../../../core/utils/getAssetsPath";
 import { createTextImage } from "../../utils/createTextImage";
 import { extractFramesFromVideo } from "../../utils/extractFramesFromVideo";
+import { CanvasRenderer } from "../CanvasRenderer/CanvasRenderer";
 import { ComplexFilterBuilder } from "./Builders/ComplexFilterBuilder";
 import { IElementComponent } from "./Components/BaseComponent";
 import { Audio } from "./Entities/Audio";
@@ -43,6 +44,8 @@ export class VideoRenderer {
 
     assets: TemplateAsset[] = [];
 
+    canvasRenderer: CanvasRenderer;
+
     complexFilterBuilder: ComplexFilterBuilder;
 
     templateMapper: TemplateMapper;
@@ -63,8 +66,15 @@ export class VideoRenderer {
         this.template = template;
         this.ffmpegCommand = ffmpeg();
 
+        this.canvasRenderer = new CanvasRenderer({
+            width: this.template.width,
+            height: this.template.height,
+        });
         this.complexFilterBuilder = new ComplexFilterBuilder();
-        this.elementsFactory = new ElementComponentFactory(this.complexFilterBuilder);
+        this.elementsFactory = new ElementComponentFactory(
+            this.complexFilterBuilder,
+            this.canvasRenderer
+        );
         this.templateMapper = new TemplateMapper(this.template, this.elementsFactory);
 
         this.mapTemplate();

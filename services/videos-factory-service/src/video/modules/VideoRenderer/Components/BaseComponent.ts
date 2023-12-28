@@ -9,7 +9,7 @@ export interface IElementComponent {
         ffmpegCommand: ffmpeg.FfmpegCommand,
         template: Template,
         durationPerVideo?: number
-    ): void;
+    ): Promise<void> | void;
 }
 
 export class BaseComponent<T extends BaseElement> {

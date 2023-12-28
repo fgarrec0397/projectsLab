@@ -1,5 +1,3 @@
-import { Subtitle } from "../../../utils/mappers/mapSubtitles";
-
 export class ComplexFilterBuilder {
     private audioCount: number = 0;
 
@@ -47,9 +45,11 @@ export class ComplexFilterBuilder {
     }
 
     addOverlay(start?: number, end?: number) {
-        let overlayFilter = `${this.videoOutputName}`;
+        let overlayFilter = `[${this.videoOutputName}]`;
 
-        overlayFilter += `[${this.videoWithAudioCount + 1 + this.overlayCount}:v]overlay`;
+        overlayFilter += `[${
+            this.videoWithAudioCount + this.audioCount + this.overlayCount
+        }:v]overlay`;
 
         // Set the time when it is enabled
         if (start !== undefined && end !== undefined) {
@@ -59,33 +59,12 @@ export class ComplexFilterBuilder {
         // Set the position
         overlayFilter += `:x=0:y=0`;
 
+        this.videoOutputName = "v_out";
+
+        overlayFilter += `[${this.videoOutputName}]`;
+
         this.overlayComplexFilter = overlayFilter;
     }
-
-    // buildTextOverlay(text: Subtitle[] | Subtitle) {
-    //     this.videoOutputName = "v_out";
-
-    //     if (!Array.isArray(text)) {
-    //         this.addOverlay()
-    //         return;
-    //     }
-
-    //     if (!text.length) {
-    //         return;
-    //     }
-
-    //     text.forEach((sub, index) => {
-    //         overlayFilter += `[${
-    //             this.videoWithAudioCount + 1 + index
-    //         }:v]overlay=enable='between(t,${sub.start},${sub.end})':x=0:y=0`;
-    //         overlayFilter +=
-    //             index < text.length - 1 ? `[vs${index + 1}]; ` : `[${this.videoOutputName}]`;
-    //     });
-
-    //     this.overlayComplexFilter = overlayFilter;
-
-    //     return;
-    // }
 
     getMapping() {
         return [this.videoOutputName, this.audioOutputName];
@@ -100,7 +79,10 @@ export class ComplexFilterBuilder {
             return "";
         }
 
-        return this.finalComplexFilter;
+        console.log(this.finalComplexFilter, "this.finalComplexFilter");
+        console.log(this.finalComplexFilter.join(";"), "this.finalComplexFilter.join(';')");
+
+        return this.finalComplexFilter.join(";");
     }
 
     private concatVideoWithAudioComplexFilter() {

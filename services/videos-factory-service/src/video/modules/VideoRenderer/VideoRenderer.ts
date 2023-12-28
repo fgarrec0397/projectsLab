@@ -78,29 +78,33 @@ export class VideoRenderer {
         this.templateMapper = new TemplateMapper(this.template, this.elementsFactory);
 
         this.mapTemplate();
-        this.cleanUpDirectories();
+        // this.cleanUpDirectories();
     }
 
     public async initRender() {
         if (this.template.useFrames) {
             await this.decompressVideos();
         }
-        this.buildCommand();
+
+        await this.processElements();
+
+        this.buildComplexFilterCommand();
+
         this.render();
     }
 
-    private buildCommand() {
+    private async processElements() {
         // Process each element with the composite pattern
-        this.elements.forEach((element) => {
-            element.process(this.ffmpegCommand, this.template, this.durationPerVideo);
-        });
+        for (const element of this.elements) {
+            await element.process(this.ffmpegCommand, this.template, this.durationPerVideo);
+        }
+    }
 
+    private buildComplexFilterCommand() {
         const complexFilterCommand = this.complexFilterBuilder.build();
         const complexFilterMapping = this.complexFilterBuilder.getMapping();
 
         this.ffmpegCommand.complexFilter(complexFilterCommand, complexFilterMapping);
-
-        console.log("Constructed FFmpeg command:", this.ffmpegCommand._getArguments().join(" "));
     }
 
     private render() {
@@ -111,8 +115,15 @@ export class VideoRenderer {
             .outputOptions(["-pix_fmt yuv420p"])
             .fps(this.template.fps)
             .on("end", () => console.timeEnd("Rendering finished"))
-            .on("error", (err: Error) => console.log("Error: " + err.message))
+            .on("error", (error: Error) => {
+                console.log(`Error - ${error.name}: ${error.message}. Stack: ${error.stack}`);
+            })
             .save(getAssetsPath("out/refactor-video.mp4"));
+        console.log("Constructed FFmpeg command:", this.ffmpegCommand._getArguments().join(" "));
+
+        // TODO - fluent-ffmpeg fail when printing the command. Need to print the command, then apply a regex to it to add quotes to make sure it does not fail
+        // Working command for the template
+        // ffmpeg -t 10 -i "C:\\Users\\fgarr\\Documents\\lab\\projectsLab\\services\\videos-factory-service\\assets\\poc\\video1.mp4" -t 15 -i "C:\\Users\\fgarr\\Documents\\lab\\projectsLab\\services\\videos-factory-service\\assets\\poc\\video2.mp4" -t 10 -i "C:\\Users\\fgarr\\Documents\\lab\\projectsLab\\services\\videos-factory-service\\assets\\poc\\video3.mp4" -t 10 -i "C:\\Users\\fgarr\\Documents\\lab\\projectsLab\\services\\videos-factory-service\\assets\\poc\\video4.mp4" -i "C:\\Users\\fgarr\\Documents\\lab\\projectsLab\\services\\videos-factory-service\\assets\\poc\\background-music-Blade-Runner2049.mp3" -i "C:\\Users\\fgarr\\Documents\\lab\\projectsLab\\services\\videos-factory-service\\assets\\poc\\speech.mp3" -i "C:\\Users\\fgarr\\Documents\\lab\\projectsLab\\services\\videos-factory-service\\assets\\poc\\tmp\\output\\text-0037a4bc-2b3c-438d-8db7-05fe343fec9c.png" -filter_complex "[0:v][0:a][1:v][1:a][2:v][2:a][3:v][3:a]concat=n=4:v=1:a=1[v][a];[a][4:a][5:a]amix=inputs=3[a_out];[v][6:v]overlay=x=0:y=0[v_out]" -map "[v_out]" -map "[a_out]" output.mp4
     }
 
     // TODO - use the same process as the legacy feature as it is pretty fast to render substiles

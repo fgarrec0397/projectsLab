@@ -41,7 +41,5 @@ export class TextComponent extends BaseComponent<Text> implements IElementCompon
             ffmpegCommand.input(outputFilePath);
             this.complexFilterBuilder.addOverlay(text.start, text.end);
         }
-
-        console.log(text, "text");
     }
 }

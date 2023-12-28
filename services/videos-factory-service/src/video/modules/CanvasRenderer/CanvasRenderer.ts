@@ -1,5 +1,5 @@
 import { Canvas, CanvasRenderingContext2D, createCanvas } from "canvas";
-import { writeFile, writeFileSync } from "fs";
+import { promises } from "fs";
 
 export type CanvasRendererConfig = {
     width: number;
@@ -31,7 +31,7 @@ export class CanvasRenderer {
 
         const buffer = this.canvas.toBuffer("image/png");
 
-        await writeFile(filename, buffer, () => {});
+        await promises.writeFile(filename, buffer);
         console.log("Should write the file");
 
         this.context.restore();

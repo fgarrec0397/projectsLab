@@ -1,11 +1,12 @@
+import { TimedText } from "../../../utils/mappers/mapSubtitles";
 import { BaseElement, BaseElementConfig } from "./BaseElement";
 
 type TextConfig = BaseElementConfig & {
-    value: string;
+    value: string | TimedText[];
 };
 
 export class Text extends BaseElement {
-    value: string;
+    value: string | TimedText[];
 
     constructor(config: TextConfig) {
         super(config);

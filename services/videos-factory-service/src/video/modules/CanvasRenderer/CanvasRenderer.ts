@@ -32,7 +32,6 @@ export class CanvasRenderer {
         const buffer = this.canvas.toBuffer("image/png");
 
         await promises.writeFile(filename, buffer);
-        console.log("Should write the file");
 
         this.context.restore();
     }

@@ -1,7 +1,7 @@
-import { Subtitle } from "../mappers/mapSubtitles";
+import { TimedText } from "../mappers/mapSubtitles";
 import { nanosToSeconds } from "../nanosToSeconds";
 
-export const buildSubtitlesFilter = (subtitles?: Subtitle[]) => {
+export const buildSubtitlesFilter = (subtitles?: TimedText[]) => {
     const filters: Array<string> = [];
 
     if (!subtitles) {

@@ -1,12 +1,12 @@
 import { google } from "@google-cloud/speech/build/protos/protos";
 
-export type Subtitle = {
+export type TimedText = {
     word: string | null | undefined;
     start?: number;
     end?: number;
 };
 
-export const mapSubtitles = (data?: google.cloud.speech.v1.IRecognizeResponse): Subtitle[] => {
+export const mapSubtitles = (data?: google.cloud.speech.v1.IRecognizeResponse): TimedText[] => {
     const newData = data?.results
         ?.flatMap(({ alternatives }) => {
             if (!alternatives?.[0].words) {
@@ -19,7 +19,7 @@ export const mapSubtitles = (data?: google.cloud.speech.v1.IRecognizeResponse): 
                 end: endTime,
             }));
         })
-        .filter((x) => x !== undefined || x !== null) as Subtitle[];
+        .filter((x) => x !== undefined || x !== null) as TimedText[];
 
     return newData || [];
 };

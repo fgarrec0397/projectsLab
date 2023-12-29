@@ -3,9 +3,9 @@ import ffmpeg from "fluent-ffmpeg";
 import { getAssetsPath } from "../../core/utils/getAssetsPath";
 import { VideoAssetDictionary, VideoConfig } from "../controllers/v1/videoController";
 import { buildSubtitlesFilter } from "./builders/buildSubtitlesFilter";
-import { Subtitle } from "./mappers/mapSubtitles";
+import { TimedText } from "./mappers/mapSubtitles";
 
-export const mergeSubtitlesToVideo = async (subtitles: Subtitle[], config: VideoConfig) => {
+export const mergeSubtitlesToVideo = async (subtitles: TimedText[], config: VideoConfig) => {
     const ffmpegCommand = ffmpeg();
     const subtitlesFilters = buildSubtitlesFilter(subtitles);
 
@@ -44,7 +44,7 @@ export const mergeSubtitlesToVideo = async (subtitles: Subtitle[], config: Video
 export const mergeFrames = async (
     assets: VideoAssetDictionary,
     config: VideoConfig,
-    subtitles?: Subtitle[]
+    subtitles?: TimedText[]
 ) => {
     const ffmpegCommand = ffmpeg();
 

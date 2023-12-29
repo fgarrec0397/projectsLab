@@ -1,6 +1,6 @@
 import { google } from "@google-cloud/speech/build/protos/protos";
 
-import { Subtitle } from "../../../utils/mappers/mapSubtitles";
+import { TimedText } from "../../../utils/mappers/mapSubtitles";
 import { nanosToSeconds } from "../../../utils/nanosToSeconds";
 
 export class SubtitlesMapper {
@@ -17,7 +17,7 @@ export class SubtitlesMapper {
                     end: nanosToSeconds(endTime!.nanos!),
                 }));
             })
-            .filter((x) => x !== undefined || x !== null) as Subtitle[];
+            .filter((x) => x !== undefined || x !== null) as TimedText[];
 
         return newData || [];
     }

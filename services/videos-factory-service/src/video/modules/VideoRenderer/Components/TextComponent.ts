@@ -26,9 +26,18 @@ export class TextComponent extends BaseComponent<Text> implements IElementCompon
             return;
         }
 
-        if (typeof text.value === "string") {
+        const handleCreateText = async (
+            id: string,
+            textValue: string | null | undefined,
+            start?: number,
+            end?: number
+        ) => {
+            if (!textValue) {
+                return;
+            }
+
             const outputFolderPath = getAssetsPath(`tmp/output`);
-            const outputFilePath = getAssetsPath(`tmp/output/text-${text.id}.png`);
+            const outputFilePath = getAssetsPath(`tmp/output/text-${id}.png`);
 
             if (!existsSync(outputFolderPath)) {
                 mkdirSync(outputFolderPath);
@@ -36,10 +45,33 @@ export class TextComponent extends BaseComponent<Text> implements IElementCompon
             } else {
                 console.log("Folder already exists");
             }
-            await this.canvasRenderer.createTextImage(text.value, outputFilePath);
 
+            console.log("before creating text");
+            await this.canvasRenderer.createTextImage(textValue, outputFilePath);
+
+            console.log("after creating text");
             ffmpegCommand.input(outputFilePath);
-            this.complexFilterBuilder.addOverlay(text.start, text.end);
+            console.log("after add input text");
+
+            this.complexFilterBuilder.addOverlay(start, end);
+        };
+
+        if (typeof text.value === "string") {
+            return handleCreateText(text.id, text.value, text.start, text.end);
+        }
+
+        for (const { timedText, valueIndex } of text.value.map((x, index) => ({
+            timedText: x,
+            valueIndex: index,
+        }))) {
+            console.log(`Creating ${timedText.word} text frame`);
+
+            return handleCreateText(
+                String(valueIndex),
+                timedText.word,
+                timedText.start,
+                timedText.end
+            );
         }
     }
 }

@@ -11,7 +11,7 @@ import { filterAssets } from "../utils/filters/filterAssets";
 import { getVideoFrameReader } from "../utils/getVideoFrameReader";
 import { mapAssetsToImages } from "../utils/mappers/mapAssetsToImages";
 import { mapReadersToAssets } from "../utils/mappers/mapReadersToAssets";
-import { Subtitle } from "../utils/mappers/mapSubtitles";
+import { TimedText } from "../utils/mappers/mapSubtitles";
 import { mapVideoConfigToSceneConfig } from "../utils/mappers/mapVideoConfigToSceneConfig";
 import { mapVideosAssets } from "../utils/mappers/mapVideosAssets";
 import { mergeFrames } from "../utils/mergeFrames";
@@ -33,13 +33,13 @@ export class VideoService {
 
     config: VideoConfig;
 
-    subtitles: Subtitle[];
+    subtitles: TimedText[];
 
     templateModule: TemplateModule;
 
     videosReaders?: VideoReader[];
 
-    constructor(templateModule: TemplateModule, subtitles: Subtitle[]) {
+    constructor(templateModule: TemplateModule, subtitles: TimedText[]) {
         this.templateModule = templateModule;
         this.config = templateModule.template.config;
         this.canvas = templateModule.canvas;

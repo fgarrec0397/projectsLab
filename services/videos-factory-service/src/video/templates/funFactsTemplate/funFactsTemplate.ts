@@ -15,6 +15,8 @@ const timedSubtitles = loadJson<[google.cloud.speech.v1.IRecognizeResponse]>(
 
 const subtitles = mapSubtitles(timedSubtitles?.[0]);
 
+console.log(getAssetsPath("video1.mp4"), `getAssetsPath("video1.mp4")`);
+
 export const funFactsTemplate: Template = {
     // duration: 46,
     fps: 60,

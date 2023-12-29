@@ -23,7 +23,7 @@ export class ComplexFilterBuilder {
 
     addVideoWithAudio() {
         this.videoWithAudioComplexFilter.push(
-            `[${this.videoWithAudioCount}:v] [${this.videoWithAudioCount}:a]`
+            `[${this.videoWithAudioCount}:v][${this.videoWithAudioCount}:a]`
         );
         this.incrementVideoWithAudioCount();
 
@@ -57,7 +57,7 @@ export class ComplexFilterBuilder {
         }
 
         // Set the position
-        overlayFilter += `:x=0:y=0`;
+        overlayFilter += `=x=0:y=0`;
 
         this.videoOutputName = "v_out";
 
@@ -82,7 +82,7 @@ export class ComplexFilterBuilder {
         console.log(this.finalComplexFilter, "this.finalComplexFilter");
         console.log(this.finalComplexFilter.join(";"), "this.finalComplexFilter.join(';')");
 
-        return this.finalComplexFilter.join(";");
+        return `"${this.finalComplexFilter.join(";")}"`;
     }
 
     private concatVideoWithAudioComplexFilter() {
@@ -91,8 +91,8 @@ export class ComplexFilterBuilder {
         }
 
         const videoWithAudioConcatFilter =
-            this.videoWithAudioComplexFilter.join(" ") +
-            `concat=n=${this.videoWithAudioCount}:v=1:a=1 [v] [a]`;
+            this.videoWithAudioComplexFilter.join("") +
+            `concat=n=${this.videoWithAudioCount}:v=1:a=1[v][a]`;
 
         this.finalComplexFilter.push(videoWithAudioConcatFilter);
     }

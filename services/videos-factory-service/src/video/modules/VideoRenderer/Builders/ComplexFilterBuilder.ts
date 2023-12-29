@@ -82,7 +82,7 @@ export class ComplexFilterBuilder {
         console.log(this.finalComplexFilter, "this.finalComplexFilter");
         console.log(this.finalComplexFilter.join(";"), "this.finalComplexFilter.join(';')");
 
-        return `"${this.finalComplexFilter.join(";")}"`;
+        return this.finalComplexFilter.join(";");
     }
 
     private concatVideoWithAudioComplexFilter() {

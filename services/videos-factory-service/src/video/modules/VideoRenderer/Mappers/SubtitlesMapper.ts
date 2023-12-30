@@ -11,14 +11,31 @@ export class SubtitlesMapper {
                     return null;
                 }
 
+                // TODO - check what is wrong with the start and end time
                 return alternatives[0].words.map(({ word, startTime, endTime }) => ({
                     word,
-                    start: nanosToSeconds(startTime!.nanos!),
-                    end: nanosToSeconds(endTime!.nanos!),
+                    start: this.mapGoogleDurationToSeconds(startTime),
+                    end: this.mapGoogleDurationToSeconds(endTime),
                 }));
             })
             .filter((x) => x !== undefined || x !== null) as TimedText[];
 
         return newData || [];
+    }
+
+    private mapGoogleDurationToSeconds(duration: google.protobuf.IDuration | null | undefined) {
+        if (
+            !duration ||
+            duration.nanos === undefined ||
+            duration.nanos === null ||
+            duration.seconds === undefined ||
+            duration.seconds === null
+        ) {
+            return 0;
+        }
+
+        const nanosSeconds = nanosToSeconds(duration.nanos);
+
+        return String(nanosSeconds + Number(duration.seconds));
     }
 }

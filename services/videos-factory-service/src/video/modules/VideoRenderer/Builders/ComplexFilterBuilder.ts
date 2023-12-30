@@ -48,7 +48,9 @@ export class ComplexFilterBuilder {
         let overlayFilter = `[${this.videoOutputName}]`;
         let enableArg: string | undefined;
 
-        overlayFilter += `[${this.videoWithAudioCount + this.audioCount}:v]overlay`;
+        overlayFilter += `[${
+            this.videoWithAudioCount + this.audioCount + this.overlayCount
+        }:v]overlay`;
 
         // Set the time when it is enabled
         if (start !== undefined && end !== undefined) {

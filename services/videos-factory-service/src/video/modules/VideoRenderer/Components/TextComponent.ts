@@ -81,9 +81,10 @@ export class TextComponent extends BaseComponent<Text> implements IElementCompon
                 textValue: timedText.word,
                 start: timedText.start,
                 end: timedText.end,
+                shouldAddInput: true,
             });
         }
 
-        ffmpegCommand.input(getAssetsPath(`tmp/output/text-%04d.png`));
+        // ffmpegCommand.input(getAssetsPath(`tmp/output/text-%04d.png`));
     }
 }

@@ -46,24 +46,33 @@ export class ComplexFilterBuilder {
 
     addOverlay(start?: number, end?: number) {
         let overlayFilter = `[${this.videoOutputName}]`;
+        let enableArg: string | undefined;
 
-        overlayFilter += `[${
-            this.videoWithAudioCount + this.audioCount + this.overlayCount
-        }:v]overlay`;
+        overlayFilter += `[${this.videoWithAudioCount + this.audioCount}:v]overlay`;
 
         // Set the time when it is enabled
         if (start !== undefined && end !== undefined) {
-            overlayFilter += `=enable='between(t,${start},${end})'`;
+            enableArg = `=enable='between(t,${start},${end})'`;
         }
 
         // Set the position
-        overlayFilter += `=x=0:y=0`;
 
-        this.videoOutputName = "v_out";
+        if (enableArg !== undefined) {
+            overlayFilter += enableArg;
+            overlayFilter += `:x=0:y=0`;
+        } else {
+            overlayFilter += `=x=0:y=0`;
+        }
 
-        overlayFilter += `[${this.videoOutputName}]`;
+        const overlayOutputName = `ovl${this.overlayCount}`;
 
-        this.overlayComplexFilter = overlayFilter;
+        this.videoOutputName = overlayOutputName;
+
+        overlayFilter += `[${this.videoOutputName}];`;
+
+        this.overlayComplexFilter += overlayFilter;
+
+        this.overlayCount++;
     }
 
     getMapping() {
@@ -78,9 +87,6 @@ export class ComplexFilterBuilder {
         if (!this.finalComplexFilter.length) {
             return "";
         }
-
-        console.log(this.finalComplexFilter, "this.finalComplexFilter");
-        console.log(this.finalComplexFilter.join(";"), "this.finalComplexFilter.join(';')");
 
         return this.finalComplexFilter.join(";");
     }
@@ -114,7 +120,9 @@ export class ComplexFilterBuilder {
     }
 
     private concatOverlayComplexFilter() {
-        this.finalComplexFilter.push(this.overlayComplexFilter);
+        console.log(this.overlayComplexFilter.slice(0, -1), "this.overlayComplexFilter");
+
+        this.finalComplexFilter.push(this.overlayComplexFilter.slice(0, -1));
     }
 
     private incrementVideoWithAudioCount() {

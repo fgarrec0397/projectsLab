@@ -110,7 +110,8 @@ export class VideoRenderer {
     private async render() {
         console.log("Rendering started...");
         console.time("Rendering finished");
-        return new Promise<void>((resolve) => {
+        console.log(this.ffmpegCommand._getArguments().join(" "));
+        return new Promise<void>((resolve, reject) => {
             this.ffmpegCommand
                 .videoCodec("libx264")
                 .outputOptions(["-pix_fmt yuv420p"])
@@ -123,14 +124,14 @@ export class VideoRenderer {
                     resolve();
                 })
                 .on("error", (error: Error) => {
-                    console.log("on error called", error);
+                    reject(error);
                 })
                 .save(getAssetsPath("out/refactor-video.mp4"));
         });
     }
 
     private finishRender() {
-        this.cleanUpDirectories();
+        // this.cleanUpDirectories();
     }
 
     private async decompressVideos() {
@@ -164,7 +165,7 @@ export class VideoRenderer {
      * Clean up the temporary directories
      */
     private async cleanUpDirectories() {
-        for (const path of [getAssetsPath("out"), getAssetsPath("tmp/output")]) {
+        for (const path of [getAssetsPath("tmp/output")]) {
             if (fs.existsSync(path)) {
                 await fs.promises.rm(path, { recursive: true });
             }

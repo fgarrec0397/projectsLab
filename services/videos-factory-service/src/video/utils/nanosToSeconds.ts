@@ -1,5 +1,5 @@
 export const nanosToSeconds = (nanos?: number) => {
-    if (!nanos) {
+    if (nanos === undefined) {
         return 0;
     }
 

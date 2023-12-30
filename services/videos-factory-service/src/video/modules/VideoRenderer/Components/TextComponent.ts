@@ -26,18 +26,21 @@ export class TextComponent extends BaseComponent<Text> implements IElementCompon
             return;
         }
 
-        const handleCreateText = async (
-            id: string,
-            textValue: string | null | undefined,
-            start?: number,
-            end?: number
-        ) => {
-            if (!textValue) {
+        console.log(text, "text");
+
+        const handleCreateText = async (options: {
+            id: string;
+            textValue: string | null | undefined;
+            start?: number;
+            end?: number;
+            shouldAddInput?: boolean;
+        }) => {
+            if (!options.textValue) {
                 return;
             }
 
             const outputFolderPath = getAssetsPath(`tmp/output`);
-            const outputFilePath = getAssetsPath(`tmp/output/text-${id}.png`);
+            const outputFilePath = getAssetsPath(`tmp/output/text-${options.id}.png`);
 
             if (!existsSync(outputFolderPath)) {
                 mkdirSync(outputFolderPath);
@@ -46,19 +49,26 @@ export class TextComponent extends BaseComponent<Text> implements IElementCompon
                 console.log("Folder already exists");
             }
 
-            console.log("before creating text");
-            await this.canvasRenderer.createTextImage(textValue, outputFilePath);
+            await this.canvasRenderer.createTextImage(options.textValue, outputFilePath);
 
-            console.log("after creating text");
-            ffmpegCommand.input(outputFilePath);
-            console.log("after add input text");
+            if (options.shouldAddInput) {
+                ffmpegCommand.input(outputFilePath);
+            }
 
-            this.complexFilterBuilder.addOverlay(start, end);
+            this.complexFilterBuilder.addOverlay(options.start, options.end);
         };
 
         if (typeof text.value === "string") {
-            return handleCreateText(text.id, text.value, text.start, text.end);
+            return handleCreateText({
+                id: text.id,
+                textValue: text.value,
+                start: text.start,
+                end: text.end,
+                shouldAddInput: true,
+            });
         }
+
+        console.log(text.value, "text.value");
 
         for (const { timedText, valueIndex } of text.value.map((x, index) => ({
             timedText: x,
@@ -66,12 +76,14 @@ export class TextComponent extends BaseComponent<Text> implements IElementCompon
         }))) {
             console.log(`Creating ${timedText.word} text frame`);
 
-            return handleCreateText(
-                String(valueIndex),
-                timedText.word,
-                timedText.start,
-                timedText.end
-            );
+            await handleCreateText({
+                id: String(valueIndex).padStart(4, "0"),
+                textValue: timedText.word,
+                start: timedText.start,
+                end: timedText.end,
+            });
         }
+
+        ffmpegCommand.input(getAssetsPath(`tmp/output/text-%04d.png`));
     }
 }

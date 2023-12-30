@@ -21,18 +21,17 @@ export class CanvasRenderer {
 
     // TODO - make the text configurable
     async createTextImage(text: string, filename: string) {
-        this.context.save();
+        const canvas = createCanvas(this.config.width, this.config.height);
+        const context = canvas.getContext("2d");
 
-        this.context.fillStyle = "#0000";
-        this.context.fillRect(0, 0, this.config.width, this.config.height);
-        this.context.font = "200px Arial";
-        this.context.fillStyle = "white";
-        this.context.fillText(text, 50, 100);
+        context.fillStyle = "#0000";
+        context.fillRect(0, 0, this.config.width, this.config.height);
+        context.font = "200px Arial";
+        context.fillStyle = "white";
+        context.fillText(text, 50, 100);
 
-        const buffer = this.canvas.toBuffer("image/png");
+        const buffer = canvas.toBuffer("image/png");
 
         await promises.writeFile(filename, buffer);
-
-        this.context.restore();
     }
 }

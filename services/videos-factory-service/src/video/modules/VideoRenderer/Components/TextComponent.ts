@@ -1,5 +1,5 @@
 import ffmpeg from "fluent-ffmpeg";
-import { existsSync, mkdirSync } from "fs";
+import { existsSync, mkdirSync, promises } from "fs";
 
 import { getAssetsPath } from "../../../../core/utils/getAssetsPath";
 import { CanvasRenderer } from "../../CanvasRenderer/CanvasRenderer";
@@ -26,14 +26,12 @@ export class TextComponent extends BaseComponent<Text> implements IElementCompon
             return;
         }
 
-        console.log(text, "text");
-
         const handleCreateText = async (options: {
             id: string;
             textValue: string | null | undefined;
             start?: number;
             end?: number;
-            shouldAddInput?: boolean;
+            shouldAddToInputsList?: boolean;
         }) => {
             if (!options.textValue) {
                 return;
@@ -51,12 +49,19 @@ export class TextComponent extends BaseComponent<Text> implements IElementCompon
 
             await this.canvasRenderer.createTextImage(options.textValue, outputFilePath);
 
-            if (options.shouldAddInput) {
+            if (options.shouldAddToInputsList) {
+                promises.appendFile(
+                    getAssetsPath("tmp/inputs-list/text-overlay.txt"),
+                    "file " + outputFilePath + "\n"
+                );
+            } else {
                 ffmpegCommand.input(outputFilePath);
             }
 
             this.complexFilterBuilder.addOverlay(options.start, options.end);
         };
+
+        // getAssetsPath("tmp/inputs-list")
 
         if (typeof text.value === "string") {
             return handleCreateText({
@@ -64,12 +69,10 @@ export class TextComponent extends BaseComponent<Text> implements IElementCompon
                 textValue: text.value,
                 start: text.start,
                 end: text.end,
-                shouldAddInput: true,
             });
         }
 
-        console.log(text.value, "text.value");
-
+        // TODO if an array, should store the inputs in a txt file
         for (const { timedText, valueIndex } of text.value.map((x, index) => ({
             timedText: x,
             valueIndex: index,
@@ -81,10 +84,10 @@ export class TextComponent extends BaseComponent<Text> implements IElementCompon
                 textValue: timedText.word,
                 start: timedText.start,
                 end: timedText.end,
-                shouldAddInput: true,
+                shouldAddToInputsList: true,
             });
         }
 
-        // ffmpegCommand.input(getAssetsPath(`tmp/output/text-%04d.png`));
+        ffmpegCommand.input(getAssetsPath("tmp/inputs-list/text-overlay.txt"));
     }
 }

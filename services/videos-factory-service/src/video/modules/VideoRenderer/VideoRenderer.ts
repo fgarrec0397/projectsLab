@@ -113,6 +113,7 @@ export class VideoRenderer {
         console.time("Rendering finished");
         return new Promise<void>((resolve, reject) => {
             this.ffmpegCommand
+                .inputOptions(["-f concat", "-safe 0"])
                 .videoCodec("libx264")
                 .outputOptions(["-pix_fmt yuv420p"])
                 .fps(this.template.fps)
@@ -165,7 +166,11 @@ export class VideoRenderer {
      * Clean up the temporary directories
      */
     private async cleanUpDirectories() {
-        for (const path of [getAssetsPath("out"), getAssetsPath("tmp/output")]) {
+        for (const path of [
+            getAssetsPath("out"),
+            getAssetsPath("tmp/output"),
+            getAssetsPath("tmp/inputs-list"),
+        ]) {
             if (existsSync(path)) {
                 await promises.rm(path, { recursive: true });
             }

@@ -1,5 +1,5 @@
 import ffmpeg from "fluent-ffmpeg";
-import fs from "fs";
+import { existsSync, promises } from "fs";
 import { join } from "path";
 
 import { getAssetsPath } from "../../../core/utils/getAssetsPath";
@@ -80,6 +80,9 @@ export class VideoRenderer {
     }
 
     public async initRender() {
+        await this.beforeRender();
+
+        // TODO - Should detect here if we should batch processing elements. If yes, we should make multiple renders
         if (this.template.useFrames) {
             await this.decompressVideos();
         }
@@ -89,8 +92,6 @@ export class VideoRenderer {
         this.buildComplexFilterCommand();
 
         await this.render();
-
-        this.finishRender();
     }
 
     private async processElements() {
@@ -110,7 +111,6 @@ export class VideoRenderer {
     private async render() {
         console.log("Rendering started...");
         console.time("Rendering finished");
-        console.log(this.ffmpegCommand._getArguments().join(" "));
         return new Promise<void>((resolve, reject) => {
             this.ffmpegCommand
                 .videoCodec("libx264")
@@ -130,8 +130,8 @@ export class VideoRenderer {
         });
     }
 
-    private finishRender() {
-        // this.cleanUpDirectories();
+    private async beforeRender() {
+        await this.cleanUpDirectories();
     }
 
     private async decompressVideos() {
@@ -165,11 +165,11 @@ export class VideoRenderer {
      * Clean up the temporary directories
      */
     private async cleanUpDirectories() {
-        for (const path of [getAssetsPath("tmp/output")]) {
-            if (fs.existsSync(path)) {
-                await fs.promises.rm(path, { recursive: true });
+        for (const path of [getAssetsPath("out"), getAssetsPath("tmp/output")]) {
+            if (existsSync(path)) {
+                await promises.rm(path, { recursive: true });
             }
-            await fs.promises.mkdir(path, { recursive: true });
+            await promises.mkdir(path, { recursive: true });
         }
     }
 }

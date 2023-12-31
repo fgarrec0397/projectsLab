@@ -6,7 +6,7 @@ import { SubtitlesMapper } from "../../modules/VideoRenderer/Mappers/SubtitlesMa
 import { Template, VideoRenderer } from "../../modules/VideoRenderer/VideoRenderer";
 
 const timedSubtitles = loadJson<[google.cloud.speech.v1.IRecognizeResponse]>(
-    getAssetsPath("mock-voiceover-subtitles.json")
+    getAssetsPath("POC-mock-voiceover-subtitles.json")
 );
 const subtitlesMapper = new SubtitlesMapper();
 

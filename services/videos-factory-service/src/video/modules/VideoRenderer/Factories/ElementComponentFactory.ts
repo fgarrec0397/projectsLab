@@ -21,7 +21,7 @@ export class ElementComponentFactory {
         this.canvasRenderer = canvasRenderer;
     }
 
-    createElementComponent(element: BaseElement): IElementComponent {
+    createElementComponent(element: BaseElement): IElementComponent | undefined {
         if (element instanceof Composition) {
             const childComponents = element.elements.map(this.createElementComponent.bind(this));
             return new CompositionComponent(element, childComponents, this.complexFilterBuilder);
@@ -34,11 +34,11 @@ export class ElementComponentFactory {
         if (element instanceof Audio) {
             return new AudioComponent(element, this.complexFilterBuilder);
         }
+    }
 
+    createTextComponents(element: BaseElement): IElementComponent | undefined {
         if (element instanceof Text) {
             return new TextComponent(element, this.complexFilterBuilder, this.canvasRenderer);
         }
-
-        throw new Error("Unknown element type");
     }
 }

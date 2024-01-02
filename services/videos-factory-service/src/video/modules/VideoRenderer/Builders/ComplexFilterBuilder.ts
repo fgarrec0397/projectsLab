@@ -78,7 +78,13 @@ export class ComplexFilterBuilder {
     }
 
     getMapping() {
-        return [this.videoOutputName, this.audioOutputName];
+        const mapping = [this.videoOutputName];
+
+        if (this.audioCount > 0) {
+            mapping.push(this.audioOutputName);
+        }
+
+        return mapping;
     }
 
     build() {
@@ -91,6 +97,20 @@ export class ComplexFilterBuilder {
         }
 
         return this.finalComplexFilter.join(";");
+    }
+
+    reset() {
+        this.audioCount = 0;
+        this.videoCount = 0;
+        this.overlayCount = 0;
+        this.videoWithAudioCount = 0;
+        this.audioOutputName = "a_out";
+        this.videoOutputName = "v";
+        this.audioComplexFilter = [];
+        this.videoComplexFilter = [];
+        this.overlayComplexFilter = "";
+        this.videoWithAudioComplexFilter = [];
+        this.finalComplexFilter = [];
     }
 
     private concatVideoWithAudioComplexFilter() {
@@ -135,3 +155,6 @@ export class ComplexFilterBuilder {
         this.audioCount++;
     }
 }
+
+// this command is working
+// ffmpeg -i C:\Users\fgarr\Documents\lab\projectsLab\services\videos-factory-service\assets\poc\tmp\videos\refactor-video.mp4 -i C:\Users\fgarr\Documents\lab\projectsLab\services\videos-factory-service\assets\poc\tmp\output\text-115ee0d9-12b4-4243-bdc6-fdf8ae317a9d.png -y -filter_complex "[0:v][1:v] overlay=x=0:y=0" -vcodec libx264 -r 60 -pix_fmt yuv420p C:\Users\fgarr\Documents\lab\projectsLab\services\videos-factory-service\assets\poc\out\refactor-video.mp4

@@ -1,9 +1,7 @@
 import ffmpeg from "fluent-ffmpeg";
 import { existsSync, promises } from "fs";
-import { join } from "path";
 
 import { getAssetsPath } from "../../../core/utils/getAssetsPath";
-import { extractFramesFromVideo } from "../../utils/extractFramesFromVideo";
 import { CanvasRenderer } from "../CanvasRenderer/CanvasRenderer";
 import { ComplexFilterBuilder } from "./Builders/ComplexFilterBuilder";
 import { IElementComponent } from "./Components/BaseComponent";
@@ -22,7 +20,6 @@ export type Template = {
     outputFormat: string;
     width: number;
     height: number;
-    useFrames?: boolean;
     elements: BaseElement[];
 };
 
@@ -41,6 +38,10 @@ export class VideoRenderer {
 
     static Video = Video;
 
+    outputPath = getAssetsPath("out/refactor-video.mp4");
+
+    tempOutputPath = getAssetsPath("tmp/videos/refactor-video.mp4");
+
     assets: TemplateAsset[] = [];
 
     canvasRenderer: CanvasRenderer;
@@ -53,17 +54,20 @@ export class VideoRenderer {
 
     elements: IElementComponent[] = [];
 
+    textsElements: IElementComponent[] = [];
+
     ffmpegCommand: ffmpeg.FfmpegCommand;
 
-    durationPerVideo?: number;
+    textFfmpegCommand: ffmpeg.FfmpegCommand;
 
-    texts: TemplateText[] = [];
+    durationPerVideo?: number;
 
     template: Template;
 
     constructor(template: Template) {
         this.template = template;
         this.ffmpegCommand = ffmpeg();
+        this.textFfmpegCommand = ffmpeg();
 
         this.canvasRenderer = new CanvasRenderer({
             width: this.template.width,
@@ -83,21 +87,33 @@ export class VideoRenderer {
         await this.beforeRender();
 
         // TODO - Should detect here if we should batch processing elements. If yes, we should make multiple renders
-        if (this.template.useFrames) {
-            await this.decompressVideos();
-        }
 
-        await this.processElements();
+        await this.processVideoElements();
 
         this.buildComplexFilterCommand();
 
-        await this.render();
+        await this.renderVideo();
+
+        this.complexFilterBuilder.reset();
+
+        await this.processTextElements();
+
+        await this.renderTextOnVideo();
     }
 
-    private async processElements() {
+    private async processVideoElements() {
         // Process each element with the composite pattern
         for (const element of this.elements) {
             await element.process(this.ffmpegCommand, this.template, this.durationPerVideo);
+        }
+    }
+
+    private async processTextElements() {
+        this.textFfmpegCommand.input(this.tempOutputPath);
+
+        // Process each element with the composite pattern
+        for (const element of this.textsElements) {
+            await element.process(this.textFfmpegCommand, this.template, this.durationPerVideo);
         }
     }
 
@@ -108,12 +124,11 @@ export class VideoRenderer {
         this.ffmpegCommand.complexFilter(complexFilterCommand, complexFilterMapping);
     }
 
-    private async render() {
+    private async renderVideo() {
         console.log("Rendering started...");
         console.time("Rendering finished");
         return new Promise<void>((resolve, reject) => {
             this.ffmpegCommand
-                .inputOptions(["-f concat", "-safe 0"])
                 .videoCodec("libx264")
                 .outputOptions(["-pix_fmt yuv420p"])
                 .fps(this.template.fps)
@@ -127,7 +142,35 @@ export class VideoRenderer {
                 .on("error", (error: Error) => {
                     reject(error);
                 })
-                .save(getAssetsPath("out/refactor-video.mp4"));
+                .save(this.tempOutputPath);
+        });
+    }
+
+    private async renderTextOnVideo() {
+        console.log("Rendering started...");
+        console.time("Rendering finished");
+
+        const complexFilterCommand = this.complexFilterBuilder.build();
+        const complexFilterMapping = this.complexFilterBuilder.getMapping();
+
+        this.textFfmpegCommand.complexFilter(complexFilterCommand, complexFilterMapping);
+
+        return new Promise<void>((resolve, reject) => {
+            this.textFfmpegCommand
+                .videoCodec("libx264")
+                .outputOptions(["-pix_fmt yuv420p"])
+                .fps(this.template.fps)
+                .on("start", (commandLine) => {
+                    console.log(`Spawned Text Ffmpeg with command: ${commandLine}`);
+                })
+                .on("end", () => {
+                    console.timeEnd("Rendering finished");
+                    resolve();
+                })
+                .on("error", (error: Error) => {
+                    reject(error);
+                })
+                .save(this.outputPath);
         });
     }
 
@@ -135,31 +178,11 @@ export class VideoRenderer {
         await this.cleanUpDirectories();
     }
 
-    private async decompressVideos() {
-        const videos = this.assets.filter((x) => x.type === "video");
-
-        for (const [index, asset] of videos.entries()) {
-            console.log(`Extracting frames from video ${asset.name}`);
-
-            const outputPath = join(
-                getAssetsPath(`tmp/${asset.name}-${asset.id}`),
-                "frame-%04d.png"
-            );
-            await extractFramesFromVideo(asset.sourcePath, outputPath, this.template.fps);
-
-            this.assets[index].decompressPath = outputPath;
-        }
-        console.log("Videos frames extracted");
-    }
-
     private mapTemplate() {
-        this.assets = this.templateMapper.mapTemplateToAssets();
-
-        this.texts = this.templateMapper.mapTemplateToTexts();
-
         this.durationPerVideo = this.templateMapper.mapDurationPerVideo();
 
         this.elements = this.templateMapper.mapTemplateToElements();
+        this.textsElements = this.templateMapper.mapTemplateToTexts();
     }
 
     /**
@@ -170,6 +193,7 @@ export class VideoRenderer {
             getAssetsPath("out"),
             getAssetsPath("tmp/output"),
             getAssetsPath("tmp/inputs-list"),
+            getAssetsPath("tmp/videos"),
         ]) {
             if (existsSync(path)) {
                 await promises.rm(path, { recursive: true });

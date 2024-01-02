@@ -6,11 +6,11 @@ import { Template } from "../VideoRenderer";
 import { BaseComponent, IElementComponent } from "./BaseComponent";
 
 export class CompositionComponent extends BaseComponent<Composition> implements IElementComponent {
-    childrenComponents: IElementComponent[];
+    childrenComponents: (IElementComponent | undefined)[];
 
     constructor(
         element: Composition,
-        childrenComponents: IElementComponent[],
+        childrenComponents: (IElementComponent | undefined)[],
         complexFilterBuilder: ComplexFilterBuilder
     ) {
         super(element, complexFilterBuilder);
@@ -24,7 +24,7 @@ export class CompositionComponent extends BaseComponent<Composition> implements 
         durationPerVideo?: number
     ): void {
         this.childrenComponents.forEach((component) => {
-            component.process(ffmpegCommand, template, durationPerVideo);
+            component?.process(ffmpegCommand, template, durationPerVideo);
         });
     }
 }

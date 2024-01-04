@@ -1,10 +1,11 @@
-import ffmpeg from "fluent-ffmpeg";
+import ffmpeg, { FfmpegCommand } from "fluent-ffmpeg";
 import { existsSync, promises } from "fs";
 
 import { getAssetsPath } from "../../../core/utils/getAssetsPath";
 import { CanvasRenderer } from "../CanvasRenderer/CanvasRenderer";
 import { ComplexFilterBuilder } from "./Builders/ComplexFilterBuilder";
 import { IElementComponent } from "./Components/BaseComponent";
+import { IFragmentableComponent } from "./Components/TextComponent";
 import { Audio } from "./Entities/Audio";
 import { BaseElement } from "./Entities/BaseElement";
 import { Composition } from "./Entities/Composition";
@@ -54,7 +55,7 @@ export class VideoRenderer {
 
     elements: IElementComponent[] = [];
 
-    textsElements: IElementComponent[] = [];
+    fragmentableElements: (IElementComponent & IFragmentableComponent)[] = [];
 
     ffmpegCommand: ffmpeg.FfmpegCommand;
 
@@ -96,9 +97,9 @@ export class VideoRenderer {
 
         this.complexFilterBuilder.reset();
 
-        await this.processTextElements();
+        await this.processFragmentElements();
 
-        await this.renderTextOnVideo();
+        // await this.renderTextOnVideo();
     }
 
     private async processVideoElements() {
@@ -108,13 +109,67 @@ export class VideoRenderer {
         }
     }
 
-    private async processTextElements() {
-        this.textFfmpegCommand.input(this.tempOutputPath);
+    private async processFragmentElements() {
+        // this.textFfmpegCommand.input(this.tempOutputPath); // TODO - this should be moved to the final render
 
+        const batchSize = 10;
         // Process each element with the composite pattern
-        for (const element of this.textsElements) {
-            await element.process(this.textFfmpegCommand, this.template, this.durationPerVideo);
+        for (const element of this.fragmentableElements) {
+            const fragments = element.getFragment();
+
+            if (Array.isArray(fragments)) {
+                let currentVideoPath = this.tempOutputPath;
+
+                for (let i = 0; i < fragments.length; i += batchSize) {
+                    // const command: FfmpegCommand = ffmpeg(currentVideoPath);
+
+                    const batch: string[] = fragments.slice(i, i + batchSize);
+                    const outputVideo: string = getAssetsPath(`tmp/videos/intermediate_${i}.mp4`);
+
+                    // await element.fragmentProcess(command, batch);
+                    await this.processBatch(batch, outputVideo, element, currentVideoPath);
+                    currentVideoPath = outputVideo; // Use the output of the current batch as the input for the next
+
+                    // const complexFilter = this.complexFilterBuilder.build();
+                    // const complexFilterMapping = this.complexFilterBuilder.getMapping();
+                    // command
+                    //     .complexFilter(complexFilter, complexFilterMapping)
+                    //     .videoCodec("prores_ks") // Using ProRes
+                    //     .outputOptions("-profile:v 3") // High-quality profile
+                    //     .on("end", () => console.log("end"))
+                    //     .on("error", (err) => console.log("error batching", err))
+                    //     .save(outputVideo);
+                }
+            } else {
+                await element.process(this.textFfmpegCommand, this.template, this.durationPerVideo);
+            }
         }
+    }
+
+    private async processBatch(
+        batch: string[],
+        outputVideo: string,
+        element: IElementComponent & IFragmentableComponent<any>,
+        inputVideo?: string
+    ): Promise<void> {
+        return new Promise(async (resolve, reject) => {
+            const command: FfmpegCommand = ffmpeg(inputVideo);
+
+            await element.fragmentProcess(command, batch);
+
+            const complexFilter = this.complexFilterBuilder.build();
+            const complexFilterMapping = this.complexFilterBuilder.getMapping();
+            command
+                .complexFilter(complexFilter, complexFilterMapping)
+                .videoCodec("prores_ks") // Using ProRes
+                .outputOptions("-profile:v 3") // High-quality profile
+                .on("start", (commandLine) => {
+                    console.log(`Spawned processBatch Ffmpeg with command: ${commandLine}`);
+                })
+                .on("end", () => resolve())
+                .on("error", (err) => reject(err))
+                .save(outputVideo);
+        });
     }
 
     private buildComplexFilterCommand() {
@@ -182,7 +237,7 @@ export class VideoRenderer {
         this.durationPerVideo = this.templateMapper.mapDurationPerVideo();
 
         this.elements = this.templateMapper.mapTemplateToElements();
-        this.textsElements = this.templateMapper.mapTemplateToTexts();
+        this.fragmentableElements = this.templateMapper.mapTemplateToFragmentableElements();
     }
 
     /**

@@ -59,20 +59,20 @@ export const funFactsTemplate: Template = {
         }),
         new VideoRenderer.Text({
             name: "text",
-            value: "subtitles",
+            // value: "subtitles",
             // value: subtitles,
-            // value: [
-            //     {
-            //         word: "test",
-            //         start: 0,
-            //         end: 3,
-            //     },
-            //     {
-            //         word: "test2",
-            //         start: 3,
-            //         end: 4,
-            //     },
-            // ],
+            value: [
+                {
+                    word: "test",
+                    start: 0,
+                    end: 3,
+                },
+                {
+                    word: "test2",
+                    start: 3,
+                    end: 4,
+                },
+            ],
         }),
     ],
 };

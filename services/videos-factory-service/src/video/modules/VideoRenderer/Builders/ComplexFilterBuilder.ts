@@ -9,7 +9,8 @@ export class ComplexFilterBuilder {
 
     private audioOutputName = "a_out";
 
-    private videoOutputName = "v";
+    // private videoOutputName = "v";
+    private videoOutputName = "";
 
     private audioComplexFilter: string[] = [];
 
@@ -22,6 +23,10 @@ export class ComplexFilterBuilder {
     private finalComplexFilter: string[] = [];
 
     addVideoWithAudio() {
+        if (this.videoOutputName === "") {
+            this.videoOutputName = "v";
+        }
+
         this.videoWithAudioComplexFilter.push(
             `[${this.videoWithAudioCount}:v][${this.videoWithAudioCount}:a]`
         );
@@ -44,8 +49,20 @@ export class ComplexFilterBuilder {
         return this;
     }
 
+    // TODO - check to refactor the logic of overlays into an array that we join by ";"
     addOverlay(start?: number, end?: number) {
-        let overlayFilter = `[${this.videoOutputName}]`;
+        // this command is working
+        // ffmpeg -i C:\Users\fgarr\Documents\lab\projectsLab\services\videos-factory-service\assets\poc\tmp\videos\refactor-video.mp4 -i C:\Users\fgarr\Documents\lab\projectsLab\services\videos-factory-service\assets\poc\tmp\output\text-115ee0d9-12b4-4243-bdc6-fdf8ae317a9d.png -y
+        // -filter_complex "[0:v][1:v] overlay=x=0:y=0" -vcodec libx264 -r 60 -pix_fmt yuv420p C:\Users\fgarr\Documents\lab\projectsLab\services\videos-factory-service\assets\poc\out\refactor-video.mp4
+
+        console.log("addOverlay called");
+
+        this.overlayCount++;
+
+        let overlayFilter =
+            this.videoOutputName === ""
+                ? `[${this.overlayCount - 1}:v]`
+                : `[${this.videoOutputName}]`; // this should be undefined by default
         let enableArg: string | undefined;
 
         overlayFilter += `[${
@@ -66,19 +83,25 @@ export class ComplexFilterBuilder {
             overlayFilter += `=x=0:y=0`;
         }
 
-        const overlayOutputName = `ovl${this.overlayCount}`;
+        if (this.videoWithAudioCount > 1) {
+            const overlayOutputName = `ovl${this.overlayCount}`;
 
-        this.videoOutputName = overlayOutputName;
+            this.videoOutputName = overlayOutputName;
 
-        overlayFilter += `[${this.videoOutputName}];`;
+            overlayFilter += `[${overlayOutputName}];`;
+        } else {
+            overlayFilter += ";";
+        }
 
         this.overlayComplexFilter += overlayFilter;
-
-        this.overlayCount++;
     }
 
     getMapping() {
-        const mapping = [this.videoOutputName];
+        const mapping: string[] = [];
+
+        if (this.videoOutputName !== "") {
+            mapping.push(this.videoOutputName);
+        }
 
         if (this.audioCount > 0) {
             mapping.push(this.audioOutputName);
@@ -100,12 +123,14 @@ export class ComplexFilterBuilder {
     }
 
     reset() {
+        console.log("reset called");
+
         this.audioCount = 0;
         this.videoCount = 0;
         this.overlayCount = 0;
         this.videoWithAudioCount = 0;
         this.audioOutputName = "a_out";
-        this.videoOutputName = "v";
+        this.videoOutputName = "";
         this.audioComplexFilter = [];
         this.videoComplexFilter = [];
         this.overlayComplexFilter = "";
@@ -142,9 +167,11 @@ export class ComplexFilterBuilder {
     }
 
     private concatOverlayComplexFilter() {
-        console.log(this.overlayComplexFilter.slice(0, -1), "this.overlayComplexFilter");
-
-        this.finalComplexFilter.push(this.overlayComplexFilter.slice(0, -1));
+        if (this.overlayCount > 1) {
+            this.finalComplexFilter.push(this.overlayComplexFilter.slice(0, -1));
+        } else {
+            this.finalComplexFilter.push(this.overlayComplexFilter);
+        }
     }
 
     private incrementVideoWithAudioCount() {
@@ -155,6 +182,3 @@ export class ComplexFilterBuilder {
         this.audioCount++;
     }
 }
-
-// this command is working
-// ffmpeg -i C:\Users\fgarr\Documents\lab\projectsLab\services\videos-factory-service\assets\poc\tmp\videos\refactor-video.mp4 -i C:\Users\fgarr\Documents\lab\projectsLab\services\videos-factory-service\assets\poc\tmp\output\text-115ee0d9-12b4-4243-bdc6-fdf8ae317a9d.png -y -filter_complex "[0:v][1:v] overlay=x=0:y=0" -vcodec libx264 -r 60 -pix_fmt yuv420p C:\Users\fgarr\Documents\lab\projectsLab\services\videos-factory-service\assets\poc\out\refactor-video.mp4

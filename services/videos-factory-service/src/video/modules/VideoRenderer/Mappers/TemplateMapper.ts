@@ -1,4 +1,5 @@
 import { IElementComponent } from "../Components/BaseComponent";
+import { IFragmentableComponent } from "../Components/TextComponent";
 import { BaseElement } from "../Entities/BaseElement";
 import { Composition } from "../Entities/Composition";
 import { RenderableElement } from "../Entities/RenderableElement";
@@ -58,10 +59,10 @@ export class TemplateMapper {
             .filter((x) => x !== undefined) as IElementComponent[];
     }
 
-    mapTemplateToTexts() {
+    mapTemplateToFragmentableElements() {
         return this.template.elements
             .map((element) => this.elementsFactory.createTextComponents(element))
-            .filter((x) => x !== undefined) as IElementComponent[];
+            .filter((x) => x !== undefined) as (IElementComponent & IFragmentableComponent)[];
     }
 
     private getAssets() {

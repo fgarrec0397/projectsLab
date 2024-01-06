@@ -6,7 +6,7 @@ import { SubtitlesMapper } from "../../modules/VideoRenderer/Mappers/SubtitlesMa
 import { Template, VideoRenderer } from "../../modules/VideoRenderer/VideoRenderer";
 
 const timedSubtitles = loadJson<[google.cloud.speech.v1.IRecognizeResponse]>(
-    getAssetsPath("POC-mock-voiceover-subtitles.json")
+    getAssetsPath("mock-voiceover-subtitles.json")
 );
 const subtitlesMapper = new SubtitlesMapper();
 
@@ -60,19 +60,19 @@ export const funFactsTemplate: Template = {
         new VideoRenderer.Text({
             name: "text",
             // value: "subtitles",
-            // value: subtitles,
-            value: [
-                {
-                    word: "test",
-                    start: 0,
-                    end: 3,
-                },
-                {
-                    word: "test2",
-                    start: 3,
-                    end: 4,
-                },
-            ],
+            value: subtitles,
+            // value: [
+            //     {
+            //         word: "test",
+            //         start: 0,
+            //         end: 3,
+            //     },
+            //     {
+            //         word: "test2",
+            //         start: 3,
+            //         end: 6,
+            //     },
+            // ],
         }),
     ],
 };

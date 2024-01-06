@@ -34,9 +34,15 @@ export class ElementComponentFactory {
         if (element instanceof Audio) {
             return new AudioComponent(element, this.complexFilterBuilder);
         }
+
+        if (element instanceof Text) {
+            return new TextComponent(element, this.complexFilterBuilder, this.canvasRenderer);
+        }
+
+        throw new Error("Element not found");
     }
 
-    createTextComponents(element: BaseElement): IElementComponent | undefined {
+    createFragmentComponents(element: BaseElement): IElementComponent | undefined {
         if (element instanceof Text) {
             return new TextComponent(element, this.complexFilterBuilder, this.canvasRenderer);
         }

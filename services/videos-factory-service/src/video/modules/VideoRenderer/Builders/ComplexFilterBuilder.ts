@@ -51,7 +51,6 @@ export class ComplexFilterBuilder {
         return this;
     }
 
-    // TODO - check to refactor the logic of overlays into an array that we join by ";"
     /**
      *  Add a complex filter overlay command to overlay an item over a video
      *
@@ -61,12 +60,13 @@ export class ComplexFilterBuilder {
      * @param options Options to add to the overlay
      */
     addOverlayOnVideo(options?: { start?: number; end?: number }) {
-        // this command is working
-        // ffmpeg -i C:\Users\fgarr\Documents\lab\projectsLab\services\videos-factory-service\assets\poc\tmp\videos\refactor-video.mp4 -i C:\Users\fgarr\Documents\lab\projectsLab\services\videos-factory-service\assets\poc\tmp\output\text-115ee0d9-12b4-4243-bdc6-fdf8ae317a9d.png -y
-        // -filter_complex "[0:v][1:v] overlay=x=0:y=0" -vcodec libx264 -r 60 -pix_fmt yuv420p C:\Users\fgarr\Documents\lab\projectsLab\services\videos-factory-service\assets\poc\out\refactor-video.mp4
+        const currentOverlayIndex =
+            this.audioCount > 0 && this.videoWithAudioCount > 0
+                ? this.audioCount + this.videoWithAudioCount + this.overlayCount
+                : this.overlayCount + 1;
 
         let fromStream = this.videoOutputName === "" ? `[0:v]` : `[${this.videoOutputName}]`;
-        let currentStream = `[${this.overlayCount + 1}:v]`;
+        let currentStream = `[${currentOverlayIndex}:v]`;
 
         if (this.overlayCount > 1) {
             fromStream = `[${this.overlayCount}:v]`;
@@ -84,7 +84,6 @@ export class ComplexFilterBuilder {
         }
 
         // Set the position
-
         if (enableArg !== undefined) {
             overlayFilter += enableArg;
             overlayFilter += `:x=0:y=0`;
@@ -112,6 +111,8 @@ export class ComplexFilterBuilder {
 
         if (this.audioCount > 0) {
             mapping.push(this.audioOutputName);
+        } else {
+            mapping.push("0:a");
         }
 
         return mapping;

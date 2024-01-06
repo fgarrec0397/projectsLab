@@ -61,7 +61,7 @@ export class TemplateMapper {
 
     mapTemplateToFragmentableElements() {
         return this.template.elements
-            .map((element) => this.elementsFactory.createTextComponents(element))
+            .map((element) => this.elementsFactory.createFragmentComponents(element))
             .filter((x) => x !== undefined) as (IElementComponent & IFragmentableComponent)[];
     }
 

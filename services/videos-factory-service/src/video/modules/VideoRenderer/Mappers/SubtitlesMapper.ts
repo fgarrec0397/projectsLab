@@ -11,7 +11,6 @@ export class SubtitlesMapper {
                     return null;
                 }
 
-                // TODO - check what is wrong with the start and end time
                 return alternatives[0].words.map(({ word, startTime, endTime }) => ({
                     word,
                     start: this.mapGoogleDurationToSeconds(startTime),

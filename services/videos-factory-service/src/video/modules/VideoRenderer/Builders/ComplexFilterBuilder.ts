@@ -16,7 +16,9 @@ export class ComplexFilterBuilder {
 
     private videoComplexFilter: string[] = [];
 
-    private overlayComplexFilter: string = "";
+    private overlayComplexFilter: string[] = [];
+
+    // private overlayComplexFilter: string = "";
 
     private videoWithAudioComplexFilter: string[] = [];
 
@@ -50,28 +52,35 @@ export class ComplexFilterBuilder {
     }
 
     // TODO - check to refactor the logic of overlays into an array that we join by ";"
-    addOverlay(start?: number, end?: number) {
+    /**
+     *  Add a complex filter overlay command to overlay an item over a video
+     *
+     *  ***WARNING*** This method can not be used with the other methods of the builder for now. It needs to be used alone
+     *
+     * @param videoIndex The stream index of video to add overlay to
+     * @param options Options to add to the overlay
+     */
+    addOverlayOnVideo(options?: { start?: number; end?: number }) {
         // this command is working
         // ffmpeg -i C:\Users\fgarr\Documents\lab\projectsLab\services\videos-factory-service\assets\poc\tmp\videos\refactor-video.mp4 -i C:\Users\fgarr\Documents\lab\projectsLab\services\videos-factory-service\assets\poc\tmp\output\text-115ee0d9-12b4-4243-bdc6-fdf8ae317a9d.png -y
         // -filter_complex "[0:v][1:v] overlay=x=0:y=0" -vcodec libx264 -r 60 -pix_fmt yuv420p C:\Users\fgarr\Documents\lab\projectsLab\services\videos-factory-service\assets\poc\out\refactor-video.mp4
 
-        console.log("addOverlay called");
+        let fromStream = this.videoOutputName === "" ? `[0:v]` : `[${this.videoOutputName}]`;
+        let currentStream = `[${this.overlayCount + 1}:v]`;
 
-        this.overlayCount++;
+        if (this.overlayCount > 1) {
+            fromStream = `[${this.overlayCount}:v]`;
+            currentStream = `[${this.videoOutputName}]`;
+        }
 
-        let overlayFilter =
-            this.videoOutputName === ""
-                ? `[${this.overlayCount - 1}:v]`
-                : `[${this.videoOutputName}]`; // this should be undefined by default
+        let overlayFilter = fromStream + currentStream;
         let enableArg: string | undefined;
 
-        overlayFilter += `[${
-            this.videoWithAudioCount + this.audioCount + this.overlayCount
-        }:v]overlay`;
+        overlayFilter += `overlay`;
 
         // Set the time when it is enabled
-        if (start !== undefined && end !== undefined) {
-            enableArg = `=enable='between(t,${start},${end})'`;
+        if (options?.start !== undefined && options?.end !== undefined) {
+            enableArg = `=enable='between(t,${options.start},${options.end})'`;
         }
 
         // Set the position
@@ -83,17 +92,15 @@ export class ComplexFilterBuilder {
             overlayFilter += `=x=0:y=0`;
         }
 
-        if (this.videoWithAudioCount > 1) {
-            const overlayOutputName = `ovl${this.overlayCount}`;
+        const overlayOutputName = `ovl${this.overlayCount}`;
 
-            this.videoOutputName = overlayOutputName;
+        this.videoOutputName = overlayOutputName;
 
-            overlayFilter += `[${overlayOutputName}];`;
-        } else {
-            overlayFilter += ";";
-        }
+        overlayFilter += `[${overlayOutputName}]`;
 
-        this.overlayComplexFilter += overlayFilter;
+        this.overlayComplexFilter.push(overlayFilter);
+
+        this.overlayCount++;
     }
 
     getMapping() {
@@ -133,7 +140,7 @@ export class ComplexFilterBuilder {
         this.videoOutputName = "";
         this.audioComplexFilter = [];
         this.videoComplexFilter = [];
-        this.overlayComplexFilter = "";
+        this.overlayComplexFilter = [];
         this.videoWithAudioComplexFilter = [];
         this.finalComplexFilter = [];
     }
@@ -167,11 +174,9 @@ export class ComplexFilterBuilder {
     }
 
     private concatOverlayComplexFilter() {
-        if (this.overlayCount > 1) {
-            this.finalComplexFilter.push(this.overlayComplexFilter.slice(0, -1));
-        } else {
-            this.finalComplexFilter.push(this.overlayComplexFilter);
-        }
+        const overlayConcatFilter = this.overlayComplexFilter.join(";");
+
+        this.finalComplexFilter.push(overlayConcatFilter);
     }
 
     private incrementVideoWithAudioCount() {

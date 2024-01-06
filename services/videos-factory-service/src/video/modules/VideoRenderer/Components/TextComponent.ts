@@ -97,7 +97,10 @@ export class TextComponent
 
             ffmpegCommand.input(outputFilePath);
 
-            this.complexFilterBuilder.addOverlay(options.start, options.end);
+            this.complexFilterBuilder.addOverlayOnVideo({
+                start: options.start,
+                end: options.end,
+            });
         };
 
         // getAssetsPath("tmp/inputs-list")
@@ -170,7 +173,10 @@ export class TextComponent
 
             ffmpegCommand.input(outputFilePath);
 
-            this.complexFilterBuilder.addOverlay(options.start, options.end);
+            this.complexFilterBuilder.addOverlayOnVideo({
+                start: options.start,
+                end: options.end,
+            });
         };
 
         for (const { timedText, valueIndex } of fragments.map((x, index) => ({

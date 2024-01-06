@@ -124,7 +124,7 @@ export class VideoRenderer {
                     // const command: FfmpegCommand = ffmpeg(currentVideoPath);
 
                     const batch: string[] = fragments.slice(i, i + batchSize);
-                    const outputVideo: string = getAssetsPath(`tmp/videos/intermediate_${i}.mp4`);
+                    const outputVideo: string = getAssetsPath(`tmp/videos/intermediate_${i}.mov`);
 
                     // await element.fragmentProcess(command, batch);
                     await this.processBatch(batch, outputVideo, element, currentVideoPath);
@@ -152,6 +152,7 @@ export class VideoRenderer {
         element: IElementComponent & IFragmentableComponent<any>,
         inputVideo?: string
     ): Promise<void> {
+        console.time(`Intermediate ${outputVideo} rendering finished`);
         return new Promise(async (resolve, reject) => {
             const command: FfmpegCommand = ffmpeg(inputVideo);
 
@@ -166,7 +167,10 @@ export class VideoRenderer {
                 .on("start", (commandLine) => {
                     console.log(`Spawned processBatch Ffmpeg with command: ${commandLine}`);
                 })
-                .on("end", () => resolve())
+                .on("end", () => {
+                    console.timeEnd(`Intermediate ${outputVideo} rendering finished`);
+                    resolve();
+                })
                 .on("error", (err) => reject(err))
                 .save(outputVideo);
         });

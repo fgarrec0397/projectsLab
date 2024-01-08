@@ -5,6 +5,8 @@ import { nanosToSeconds } from "../../../utils/nanosToSeconds";
 
 export class SubtitlesMapper {
     mapGoogleSpeechDataToSubtitles(data?: google.cloud.speech.v1.IRecognizeResponse) {
+        console.log(JSON.stringify(data), "data");
+
         const newData = data?.results
             ?.flatMap(({ alternatives }) => {
                 if (!alternatives?.[0].words) {

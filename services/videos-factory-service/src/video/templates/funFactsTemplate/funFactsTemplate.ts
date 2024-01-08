@@ -12,6 +12,9 @@ const subtitlesMapper = new SubtitlesMapper();
 
 const subtitles = subtitlesMapper.mapGoogleSpeechDataToSubtitles(timedSubtitles?.[0]);
 
+console.log(JSON.stringify(subtitles), "subtitles");
+// console.log(JSON.stringify(timedSubtitles), "timedSubtitles");
+
 export const funFactsTemplate: Template = {
     // duration: 46,
     fps: 60,
@@ -45,14 +48,20 @@ export const funFactsTemplate: Template = {
                     name: "video4",
                     sourcePath: getAssetsPath("video4.mp4"),
                     start: 35,
-                    end: 45,
+                    end: 56,
+                }),
+                new VideoRenderer.Video({
+                    name: "video5",
+                    sourcePath: getAssetsPath("video5.mp4"),
+                    start: 56,
+                    end: 73,
                 }),
             ],
         }),
-        new VideoRenderer.Audio({
-            name: "audio1",
-            sourcePath: getAssetsPath("background-music-Blade-Runner2049.mp3"),
-        }),
+        // new VideoRenderer.Audio({
+        //     name: "audio1",
+        //     sourcePath: getAssetsPath("background-music-Blade-Runner2049.mp3"),
+        // }),
         new VideoRenderer.Audio({
             name: "audio1",
             sourcePath: getAssetsPath("speech.mp3"),
@@ -71,6 +80,11 @@ export const funFactsTemplate: Template = {
             //         word: "test2",
             //         start: 3,
             //         end: 6,
+            //     },
+            //     {
+            //         word: "test3",
+            //         start: 6,
+            //         end: 9,
             //     },
             // ],
         }),

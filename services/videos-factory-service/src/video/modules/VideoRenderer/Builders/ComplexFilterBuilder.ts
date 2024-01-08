@@ -69,8 +69,8 @@ export class ComplexFilterBuilder {
         let currentStream = `[${currentOverlayIndex}:v]`;
 
         if (this.overlayCount > 1) {
-            fromStream = `[${this.overlayCount}:v]`;
-            currentStream = `[${this.videoOutputName}]`;
+            fromStream = `[${this.videoOutputName}]`;
+            currentStream = `[${currentOverlayIndex}:v]`;
         }
 
         let overlayFilter = fromStream + currentStream;

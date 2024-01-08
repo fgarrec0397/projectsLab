@@ -50,9 +50,6 @@ export class TextComponent
 
             if (!existsSync(outputFolderPath)) {
                 mkdirSync(outputFolderPath);
-                console.log("Folder created");
-            } else {
-                console.log("Folder already exists");
             }
 
             await this.canvasRenderer.createTextImage(options.textValue, outputFilePath);
@@ -89,13 +86,9 @@ export class TextComponent
             return;
         }
 
-        console.log(fragments, "fragments");
-
         if (typeof fragments === "string") {
             return;
         }
-
-        console.log(this.complexFilterBuilder, "this.complexFilterBuilder in Text component");
 
         const handleCreateText = async (options: {
             id: string;
@@ -112,11 +105,7 @@ export class TextComponent
 
             if (!existsSync(outputFolderPath)) {
                 mkdirSync(outputFolderPath);
-                console.log("Folder created");
-            } else {
-                console.log("Folder already exists");
             }
-
             await this.canvasRenderer.createTextImage(options.textValue, outputFilePath);
 
             ffmpegCommand.input(outputFilePath);
@@ -140,7 +129,7 @@ export class TextComponent
             timedText: x,
             valueIndex: index,
         }))) {
-            console.log(`Creating ${timedText.word} text frame`);
+            console.log(`Creating ${timedText.word} text`);
 
             await handleCreateText({
                 id: String(valueIndex).padStart(4, "0"),
@@ -148,7 +137,6 @@ export class TextComponent
                 start: timedText.start,
                 end: timedText.end,
             });
-            console.log("after handleCreateText");
         }
     }
 }

@@ -1,4 +1,4 @@
-import ffmpeg, { FfmpegCommand, ffprobe } from "fluent-ffmpeg";
+import ffmpeg, { FfmpegCommand } from "fluent-ffmpeg";
 import { existsSync, promises } from "fs";
 
 import { getAssetsPath } from "../../../core/utils/getAssetsPath";
@@ -105,11 +105,7 @@ export class VideoRenderer {
 
         this.complexFilterBuilder.reset();
 
-        // await this.prepareFragmentRender();
-
         await this.processFragmentElements();
-
-        // await this.renderTextOnVideo();
     }
 
     private async processVideoElements() {
@@ -128,34 +124,25 @@ export class VideoRenderer {
      */
     private async processFragmentElements() {
         // this.textFfmpegCommand.input(this.tempOutputPath); // TODO - this should be moved to the final render
-
-        const batchSize = 10;
+        // TODO - try with an animated gif
+        const batchSize = 50;
         // Process each element with the composite pattern
         for (const element of this.fragmentableElements) {
             const fragments = element.getFragment();
+            console.log(JSON.stringify(fragments), "fragments");
+            console.log(fragments.length, "fragments.length");
 
             if (Array.isArray(fragments)) {
                 let currentVideoPath = this.tempOutputPath;
 
                 for (let i = 0; i < fragments.length; i += batchSize) {
-                    // const command: FfmpegCommand = ffmpeg(currentVideoPath);
-
                     const batch: string[] = fragments.slice(i, i + batchSize);
                     const outputVideo: string = getAssetsPath(`tmp/videos/intermediate_${i}.mov`);
+                    console.log(JSON.stringify(batch), "JSON.stringify(batch)");
 
-                    // await element.fragmentProcess(command, batch);
                     await this.processBatch(batch, outputVideo, element, currentVideoPath);
                     currentVideoPath = outputVideo; // Use the output of the current batch as the input for the next
                     this.complexFilterBuilder.reset();
-                    // const complexFilter = this.complexFilterBuilder.build();
-                    // const complexFilterMapping = this.complexFilterBuilder.getMapping();
-                    // command
-                    //     .complexFilter(complexFilter, complexFilterMapping)
-                    //     .videoCodec("prores_ks") // Using ProRes
-                    //     .outputOptions("-profile:v 3") // High-quality profile
-                    //     .on("end", () => console.log("end"))
-                    //     .on("error", (err) => console.log("error batching", err))
-                    //     .save(outputVideo);
                 }
             } else {
                 await element.process(this.textFfmpegCommand, this.template, this.durationPerVideo);
@@ -225,12 +212,6 @@ export class VideoRenderer {
         });
     }
 
-    private async prepareFragmentRender() {
-        const videoDuration =
-            this.template.duration || (await this.getVideoDuration(this.tempOutputPath));
-        await this.renderBlankVideo(videoDuration);
-    }
-
     private async beforeRender() {
         await this.cleanUpDirectories();
     }
@@ -240,54 +221,6 @@ export class VideoRenderer {
 
         this.elements = this.templateMapper.mapTemplateToElements();
         this.fragmentableElements = this.templateMapper.mapTemplateToFragmentableElements();
-    }
-
-    private async renderBlankVideo(duration: number) {
-        const command = ffmpeg();
-        console.log("Rendering a blank video");
-        console.time("Rendering the blank video finished");
-
-        return new Promise<void>((resolve, reject) => {
-            command
-                .input(
-                    `color=c=black:s=${this.template.width}x${this.template.height}:r=25:d=${10}`
-                )
-                // .input("color=c=black:s=1280x720:r=25:d=60") // Duration set to 60 seconds for testing
-                .inputFormat("lavfi")
-                .input("anullsrc")
-                .inputFormat("lavfi")
-                .addOption("-c:v", "libvpx-vp9")
-                .addOption("-b:v", "0")
-                .addOption("-crf", "30")
-                .addOption("-vf", "format=yuva420p")
-                .output(this.tempBlankVideoPath)
-                .on("start", (commandLine) => {
-                    console.log(`Spawned renderBlankVideo Ffmpeg with command: ${commandLine}`);
-                })
-                .on("end", () => {
-                    console.timeEnd("Rendering the blank video finished");
-                    resolve();
-                })
-                .on("error", (error) => {
-                    reject(error);
-                })
-                .run();
-        });
-    }
-
-    private async getVideoDuration(filePath: string) {
-        console.log(`Getting duration of ${filePath}`);
-        return new Promise<number>((resolve, reject) => {
-            ffprobe(filePath, (err, metadata) => {
-                if (err) {
-                    reject(err);
-                    return;
-                }
-                const duration = metadata.format.duration || 0;
-                console.log(`Duration is ${duration}`);
-                resolve(duration);
-            });
-        });
     }
 
     /**

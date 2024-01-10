@@ -2,15 +2,21 @@ import { google } from "@google-cloud/speech/build/protos/protos";
 
 import { getAssetsPath } from "../../../core/utils/getAssetsPath";
 import { loadJson } from "../../../core/utils/loadJson";
-import { SubtitlesMapper } from "../../modules/VideoRenderer/Mappers/SubtitlesMapper";
+import {
+    SubtitlesMapper,
+    TranscribeTranscript,
+} from "../../modules/VideoRenderer/Mappers/SubtitlesMapper";
 import { Template, VideoRenderer } from "../../modules/VideoRenderer/VideoRenderer";
 
-const timedSubtitles = loadJson<[google.cloud.speech.v1.IRecognizeResponse]>(
-    getAssetsPath("mock-voiceover-subtitles.json")
+// const timedSubtitles = loadJson<[google.cloud.speech.v1.IRecognizeResponse]>(
+//     getAssetsPath("mock-voiceover-subtitles.json")
+// );
+const timedSubtitles = loadJson<TranscribeTranscript>(
+    getAssetsPath("mock-aws-transcribe-subtitles.json")
 );
 const subtitlesMapper = new SubtitlesMapper();
 
-const subtitles = subtitlesMapper.mapGoogleSpeechDataToSubtitles(timedSubtitles?.[0]);
+const subtitles = subtitlesMapper.mapAwsTranscribeToTimedText(timedSubtitles);
 
 console.log(JSON.stringify(subtitles), "subtitles");
 // console.log(JSON.stringify(timedSubtitles), "timedSubtitles");

@@ -8,7 +8,7 @@ import { VideoUtils } from "../../../VideoRenderer/Utilities/VideoUtils";
 import { VoiceGeneratorStrategy } from "./VoiceGeneratorStrategy";
 
 export class OpenAIVoiceGeneratorStrategy implements VoiceGeneratorStrategy {
-    tempVoiceFilePath: string = getAssetsPath("speech-temp.mp3");
+    tempVoiceFilePath: string = getAssetsPath("speech-temp.flac");
 
     openai: OpenAI;
 
@@ -23,7 +23,8 @@ export class OpenAIVoiceGeneratorStrategy implements VoiceGeneratorStrategy {
 
         const mp3 = await this.openai.audio.speech.create({
             model: "tts-1-hd",
-            voice: "alloy",
+            voice: "echo",
+            response_format: "flac",
             input,
         });
 

@@ -18,6 +18,8 @@
     "@video": "./src/video"
   },
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.485.0",
+    "@aws-sdk/client-transcribe": "^3.485.0",
     "@google-cloud/speech": "^6.1.0",
     "@projectslab/eslint-config": "*",
     "@projectslab/helpers": "*",

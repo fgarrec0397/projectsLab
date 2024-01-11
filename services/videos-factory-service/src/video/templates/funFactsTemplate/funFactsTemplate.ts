@@ -12,11 +12,11 @@ import { Template, VideoRenderer } from "../../modules/VideoRenderer/VideoRender
 //     getAssetsPath("mock-voiceover-subtitles.json")
 // );
 const timedSubtitles = loadJson<TranscribeTranscript>(
-    getAssetsPath("mock-aws-transcribe-subtitles.json")
+    getAssetsPath("mock-deepgram-subtitles.json")
 );
 const subtitlesMapper = new SubtitlesMapper();
 
-const subtitles = subtitlesMapper.mapAwsTranscribeToTimedText(timedSubtitles);
+const subtitles = subtitlesMapper.mapDeepgramToTimedText(timedSubtitles as any);
 
 console.log(JSON.stringify(subtitles), "subtitles");
 // console.log(JSON.stringify(timedSubtitles), "timedSubtitles");

@@ -6,19 +6,26 @@ import { OpenAIVoiceGeneratorStrategy } from "../../modules/ScriptManager/Strate
 import { VideoRenderer } from "../../modules/VideoRenderer/VideoRenderer";
 import { funFactsTemplate } from "../../templates/funFactsTemplate/funFactsTemplate";
 
+const canGenerateScript = false;
+const canRenderVideo = true;
+
 class VideoController {
     async get(request: Request, result: Response) {
-        // const scriptManager = new ScriptManager(
-        //     new OpenAIVoiceGeneratorStrategy(),
-        //     new GoogleTimestampsGeneratorStrategy()
-        // );
+        if (canGenerateScript) {
+            const scriptManager = new ScriptManager(
+                new OpenAIVoiceGeneratorStrategy(),
+                new GoogleTimestampsGeneratorStrategy()
+            );
 
-        // await scriptManager.generateScript();
+            await scriptManager.generateScript();
 
-        // console.log(scriptManager.subtitles, "scriptManager.subtitles");
+            console.log(scriptManager.subtitles, "scriptManager.subtitles");
+        }
 
-        const videoFactory = new VideoRenderer(funFactsTemplate);
-        await videoFactory.initRender();
+        if (canRenderVideo) {
+            const videoFactory = new VideoRenderer(funFactsTemplate);
+            await videoFactory.initRender();
+        }
 
         result.status(200).json({ result: "video controller GET" });
     }

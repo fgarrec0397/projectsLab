@@ -1,8 +1,8 @@
 import ffmpeg from "fluent-ffmpeg";
 
+import { Template } from "../../../videoTypes";
 import { ComplexFilterBuilder } from "../Builders/ComplexFilterBuilder";
 import { Composition } from "../Entities/Composition";
-import { Template } from "../VideoRenderer";
 import { BaseComponent, IElementComponent } from "./BaseComponent";
 
 export class CompositionComponent extends BaseComponent<Composition> implements IElementComponent {

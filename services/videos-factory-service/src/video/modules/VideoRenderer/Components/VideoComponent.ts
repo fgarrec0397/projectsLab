@@ -1,7 +1,7 @@
 import ffmpeg from "fluent-ffmpeg";
 
+import { Template } from "../../../videoTypes";
 import { Video } from "../Entities/Video";
-import { Template } from "../VideoRenderer";
 import { BaseComponent, IElementComponent } from "./BaseComponent";
 
 export class VideoComponent extends BaseComponent<Video> implements IElementComponent {

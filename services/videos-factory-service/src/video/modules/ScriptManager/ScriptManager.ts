@@ -1,7 +1,7 @@
 import fs from "fs";
 
 import { getAssetsPath } from "../../../core/utils/getAssetsPath";
-import { TimedText } from "../../utils/mappers/mapSubtitles";
+import { TimedText } from "../../videoTypes";
 import { TimestampsGeneratorStrategy } from "./Strategies/TimestampsGeneratorStrategy/TimestampsGeneratorStrategy";
 import { VoiceGeneratorStrategy } from "./Strategies/VoiceGeneratorStrategy/VoiceGeneratorStrategy";
 

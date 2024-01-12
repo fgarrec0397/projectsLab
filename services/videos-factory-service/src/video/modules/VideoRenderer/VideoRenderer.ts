@@ -2,27 +2,18 @@ import ffmpeg, { FfmpegCommand } from "fluent-ffmpeg";
 import { existsSync, promises } from "fs";
 
 import { getAssetsPath } from "../../../core/utils/getAssetsPath";
+import { Template } from "../../videoTypes";
 import { CanvasRenderer } from "../CanvasRenderer/CanvasRenderer";
 import { ComplexFilterBuilder } from "./Builders/ComplexFilterBuilder";
 import { IElementComponent } from "./Components/BaseComponent";
 import { IFragmentableComponent } from "./Components/TextComponent";
 import { Audio } from "./Entities/Audio";
-import { BaseElement } from "./Entities/BaseElement";
 import { Composition } from "./Entities/Composition";
 import { RenderableElement } from "./Entities/RenderableElement";
 import { Text } from "./Entities/Text";
 import { Video } from "./Entities/Video";
 import { ElementComponentFactory } from "./Factories/ElementComponentFactory";
 import { TemplateMapper } from "./Mappers/TemplateMapper";
-
-export type Template = {
-    duration?: number;
-    fps: number;
-    outputFormat: string;
-    width: number;
-    height: number;
-    elements: BaseElement[];
-};
 
 export type TemplateAsset = RenderableElement & {
     decompressPath?: string;
@@ -109,28 +100,16 @@ export class VideoRenderer {
     }
 
     private async processVideoElements() {
-        // Process each element with the composite pattern
         for (const element of this.elements) {
             await element.process(this.ffmpegCommand, this.template, this.durationPerVideo);
         }
     }
 
-    // TODO - the following list
-    /**
-     * retry with only one item
-     * detect when we need to process fragment elements (we should not if there are no fragment elements)
-     * try with all the subtitles
-     * more...
-     */
     private async processFragmentElements() {
-        // this.textFfmpegCommand.input(this.tempOutputPath); // TODO - this should be moved to the final render
-        // TODO - try with an animated gif
         const batchSize = 50;
-        // Process each element with the composite pattern
+
         for (const element of this.fragmentableElements) {
             const fragments = element.getFragment();
-            console.log(JSON.stringify(fragments), "fragments");
-            console.log(fragments.length, "fragments.length");
 
             if (Array.isArray(fragments)) {
                 let currentVideoPath = this.tempOutputPath;
@@ -138,10 +117,11 @@ export class VideoRenderer {
                 for (let i = 0; i < fragments.length; i += batchSize) {
                     const batch: string[] = fragments.slice(i, i + batchSize);
                     const outputVideo: string = getAssetsPath(`tmp/videos/intermediate_${i}.mov`);
-                    console.log(JSON.stringify(batch), "JSON.stringify(batch)");
 
                     await this.processBatch(batch, outputVideo, element, currentVideoPath);
-                    currentVideoPath = outputVideo; // Use the output of the current batch as the input for the next
+
+                    currentVideoPath = outputVideo;
+
                     this.complexFilterBuilder.reset();
                 }
             } else {
@@ -168,9 +148,9 @@ export class VideoRenderer {
             command
                 .complexFilter(complexFilter)
                 .addOption("-map", `[${videoMapping}]`)
-                .addOption("-map", audioMapping) // Map the audio from the first input
-                .videoCodec("prores_ks") // Using ProRes
-                .outputOptions("-profile:v 3") // High-quality profile
+                .addOption("-map", audioMapping)
+                .videoCodec("prores_ks")
+                .outputOptions("-profile:v 3")
                 .on("start", (commandLine) => {
                     console.log(`Spawned processBatch Ffmpeg with command: ${commandLine}`);
                 })
@@ -223,9 +203,6 @@ export class VideoRenderer {
         this.fragmentableElements = this.templateMapper.mapTemplateToFragmentableElements();
     }
 
-    /**
-     * Clean up the temporary directories
-     */
     private async cleanUpDirectories() {
         for (const path of [
             getAssetsPath("out"),

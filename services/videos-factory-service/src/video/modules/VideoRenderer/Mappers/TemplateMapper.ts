@@ -1,10 +1,11 @@
+import { Template } from "../../../videoTypes";
 import { IElementComponent } from "../Components/BaseComponent";
 import { IFragmentableComponent } from "../Components/TextComponent";
 import { BaseElement } from "../Entities/BaseElement";
 import { Composition } from "../Entities/Composition";
 import { RenderableElement } from "../Entities/RenderableElement";
 import { ElementComponentFactory } from "../Factories/ElementComponentFactory";
-import { Template, TemplateAsset } from "../VideoRenderer";
+import { TemplateAsset } from "../VideoRenderer";
 
 export class TemplateMapper {
     template: Template;

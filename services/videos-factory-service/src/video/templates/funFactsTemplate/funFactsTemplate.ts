@@ -1,27 +1,12 @@
-import { google } from "@google-cloud/speech/build/protos/protos";
-
 import { getAssetsPath } from "../../../core/utils/getAssetsPath";
-import { loadJson } from "../../../core/utils/loadJson";
-import {
-    SubtitlesMapper,
-    TranscribeTranscript,
-} from "../../modules/VideoRenderer/Mappers/SubtitlesMapper";
-import { Template, VideoRenderer } from "../../modules/VideoRenderer/VideoRenderer";
+import { VideoRenderer } from "../../modules/VideoRenderer/VideoRenderer";
+import { Template, TimedText } from "../../videoTypes";
 
-// const timedSubtitles = loadJson<[google.cloud.speech.v1.IRecognizeResponse]>(
-//     getAssetsPath("mock-voiceover-subtitles.json")
-// );
-const timedSubtitles = loadJson<TranscribeTranscript>(
-    getAssetsPath("mock-deepgram-subtitles.json")
-);
-const subtitlesMapper = new SubtitlesMapper();
+type FunFactsTemplateData = {
+    subtitles: TimedText[];
+};
 
-const subtitles = subtitlesMapper.mapDeepgramToTimedText(timedSubtitles as any);
-
-console.log(JSON.stringify(subtitles), "subtitles");
-// console.log(JSON.stringify(timedSubtitles), "timedSubtitles");
-
-export const funFactsTemplate: Template = {
+export const funFactsTemplate = (data: FunFactsTemplateData): Template => ({
     // duration: 46,
     fps: 60,
     outputFormat: "mp4",
@@ -75,7 +60,7 @@ export const funFactsTemplate: Template = {
         new VideoRenderer.Text({
             name: "text",
             // value: "subtitles",
-            value: subtitles,
+            value: data.subtitles,
             // value: [
             //     {
             //         word: "test",
@@ -95,4 +80,4 @@ export const funFactsTemplate: Template = {
             // ],
         }),
     ],
-};
+});

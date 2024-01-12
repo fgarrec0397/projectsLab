@@ -1,8 +1,8 @@
 import ffmpeg from "fluent-ffmpeg";
 
+import { Template } from "../../../videoTypes";
 import { ComplexFilterBuilder } from "../Builders/ComplexFilterBuilder";
 import { BaseElement } from "../Entities/BaseElement";
-import { Template } from "../VideoRenderer";
 
 export interface IElementComponent {
     process(

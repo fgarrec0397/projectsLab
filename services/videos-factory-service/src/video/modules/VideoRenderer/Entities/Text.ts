@@ -1,4 +1,4 @@
-import { TimedText } from "../../../utils/mappers/mapSubtitles";
+import { TimedText } from "../../../videoTypes";
 import { BaseElement, BaseElementConfig } from "./BaseElement";
 
 type TextConfig = BaseElementConfig & {

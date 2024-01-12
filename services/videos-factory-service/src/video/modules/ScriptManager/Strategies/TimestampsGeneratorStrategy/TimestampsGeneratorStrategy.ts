@@ -1,4 +1,4 @@
-import { TimedText } from "../../../../utils/mappers/mapSubtitles";
+import { TimedText } from "../../../../videoTypes";
 
 export interface TimestampsGeneratorStrategy {
     generateTimestampsBasedOnAudio(input: Buffer): Promise<TimedText[]>;

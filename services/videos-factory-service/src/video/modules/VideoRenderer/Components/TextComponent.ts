@@ -2,7 +2,7 @@ import ffmpeg from "fluent-ffmpeg";
 import { existsSync, mkdirSync } from "fs";
 
 import { getAssetsPath } from "../../../../core/utils/getAssetsPath";
-import { TimedText } from "../../../utils/mappers/mapSubtitles";
+import { TimedText } from "../../../videoTypes";
 import { CanvasRenderer } from "../../CanvasRenderer/CanvasRenderer";
 import { ComplexFilterBuilder } from "../Builders/ComplexFilterBuilder";
 import { Text } from "../Entities/Text";

@@ -2,8 +2,7 @@ import { SpeechClient } from "@google-cloud/speech";
 import { google } from "@google-cloud/speech/build/protos/protos";
 
 import { GoogleCloudSpeechModule } from "../../../../../core/modules/GoogleCloudSpeech";
-import { TimedText } from "../../../../utils/mappers/mapSubtitles";
-import { nanosToSeconds } from "../../../../utils/nanosToSeconds";
+import { TimedText } from "../../../../videoTypes";
 import { TimestampsGeneratorStrategy } from "./TimestampsGeneratorStrategy";
 
 export class GoogleTimestampsGeneratorStrategy implements TimestampsGeneratorStrategy {
@@ -59,8 +58,16 @@ export class GoogleTimestampsGeneratorStrategy implements TimestampsGeneratorStr
             return 0;
         }
 
-        const nanosSeconds = nanosToSeconds(duration.nanos);
+        const nanosSeconds = this.nanosToSeconds(duration.nanos);
 
         return String(nanosSeconds + Number(duration.seconds));
+    }
+
+    private nanosToSeconds(nanos?: number) {
+        if (nanos === undefined) {
+            return 0;
+        }
+
+        return nanos / 1e9;
     }
 }

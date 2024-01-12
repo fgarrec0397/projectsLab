@@ -9,7 +9,6 @@ export class ComplexFilterBuilder {
 
     private audioOutputName = "a_out";
 
-    // private videoOutputName = "v";
     private videoOutputName = "";
 
     private audioComplexFilter: string[] = [];
@@ -17,8 +16,6 @@ export class ComplexFilterBuilder {
     private videoComplexFilter: string[] = [];
 
     private overlayComplexFilter: string[] = [];
-
-    // private overlayComplexFilter: string = "";
 
     private videoWithAudioComplexFilter: string[] = [];
 
@@ -51,14 +48,6 @@ export class ComplexFilterBuilder {
         return this;
     }
 
-    /**
-     *  Add a complex filter overlay command to overlay an item over a video
-     *
-     *  ***WARNING*** This method can not be used with the other methods of the builder for now. It needs to be used alone
-     *
-     * @param videoIndex The stream index of video to add overlay to
-     * @param options Options to add to the overlay
-     */
     addOverlayOnVideo(options?: { start?: number; end?: number }) {
         const currentOverlayIndex =
             this.audioCount > 0 && this.videoWithAudioCount > 0
@@ -78,12 +67,10 @@ export class ComplexFilterBuilder {
 
         overlayFilter += `overlay`;
 
-        // Set the time when it is enabled
         if (options?.start !== undefined && options?.end !== undefined) {
             enableArg = `=enable='between(t,${options.start},${options.end})'`;
         }
 
-        // Set the position
         if (enableArg !== undefined) {
             overlayFilter += enableArg;
             overlayFilter += `:x=0:y=0`;
@@ -131,8 +118,6 @@ export class ComplexFilterBuilder {
     }
 
     reset() {
-        console.log("reset called");
-
         this.audioCount = 0;
         this.videoCount = 0;
         this.overlayCount = 0;

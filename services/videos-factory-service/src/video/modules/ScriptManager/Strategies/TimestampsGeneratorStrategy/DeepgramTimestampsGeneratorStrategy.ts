@@ -1,7 +1,7 @@
-import { DeepgramClient, DeepgramResponse, SyncPrerecordedResponse } from "@deepgram/sdk";
+import { DeepgramClient, SyncPrerecordedResponse } from "@deepgram/sdk";
 
 import { DeepgramModule } from "../../../../../core/modules/Deepgram";
-import { TimedText } from "../../../../utils/mappers/mapSubtitles";
+import { TimedText } from "../../../../videoTypes";
 import { TimestampsGeneratorStrategy } from "./TimestampsGeneratorStrategy";
 
 export class DeepgramTimestampsGeneratorStrategy implements TimestampsGeneratorStrategy {
@@ -15,16 +15,18 @@ export class DeepgramTimestampsGeneratorStrategy implements TimestampsGeneratorS
         console.log("Create the timestamps with Deepgram");
         const result = await this.deepgramModule.listen.prerecorded.transcribeFile(input);
 
-        return this.mapDataToTimedText(result);
+        return this.mapDataToTimedText(result.result);
     }
 
-    mapDataToTimedText(data: DeepgramResponse<SyncPrerecordedResponse>) {
-        return data.result?.results.channels[0].alternatives[0].words.map(
-            ({ word, start, end }) => ({
-                word,
-                start,
-                end,
-            })
-        ) as TimedText[];
+    mapDataToTimedText(data: SyncPrerecordedResponse | null) {
+        if (!data) {
+            return [];
+        }
+
+        return data.results.channels[0].alternatives[0].words.map(({ word, start, end }) => ({
+            word,
+            start,
+            end,
+        })) as TimedText[];
     }
 }

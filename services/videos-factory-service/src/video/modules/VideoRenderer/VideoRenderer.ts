@@ -122,6 +122,8 @@ export class VideoRenderer {
     }
 
     private async processVideoElements() {
+        this.complexFilterBuilder.setCrop(this.size);
+
         for (const element of this.elements) {
             await element.process(this.tempFfmpegCommand, this.template, this.durationPerVideo);
         }
@@ -188,7 +190,6 @@ export class VideoRenderer {
     }
 
     private buildComplexFilterCommand() {
-        this.complexFilterBuilder.setCrop(this.size);
         const complexFilterCommand = this.complexFilterBuilder.build();
         const complexFilterMapping = this.complexFilterBuilder.getMapping();
 

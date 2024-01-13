@@ -23,10 +23,12 @@ export class DeepgramTimestampsGeneratorStrategy implements TimestampsGeneratorS
             return [];
         }
 
-        return data.results.channels[0].alternatives[0].words.map(({ word, start, end }) => ({
-            word,
-            start,
-            end,
-        })) as TimedText[];
+        return data.results.channels[0].alternatives[0].words.map(
+            ({ punctuated_word, start, end }) => ({
+                word: punctuated_word,
+                start,
+                end,
+            })
+        ) as TimedText[];
     }
 }

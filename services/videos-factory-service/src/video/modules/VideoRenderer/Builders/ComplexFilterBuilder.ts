@@ -98,7 +98,12 @@ export class ComplexFilterBuilder {
     }
 
     setCrop(size: SizeParam) {
-        const videoInputName = this.videoOutputName !== "" ? this.videoOutputName : "0:v";
+        const videoInputName =
+            this.videoWithAudioCount > 0
+                ? "v"
+                : this.videoOutputName !== ""
+                  ? this.videoOutputName
+                  : "0:v";
         const newVideoOutputName = "vCropped";
         this.cropComplexFilter = `[${videoInputName}]crop=out_w=in_h*(${size.width}/${size.height}):out_h=in_h[${newVideoOutputName}]`;
         this.videoOutputName = newVideoOutputName;

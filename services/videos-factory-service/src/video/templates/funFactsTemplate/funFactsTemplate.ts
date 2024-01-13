@@ -58,7 +58,7 @@ export const funFactsTemplate = (data: FunFactsTemplateData): Template => ({
         }),
         new VideoRenderer.Text({
             name: "text",
-            value: data.subtitles,
+            value: "data.subtitles",
         }),
     ],
 });

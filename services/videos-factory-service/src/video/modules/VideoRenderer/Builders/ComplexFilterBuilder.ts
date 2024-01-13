@@ -1,3 +1,9 @@
+type SizeParam = {
+    width: number;
+    height: number;
+};
+
+// TODO - Check to implement a decorator that would manage the chaning of output name on each function that needs it
 export class ComplexFilterBuilder {
     private audioCount: number = 0;
 
@@ -18,6 +24,8 @@ export class ComplexFilterBuilder {
     private overlayComplexFilter: string[] = [];
 
     private videoWithAudioComplexFilter: string[] = [];
+
+    private cropComplexFilter: string = "";
 
     private finalComplexFilter: string[] = [];
 
@@ -89,6 +97,13 @@ export class ComplexFilterBuilder {
         this.overlayCount++;
     }
 
+    setCrop(size: SizeParam) {
+        const videoInputName = this.videoOutputName !== "" ? this.videoOutputName : "0:v";
+        const newVideoOutputName = "vCropped";
+        this.cropComplexFilter = `[${videoInputName}]crop=out_w=in_h*(${size.width}/${size.height}):out_h=in_h[${newVideoOutputName}]`;
+        this.videoOutputName = newVideoOutputName;
+    }
+
     getMapping() {
         const mapping: string[] = [];
 
@@ -106,9 +121,10 @@ export class ComplexFilterBuilder {
     }
 
     build() {
-        this.concatVideoWithAudioComplexFilter();
-        this.concatAudioComplexFilter();
-        this.concatOverlayComplexFilter();
+        this.mergeVideoWithAudioComplexFilter();
+        this.mergeCropComplexFilter();
+        this.mergeAudioComplexFilter();
+        this.mergeOverlayComplexFilter();
 
         if (!this.finalComplexFilter.length) {
             return "";
@@ -128,10 +144,11 @@ export class ComplexFilterBuilder {
         this.videoComplexFilter = [];
         this.overlayComplexFilter = [];
         this.videoWithAudioComplexFilter = [];
+        this.cropComplexFilter = "";
         this.finalComplexFilter = [];
     }
 
-    private concatVideoWithAudioComplexFilter() {
+    private mergeVideoWithAudioComplexFilter() {
         if (this.videoWithAudioCount === 0) {
             return;
         }
@@ -143,7 +160,15 @@ export class ComplexFilterBuilder {
         this.finalComplexFilter.push(videoWithAudioConcatFilter);
     }
 
-    private concatAudioComplexFilter() {
+    private mergeCropComplexFilter() {
+        if (this.cropComplexFilter === "") {
+            return;
+        }
+
+        this.finalComplexFilter.push(this.cropComplexFilter);
+    }
+
+    private mergeAudioComplexFilter() {
         if (this.audioCount === 0) {
             return;
         }
@@ -159,7 +184,7 @@ export class ComplexFilterBuilder {
         this.finalComplexFilter.push(audioConcatFilter);
     }
 
-    private concatOverlayComplexFilter() {
+    private mergeOverlayComplexFilter() {
         const overlayConcatFilter = this.overlayComplexFilter.join(";");
 
         this.finalComplexFilter.push(overlayConcatFilter);

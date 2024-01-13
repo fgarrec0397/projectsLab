@@ -7,7 +7,6 @@ type FunFactsTemplateData = {
 };
 
 export const funFactsTemplate = (data: FunFactsTemplateData): Template => ({
-    // duration: 46,
     fps: 60,
     outputFormat: "mp4",
     width: 1080,
@@ -59,25 +58,7 @@ export const funFactsTemplate = (data: FunFactsTemplateData): Template => ({
         }),
         new VideoRenderer.Text({
             name: "text",
-            // value: "subtitles",
             value: data.subtitles,
-            // value: [
-            //     {
-            //         word: "test",
-            //         start: 0,
-            //         end: 3,
-            //     },
-            //     {
-            //         word: "test2",
-            //         start: 3,
-            //         end: 6,
-            //     },
-            //     {
-            //         word: "test3",
-            //         start: 6,
-            //         end: 9,
-            //     },
-            // ],
         }),
     ],
 });

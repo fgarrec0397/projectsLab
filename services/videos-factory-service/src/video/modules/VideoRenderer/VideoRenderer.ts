@@ -21,6 +21,11 @@ export type TemplateAsset = RenderableElement & {
 
 export type TemplateText = Text;
 
+export type TemplateSize = {
+    width: number;
+    height: number;
+};
+
 export class VideoRenderer {
     static Audio = Audio;
 
@@ -32,9 +37,7 @@ export class VideoRenderer {
 
     outputPath = getAssetsPath("out/refactor-video.mp4");
 
-    tempOutputPath = getAssetsPath("tmp/videos/refactor-video.mp4");
-
-    tempBlankVideoPath = getAssetsPath("tmp/videos/blank.mp4");
+    tempOutputPath = getAssetsPath("tmp/videos/temp-video.mov");
 
     assets: TemplateAsset[] = [];
 
@@ -50,20 +53,26 @@ export class VideoRenderer {
 
     fragmentableElements: (IElementComponent & IFragmentableComponent)[] = [];
 
-    ffmpegCommand: ffmpeg.FfmpegCommand;
+    tempFfmpegCommand: ffmpeg.FfmpegCommand;
 
     textFfmpegCommand: ffmpeg.FfmpegCommand;
+
+    finalFfmpegCommand: ffmpeg.FfmpegCommand;
 
     durationPerVideo?: number;
 
     template: Template;
 
+    size: TemplateSize;
+
     shouldProcessFragments: boolean;
 
     constructor(template: Template) {
         this.template = template;
-        this.ffmpegCommand = ffmpeg();
+
+        this.tempFfmpegCommand = ffmpeg();
         this.textFfmpegCommand = ffmpeg();
+        this.finalFfmpegCommand = ffmpeg();
 
         this.canvasRenderer = new CanvasRenderer({
             width: this.template.width,
@@ -76,37 +85,50 @@ export class VideoRenderer {
         );
         this.templateMapper = new TemplateMapper(this.template, this.elementsFactory);
 
+        this.size = {
+            width: this.template.width,
+            height: this.template.height,
+        };
+
         this.mapTemplate();
 
         this.shouldProcessFragments = this.fragmentableElements.length > 0;
     }
 
     public async initRender() {
+        console.time("Video Rendered");
         await this.beforeRender();
 
         await this.processVideoElements();
 
         this.buildComplexFilterCommand();
 
-        await this.renderVideo();
+        await this.renderTempVideo();
 
         if (!this.shouldProcessFragments) {
+            await this.renderFinalVideo();
+
+            console.timeEnd("Video Rendered");
             return;
         }
 
         this.complexFilterBuilder.reset();
 
         await this.processFragmentElements();
+
+        await this.renderFinalVideo();
+
+        console.timeEnd("Video Rendered");
     }
 
     private async processVideoElements() {
         for (const element of this.elements) {
-            await element.process(this.ffmpegCommand, this.template, this.durationPerVideo);
+            await element.process(this.tempFfmpegCommand, this.template, this.durationPerVideo);
         }
     }
 
     private async processFragmentElements() {
-        const batchSize = 50;
+        const batchSize = 175;
 
         for (const element of this.fragmentableElements) {
             const fragments = element.getFragment();
@@ -116,11 +138,13 @@ export class VideoRenderer {
 
                 for (let i = 0; i < fragments.length; i += batchSize) {
                     const batch: string[] = fragments.slice(i, i + batchSize);
-                    const outputVideo: string = getAssetsPath(`tmp/videos/intermediate_${i}.mov`);
+                    this.tempOutputPath = getAssetsPath(`tmp/videos/intermediate_${i}.mov`);
 
-                    await this.processBatch(batch, outputVideo, element, currentVideoPath);
+                    this.complexFilterBuilder.setCrop(this.size);
 
-                    currentVideoPath = outputVideo;
+                    await this.processBatch(batch, this.tempOutputPath, element, currentVideoPath);
+
+                    currentVideoPath = this.tempOutputPath;
 
                     this.complexFilterBuilder.reset();
                 }
@@ -164,17 +188,18 @@ export class VideoRenderer {
     }
 
     private buildComplexFilterCommand() {
+        this.complexFilterBuilder.setCrop(this.size);
         const complexFilterCommand = this.complexFilterBuilder.build();
         const complexFilterMapping = this.complexFilterBuilder.getMapping();
 
-        this.ffmpegCommand.complexFilter(complexFilterCommand, complexFilterMapping);
+        this.tempFfmpegCommand.complexFilter(complexFilterCommand, complexFilterMapping);
     }
 
-    private async renderVideo() {
+    private async renderTempVideo() {
         console.log("Rendering started...");
         console.time("Rendering finished");
         return new Promise<void>((resolve, reject) => {
-            this.ffmpegCommand
+            this.tempFfmpegCommand
                 .videoCodec("libx264")
                 .outputOptions(["-pix_fmt yuv420p"])
                 .fps(this.template.fps)
@@ -189,6 +214,31 @@ export class VideoRenderer {
                     reject(error);
                 })
                 .save(this.tempOutputPath);
+        });
+    }
+
+    private async renderFinalVideo() {
+        console.log("Final rendering started...");
+        console.time("Final rendering finished");
+        console.log(this.tempOutputPath, "this.tempOutputPath");
+
+        return new Promise<void>((resolve, reject) => {
+            this.finalFfmpegCommand
+                .input(this.tempOutputPath)
+                .videoCodec("libx264")
+                .outputOptions(["-pix_fmt yuv420p"])
+                .fps(this.template.fps)
+                .on("start", (commandLine) => {
+                    console.log(`Spawned Ffmpeg with command: ${commandLine}`);
+                })
+                .on("end", () => {
+                    console.timeEnd("Final rendering finished");
+                    resolve();
+                })
+                .on("error", (error: Error) => {
+                    reject(error);
+                })
+                .save(this.outputPath);
         });
     }
 

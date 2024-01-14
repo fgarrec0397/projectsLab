@@ -130,7 +130,7 @@ export class VideoRenderer {
     }
 
     private async processFragmentElements() {
-        const batchSize = 175;
+        const batchSize = 125;
 
         for (const element of this.fragmentableElements) {
             const fragments = element.getFragment();
@@ -176,7 +176,10 @@ export class VideoRenderer {
                 .addOption("-map", `[${videoMapping}]`)
                 .addOption("-map", audioMapping)
                 .videoCodec("prores_ks")
-                .outputOptions("-profile:v 3")
+                .outputOptions("-profile:v 3");
+            // console.log("batch command", command._getArguments().join(""));
+
+            command
                 .on("start", (commandLine) => {
                     console.log(`Spawned processBatch Ffmpeg with command: ${commandLine}`);
                 })

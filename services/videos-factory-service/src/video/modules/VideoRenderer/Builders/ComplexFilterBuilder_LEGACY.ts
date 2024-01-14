@@ -3,10 +3,6 @@ type SizeParam = {
     height: number;
 };
 
-type Overlay = { index: number; start?: number; end?: number };
-
-type OverlayParam = Omit<Overlay, "index">;
-
 // TODO - Check to implement a decorator that would manage the chaning of output name on each function that needs it
 export class ComplexFilterBuilder {
     private audioCount: number = 0;
@@ -31,10 +27,6 @@ export class ComplexFilterBuilder {
 
     private cropComplexFilter: string = "";
 
-    private size: SizeParam | undefined;
-
-    private overlays: Overlay[] | undefined;
-
     private finalComplexFilter: string[] = [];
 
     addVideoWithAudio() {
@@ -50,6 +42,13 @@ export class ComplexFilterBuilder {
         return this;
     }
 
+    // TODO - need to also handle only video in the future
+    addVideo() {
+        this.videoComplexFilter.push(`[${this.videoCount}:v:0]`);
+
+        return this;
+    }
+
     addAudio() {
         this.audioComplexFilter.push(`[${this.audioCount}:a:0]`);
         this.incrementAudioCount();
@@ -57,22 +56,57 @@ export class ComplexFilterBuilder {
         return this;
     }
 
-    addOverlayOnVideo(options?: OverlayParam) {
-        if (!this.overlays) {
-            this.overlays = [];
+    addOverlayOnVideo(options?: { start?: number; end?: number }) {
+        const currentOverlayIndex =
+            this.audioCount > 0 && this.videoWithAudioCount > 0
+                ? this.audioCount + this.videoWithAudioCount + this.overlayCount
+                : this.overlayCount + 1;
+
+        let fromStream = this.videoOutputName === "" ? `[0:v]` : `[${this.videoOutputName}]`;
+        let currentStream = `[${currentOverlayIndex}:v]`;
+
+        if (this.overlayCount > 1) {
+            fromStream = `[${this.videoOutputName}]`;
+            currentStream = `[${currentOverlayIndex}:v]`;
         }
 
-        this.overlays.push({ index: this.overlayCount, ...options });
+        let overlayFilter = fromStream + currentStream;
+        let enableArg: string | undefined;
+
+        overlayFilter += `overlay`;
+
+        if (options?.start !== undefined && options?.end !== undefined) {
+            enableArg = `=enable='between(t,${options.start},${options.end})'`;
+        }
+
+        if (enableArg !== undefined) {
+            overlayFilter += enableArg;
+            overlayFilter += `:x=0:y=0`;
+        } else {
+            overlayFilter += `=x=0:y=0`;
+        }
+
+        const overlayOutputName = `ovl${this.overlayCount}`;
+
+        this.videoOutputName = overlayOutputName;
+
+        overlayFilter += `[${overlayOutputName}]`;
+
+        this.overlayComplexFilter.push(overlayFilter);
 
         this.overlayCount++;
-
-        return this;
     }
 
     setCrop(size: SizeParam) {
-        this.size = size;
-
-        return this;
+        const videoInputName =
+            this.videoWithAudioCount > 0
+                ? "v"
+                : this.videoOutputName !== ""
+                  ? this.videoOutputName
+                  : "0:v";
+        const newVideoOutputName = "vCropped";
+        this.cropComplexFilter = `[${videoInputName}]crop=out_w=in_h*(${size.width}/${size.height}):out_h=in_h[${newVideoOutputName}]`;
+        this.videoOutputName = newVideoOutputName;
     }
 
     getMapping() {
@@ -92,10 +126,10 @@ export class ComplexFilterBuilder {
     }
 
     build() {
-        this.buildVideoWithAudioComplexFilter();
-        this.buildCropComplexFilter();
-        this.buildAudioComplexFilter();
-        this.buildOverlayComplexFilter();
+        this.mergeVideoWithAudioComplexFilter();
+        this.mergeCropComplexFilter();
+        this.mergeAudioComplexFilter();
+        this.mergeOverlayComplexFilter();
 
         if (!this.finalComplexFilter.length) {
             return "";
@@ -116,12 +150,10 @@ export class ComplexFilterBuilder {
         this.overlayComplexFilter = [];
         this.videoWithAudioComplexFilter = [];
         this.cropComplexFilter = "";
-        this.size = undefined;
-        this.overlays = [];
         this.finalComplexFilter = [];
     }
 
-    private buildVideoWithAudioComplexFilter() {
+    private mergeVideoWithAudioComplexFilter() {
         if (this.videoWithAudioCount === 0) {
             return;
         }
@@ -133,26 +165,15 @@ export class ComplexFilterBuilder {
         this.finalComplexFilter.push(videoWithAudioConcatFilter);
     }
 
-    private buildCropComplexFilter() {
-        if (!this.size) {
+    private mergeCropComplexFilter() {
+        if (this.cropComplexFilter === "") {
             return;
         }
-
-        const videoInputName =
-            this.videoWithAudioCount > 0
-                ? "v"
-                : this.videoOutputName !== ""
-                  ? this.videoOutputName
-                  : "0:v";
-        const newVideoOutputName = "vCropped";
-
-        this.cropComplexFilter = `[${videoInputName}]crop=out_w=in_h*(${this.size.width}/${this.size.height}):out_h=in_h[${newVideoOutputName}]`;
-        this.videoOutputName = newVideoOutputName;
 
         this.finalComplexFilter.push(this.cropComplexFilter);
     }
 
-    private buildAudioComplexFilter() {
+    private mergeAudioComplexFilter() {
         if (this.audioCount === 0) {
             return;
         }
@@ -168,51 +189,8 @@ export class ComplexFilterBuilder {
         this.finalComplexFilter.push(audioConcatFilter);
     }
 
-    private buildOverlayComplexFilter() {
-        const overlayComplexFilter: string[] = [];
-
-        this.overlays?.forEach((overlay, index) => {
-            const currentOverlayIndex =
-                this.audioCount > 0 && this.videoWithAudioCount > 0
-                    ? this.audioCount + this.videoWithAudioCount + index
-                    : index + 1;
-
-            let fromStream = this.videoOutputName === "" ? `[0:v]` : `[${this.videoOutputName}]`;
-            let currentStream = `[${currentOverlayIndex}:v]`;
-
-            if (this.overlayCount > 1) {
-                fromStream = `[${this.videoOutputName}]`;
-                currentStream = `[${currentOverlayIndex}:v]`;
-            }
-
-            let overlayFilter = fromStream + currentStream;
-            let enableArg: string | undefined;
-
-            overlayFilter += `overlay`;
-
-            if (overlay?.start !== undefined && overlay?.end !== undefined) {
-                enableArg = `=enable='between(t,${overlay.start},${overlay.end})'`;
-            }
-
-            if (enableArg !== undefined) {
-                overlayFilter += enableArg;
-                // overlayFilter += `:x=0:y=0`;
-                overlayFilter += `:x=(main_w-overlay_w)/2:y=(main_h-overlay_h)/2`;
-            } else {
-                // overlayFilter += `=x=0:y=0`;
-                overlayFilter += `=(main_w-overlay_w)/2:(main_h-overlay_h)/2`;
-            }
-
-            const overlayOutputName = `ovl${index}`;
-
-            this.videoOutputName = overlayOutputName;
-
-            overlayFilter += `[${overlayOutputName}]`;
-
-            overlayComplexFilter.push(overlayFilter);
-        });
-
-        const overlayConcatFilter = overlayComplexFilter.join(";");
+    private mergeOverlayComplexFilter() {
+        const overlayConcatFilter = this.overlayComplexFilter.join(";");
 
         this.finalComplexFilter.push(overlayConcatFilter);
     }

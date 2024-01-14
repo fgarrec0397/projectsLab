@@ -1,6 +1,7 @@
 import ffmpeg from "fluent-ffmpeg";
 
 import { Audio } from "../Entities/Audio";
+import { VideoUtils } from "../Utilities/VideoUtils";
 import { BaseComponent, IElementComponent } from "./BaseComponent";
 
 export class AudioComponent extends BaseComponent<Audio> implements IElementComponent {
@@ -13,5 +14,18 @@ export class AudioComponent extends BaseComponent<Audio> implements IElementComp
 
         ffmpegCommand.input(audio.sourcePath);
         this.complexFilterBuilder.addAudio();
+    }
+
+    async handleVideoDuration(ffmpegCommand: ffmpeg.FfmpegCommand) {
+        if (!this.element.isVideoLengthHandler) {
+            return;
+        }
+
+        if (!this.element.duration) {
+            const audioDuration = await VideoUtils.getVideoDuration(this.element.sourcePath);
+            ffmpegCommand.duration(audioDuration);
+        }
+
+        super.handleVideoDuration(ffmpegCommand);
     }
 }

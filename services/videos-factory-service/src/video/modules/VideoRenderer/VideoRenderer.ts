@@ -6,16 +6,16 @@ import { Template } from "../../videoTypes";
 import { CanvasRenderer } from "../CanvasRenderer/CanvasRenderer";
 import { ComplexFilterBuilder } from "./Builders/ComplexFilterBuilder";
 import { IElementComponent } from "./Components/BaseComponent";
-import { IFragmentableComponent } from "./Components/TextComponent";
+import { IFragmentableComponent } from "./Components/FragmentableComponent";
 import { Audio } from "./Entities/Audio";
 import { Composition } from "./Entities/Composition";
-import { RenderableElement } from "./Entities/RenderableElement";
+import { SourceableElement } from "./Entities/SourceableElement";
 import { Text } from "./Entities/Text";
 import { Video } from "./Entities/Video";
 import { ElementComponentFactory } from "./Factories/ElementComponentFactory";
 import { TemplateMapper } from "./Mappers/TemplateMapper";
 
-export type TemplateAsset = RenderableElement & {
+export type TemplateAsset = SourceableElement & {
     decompressPath?: string;
 };
 
@@ -99,7 +99,7 @@ export class VideoRenderer {
         console.time("Video Rendered");
         await this.beforeRender();
 
-        await this.processVideoElements();
+        await this.processElements();
 
         this.buildComplexFilterCommand();
 
@@ -121,11 +121,12 @@ export class VideoRenderer {
         console.timeEnd("Video Rendered");
     }
 
-    private async processVideoElements() {
+    private async processElements() {
         this.complexFilterBuilder.setCrop(this.size);
 
         for (const element of this.elements) {
             await element.process(this.tempFfmpegCommand, this.template, this.durationPerVideo);
+            await element.handleVideoDuration(this.tempFfmpegCommand);
         }
     }
 

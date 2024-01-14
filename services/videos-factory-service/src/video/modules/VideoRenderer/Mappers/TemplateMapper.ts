@@ -1,9 +1,9 @@
 import { Template } from "../../../videoTypes";
 import { IElementComponent } from "../Components/BaseComponent";
-import { IFragmentableComponent } from "../Components/TextComponent";
+import { IFragmentableComponent } from "../Components/FragmentableComponent";
 import { BaseElement } from "../Entities/BaseElement";
 import { Composition } from "../Entities/Composition";
-import { RenderableElement } from "../Entities/RenderableElement";
+import { SourceableElement } from "../Entities/SourceableElement";
 import { ElementComponentFactory } from "../Factories/ElementComponentFactory";
 import { TemplateAsset } from "../VideoRenderer";
 
@@ -20,7 +20,7 @@ export class TemplateMapper {
     }
 
     mapTemplateToAssets() {
-        const assets: RenderableElement[] = [];
+        const assets: SourceableElement[] = [];
 
         console.log(`Mapping assets`);
 
@@ -34,7 +34,7 @@ export class TemplateMapper {
                     return;
                 }
 
-                if (x instanceof RenderableElement) {
+                if (x instanceof SourceableElement) {
                     assets.push(x);
                 }
 

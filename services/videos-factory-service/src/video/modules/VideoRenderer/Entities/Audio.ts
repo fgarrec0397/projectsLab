@@ -1,13 +1,13 @@
 import {
-    RenderableElement,
-    RenderableElementConfig,
-    RenderableElementTypes,
-} from "./RenderableElement";
+    SourceableElement,
+    SourceableElementConfig,
+    SourceableElementTypes,
+} from "./SourceableElement";
 
-type AudioConfig = RenderableElementConfig;
+type AudioConfig = SourceableElementConfig;
 
-export class Audio extends RenderableElement {
-    type: RenderableElementTypes;
+export class Audio extends SourceableElement {
+    type: SourceableElementTypes;
 
     sourcePath: string;
 

@@ -2,6 +2,7 @@ import ffmpeg from "fluent-ffmpeg";
 
 import { Template } from "../../../videoTypes";
 import { Video } from "../Entities/Video";
+import { VideoUtils } from "../Utilities/VideoUtils";
 import { BaseComponent, IElementComponent } from "./BaseComponent";
 
 export class VideoComponent extends BaseComponent<Video> implements IElementComponent {
@@ -38,5 +39,18 @@ export class VideoComponent extends BaseComponent<Video> implements IElementComp
         this.complexFilterBuilder.addVideoWithAudio();
 
         ffmpegCommand.inputOptions(inputOptions);
+    }
+
+    async handleVideoDuration(ffmpegCommand: ffmpeg.FfmpegCommand) {
+        if (!this.element.isVideoLengthHandler) {
+            return;
+        }
+
+        if (!this.element.duration) {
+            const videoDuration = await VideoUtils.getVideoDuration(this.element.sourcePath);
+            ffmpegCommand.duration(videoDuration);
+        }
+
+        super.handleVideoDuration(ffmpegCommand);
     }
 }

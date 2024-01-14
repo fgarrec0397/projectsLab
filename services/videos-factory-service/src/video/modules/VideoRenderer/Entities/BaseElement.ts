@@ -1,9 +1,9 @@
 import { uidGenerator } from "@projectslab/helpers";
 
-import { renderableElementTypes } from "./RenderableElement";
+import { sourceableElementTypes } from "./SourceableElement";
 
 export const elementTypes = {
-    ...renderableElementTypes,
+    ...sourceableElementTypes,
     composition: "composition",
     text: "text",
     none: "none",
@@ -21,6 +21,8 @@ export interface BaseElementInterface {
     start?: number;
     end?: number;
     duration?: number;
+
+    isVideoLengthHandler?: boolean;
 }
 
 export abstract class BaseElement implements BaseElementInterface {
@@ -38,6 +40,8 @@ export abstract class BaseElement implements BaseElementInterface {
 
     duration?: number;
 
+    isVideoLengthHandler?: boolean;
+
     constructor(config: BaseElementConfig) {
         this.id = uidGenerator();
         this.name = config.name || this.id;
@@ -46,5 +50,6 @@ export abstract class BaseElement implements BaseElementInterface {
         this.type = config.type || "none";
         this.track = config.track || 1;
         this.duration = config.duration;
+        this.isVideoLengthHandler = config.isVideoLengthHandler;
     }
 }

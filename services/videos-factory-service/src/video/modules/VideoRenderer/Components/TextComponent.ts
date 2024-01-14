@@ -6,16 +6,11 @@ import { TimedText } from "../../../videoTypes";
 import { CanvasRenderer } from "../../CanvasRenderer/CanvasRenderer";
 import { ComplexFilterBuilder } from "../Builders/ComplexFilterBuilder";
 import { Text } from "../Entities/Text";
-import { BaseComponent, IElementComponent } from "./BaseComponent";
-
-export interface IFragmentableComponent<T = any> {
-    getFragment: () => T;
-    fragmentProcess: (ffmpegCommand: ffmpeg.FfmpegCommand, fragments: T) => Promise<void>;
-}
+import { FragmentableComponent, IFragmentableComponent } from "./FragmentableComponent";
 
 export class TextComponent
-    extends BaseComponent<Text>
-    implements IElementComponent, IFragmentableComponent<Text["value"]>
+    extends FragmentableComponent<Text>
+    implements IFragmentableComponent<Text["value"]>
 {
     canvasRenderer: CanvasRenderer;
 

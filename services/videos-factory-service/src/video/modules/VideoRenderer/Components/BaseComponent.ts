@@ -10,6 +10,7 @@ export interface IElementComponent {
         template: Template,
         durationPerVideo?: number
     ): Promise<void> | void;
+    handleVideoDuration(ffmpegCommand: ffmpeg.FfmpegCommand): Promise<void> | void;
 }
 
 export class BaseComponent<T extends BaseElement> {
@@ -20,5 +21,15 @@ export class BaseComponent<T extends BaseElement> {
     constructor(element: T, complexFilterBuilder: ComplexFilterBuilder) {
         this.complexFilterBuilder = complexFilterBuilder;
         this.element = element;
+    }
+
+    handleVideoDuration(ffmpegCommand: ffmpeg.FfmpegCommand) {
+        if (!this.element.isVideoLengthHandler) {
+            return;
+        }
+
+        if (this.element.duration) {
+            ffmpegCommand.duration(this.element.duration);
+        }
     }
 }

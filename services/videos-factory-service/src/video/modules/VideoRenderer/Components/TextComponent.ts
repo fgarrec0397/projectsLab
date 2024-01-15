@@ -30,35 +30,8 @@ export class TextComponent
             return;
         }
 
-        const handleCreateText = async (options: {
-            id: string;
-            textValue: string | null | undefined;
-            start?: number;
-            end?: number;
-        }) => {
-            if (!options.textValue) {
-                return;
-            }
-
-            const outputFolderPath = getAssetsPath(`tmp/output`);
-            const outputFilePath = getAssetsPath(`tmp/output/text-${options.id}.png`);
-
-            if (!existsSync(outputFolderPath)) {
-                mkdirSync(outputFolderPath);
-            }
-
-            await this.canvasRenderer.createTextImage(options.textValue, outputFilePath);
-
-            ffmpegCommand.input(outputFilePath);
-
-            this.complexFilterBuilder.addOverlayOnVideo({
-                start: options.start,
-                end: options.end,
-            });
-        };
-
         if (typeof text.value === "string") {
-            return handleCreateText({
+            return this.handleCreateText(ffmpegCommand, {
                 id: text.id,
                 textValue: text.value,
                 start: text.start,
@@ -85,34 +58,8 @@ export class TextComponent
             return;
         }
 
-        const handleCreateText = async (options: {
-            id: string;
-            textValue: string | null | undefined;
-            start?: number;
-            end?: number;
-        }) => {
-            if (!options.textValue) {
-                return;
-            }
-
-            const outputFolderPath = getAssetsPath(`tmp/output`);
-            const outputFilePath = getAssetsPath(`tmp/output/text-${options.id}.png`);
-
-            if (!existsSync(outputFolderPath)) {
-                mkdirSync(outputFolderPath);
-            }
-            await this.canvasRenderer.createTextImage(options.textValue, outputFilePath);
-
-            ffmpegCommand.input(outputFilePath);
-
-            this.complexFilterBuilder.addOverlayOnVideo({
-                start: options.start,
-                end: options.end,
-            });
-        };
-
         if (typeof fragments === "string") {
-            return handleCreateText({
+            return this.handleCreateText(ffmpegCommand, {
                 id: text.id,
                 textValue: fragments,
                 start: text.start,
@@ -126,12 +73,46 @@ export class TextComponent
         }))) {
             console.log(`Creating ${timedText.word} text`);
 
-            await handleCreateText({
+            await this.handleCreateText(ffmpegCommand, {
                 id: String(valueIndex).padStart(4, "0"),
                 textValue: timedText.word,
                 start: timedText.start,
                 end: timedText.end,
             });
         }
+    }
+
+    private async handleCreateText(
+        ffmpegCommand: ffmpeg.FfmpegCommand,
+        options: {
+            id: string;
+            textValue: string | null | undefined;
+            start?: number;
+            end?: number;
+        }
+    ) {
+        if (!options.textValue) {
+            return;
+        }
+
+        const outputFolderPath = getAssetsPath(`tmp/output`);
+        const outputFilePath = getAssetsPath(`tmp/output/text-${options.id}.png`);
+
+        if (!existsSync(outputFolderPath)) {
+            mkdirSync(outputFolderPath);
+        }
+
+        await this.canvasRenderer.createTextImage(
+            options.textValue,
+            outputFilePath,
+            this.element.styles
+        );
+
+        ffmpegCommand.input(outputFilePath);
+
+        this.complexFilterBuilder.addOverlayOnVideo({
+            start: options.start,
+            end: options.end,
+        });
     }
 }

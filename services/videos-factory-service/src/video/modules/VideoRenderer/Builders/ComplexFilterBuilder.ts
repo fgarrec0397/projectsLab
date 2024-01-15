@@ -196,10 +196,8 @@ export class ComplexFilterBuilder {
 
             if (enableArg !== undefined) {
                 overlayFilter += enableArg;
-                // overlayFilter += `:x=0:y=0`;
                 overlayFilter += `:x=(main_w-overlay_w)/2:y=(main_h-overlay_h)/2`;
             } else {
-                // overlayFilter += `=x=0:y=0`;
                 overlayFilter += `=(main_w-overlay_w)/2:(main_h-overlay_h)/2`;
             }
 

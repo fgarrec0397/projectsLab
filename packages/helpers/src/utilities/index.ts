@@ -1,4 +1,5 @@
 export { default as capitalizeString } from "./capitalizeString";
+export * from "./dates";
 export { getRandomIndex } from "./getRandomIndex";
 export { default as getRandomNumber } from "./getRandomNumber";
 export { default as getStringToBooleanValue } from "./getStringToBooleanValue";

@@ -1,7 +1,7 @@
 import ffmpeg from "fluent-ffmpeg";
 import { existsSync, mkdirSync } from "fs";
 
-import { getAssetsPath } from "../../../../core/utils/getAssetsPath";
+import { FilesSystem } from "../../../../core/modules/FilesSystem";
 import { TimedText } from "../../../videoTypes";
 import { CanvasRenderer } from "../../CanvasRenderer/CanvasRenderer";
 import { ComplexFilterBuilder } from "../Builders/ComplexFilterBuilder";
@@ -95,8 +95,8 @@ export class TextComponent
             return;
         }
 
-        const outputFolderPath = getAssetsPath(`tmp/output`);
-        const outputFilePath = getAssetsPath(`tmp/output/text-${options.id}.png`);
+        const outputFolderPath = FilesSystem.getAssetsPath(`tmp/output`);
+        const outputFilePath = FilesSystem.getAssetsPath(`tmp/output/text-${options.id}.png`);
 
         if (!existsSync(outputFolderPath)) {
             mkdirSync(outputFolderPath);

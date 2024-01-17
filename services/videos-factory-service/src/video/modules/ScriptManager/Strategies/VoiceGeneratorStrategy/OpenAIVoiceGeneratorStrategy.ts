@@ -1,14 +1,13 @@
 import fs from "fs";
 import OpenAI from "openai";
 
+import { FilesSystem } from "../../../../../core/modules/FilesSystem";
 import { OpenAIModule } from "../../../../../core/modules/OpenAI";
-import { convertMp3ToBuffer } from "../../../../../core/utils/convertMp3ToBuffer";
-import { getAssetsPath } from "../../../../../core/utils/getAssetsPath";
 import { VideoUtils } from "../../../VideoRenderer/Utilities/VideoUtils";
 import { VoiceGeneratorStrategy } from "./VoiceGeneratorStrategy";
 
 export class OpenAIVoiceGeneratorStrategy implements VoiceGeneratorStrategy {
-    tempVoiceFilePath: string = getAssetsPath("speech-temp.flac");
+    tempVoiceFilePath: string = FilesSystem.getAssetsPath("speech-temp.flac");
 
     openai: OpenAI;
 
@@ -34,7 +33,7 @@ export class OpenAIVoiceGeneratorStrategy implements VoiceGeneratorStrategy {
         console.log("Resample the audio");
         await VideoUtils.resampleAudio(this.tempVoiceFilePath, voiceFilePath);
 
-        const resampledAudio = await convertMp3ToBuffer(voiceFilePath);
+        const resampledAudio = await FilesSystem.convertFileToBuffer(voiceFilePath);
 
         this.audio = resampledAudio;
 

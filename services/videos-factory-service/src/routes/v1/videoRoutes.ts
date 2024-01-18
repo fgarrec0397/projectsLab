@@ -1,8 +1,10 @@
 import { Router } from "express";
 
-import videoController from "../../video/controllers/v1/videoController";
+import { Video } from "../../video/Video";
 
-const okRoutes = () => {
+const videoController = Video.instantiateController();
+
+const videoRoutes = () => {
     const router = Router();
 
     router.get("/", videoController.get);
@@ -10,4 +12,4 @@ const okRoutes = () => {
     return router;
 };
 
-export default okRoutes;
+export default videoRoutes;

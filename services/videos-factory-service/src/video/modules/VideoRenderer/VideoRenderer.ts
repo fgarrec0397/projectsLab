@@ -41,13 +41,13 @@ export class VideoRenderer {
 
     assets: TemplateAsset[] = [];
 
-    canvasRenderer: CanvasRenderer;
+    canvasRenderer?: CanvasRenderer;
 
     complexFilterBuilder: ComplexFilterBuilder;
 
-    templateMapper: TemplateMapper;
+    templateMapper?: TemplateMapper;
 
-    elementsFactory: ElementComponentFactory;
+    elementsFactory?: ElementComponentFactory;
 
     elements: IElementComponent[] = [];
 
@@ -61,19 +61,22 @@ export class VideoRenderer {
 
     durationPerVideo?: number;
 
-    template: Template;
+    template?: Template;
 
-    size: TemplateSize;
+    size?: TemplateSize;
 
-    shouldProcessFragments: boolean;
+    shouldProcessFragments?: boolean;
 
-    constructor(template: Template) {
-        this.template = template;
-
+    constructor() {
         this.tempFfmpegCommand = ffmpeg();
         this.textFfmpegCommand = ffmpeg();
         this.finalFfmpegCommand = ffmpeg();
 
+        this.complexFilterBuilder = new ComplexFilterBuilder();
+    }
+
+    public init(template: Template) {
+        this.template = template;
         this.canvasRenderer = new CanvasRenderer({
             width: this.template.width,
             height: this.template.height,
@@ -122,6 +125,10 @@ export class VideoRenderer {
     }
 
     private async processElements() {
+        if (!this.size || !this.template) {
+            throw new Error("VideoRender.init was not called");
+        }
+
         this.complexFilterBuilder.setCrop(this.size);
 
         for (const element of this.elements) {
@@ -131,6 +138,10 @@ export class VideoRenderer {
     }
 
     private async processFragmentElements() {
+        if (!this.size || !this.template) {
+            throw new Error("VideoRender.init was not called");
+        }
+
         const batchSize = 125;
 
         for (const element of this.fragmentableElements) {
@@ -206,6 +217,10 @@ export class VideoRenderer {
         console.log("Rendering started...");
         console.time("Rendering finished");
         return new Promise<void>((resolve, reject) => {
+            if (!this.template?.fps) {
+                throw new Error("VideoRender.init was not called");
+            }
+
             this.tempFfmpegCommand
                 .videoCodec("libx264")
                 .outputOptions(["-pix_fmt yuv420p"])
@@ -225,11 +240,18 @@ export class VideoRenderer {
     }
 
     private async renderFinalVideo() {
+        if (!this.template) {
+            throw new Error("VideoRender.init was not called");
+        }
         console.log("Final rendering started...");
         console.time("Final rendering finished");
         console.log(this.tempOutputPath, "this.tempOutputPath");
 
         return new Promise<void>((resolve, reject) => {
+            if (!this.template) {
+                throw new Error("VideoRender.init was not called");
+            }
+
             this.finalFfmpegCommand
                 .input(this.tempOutputPath)
                 .videoCodec("libx264")
@@ -254,6 +276,10 @@ export class VideoRenderer {
     }
 
     private mapTemplate() {
+        if (!this.templateMapper) {
+            throw new Error("VideoRender.init was not called");
+        }
+
         this.durationPerVideo = this.templateMapper.mapDurationPerVideo();
 
         this.elements = this.templateMapper.mapTemplateToElements();

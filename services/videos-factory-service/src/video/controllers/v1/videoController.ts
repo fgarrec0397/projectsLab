@@ -1,29 +1,44 @@
 import { Request, Response } from "express";
 
-import { TemplateGenerator } from "../../modules/TemplateGenerator/TemplateGenerator";
-import { VideoRenderer } from "../../modules/VideoRenderer/VideoRenderer";
 import { ScriptService } from "../../services/ScriptService";
-import { funFactsTemplate } from "../../templates/funFactsTemplate/funFactsTemplate";
+import { TemplateService } from "../../services/TemplateService";
+import { VideoService } from "../../services/VideoService";
 
 const canRenderVideo = false;
 
 export class VideoController {
     scriptService: ScriptService;
 
-    constructor(scriptService: ScriptService) {
+    templateService: TemplateService;
+
+    videoService: VideoService;
+
+    constructor(
+        scriptService: ScriptService,
+        templateService: TemplateService,
+        videoService: VideoService
+    ) {
         this.scriptService = scriptService;
+        this.templateService = templateService;
+        this.videoService = videoService;
     }
 
     async get(_: Request, result: Response) {
         const subtitles = await this.scriptService.generateScript();
 
-        if (canRenderVideo) {
-            const templateGenerator = new TemplateGenerator({ subtitles });
-            const template = templateGenerator.createTemplate(funFactsTemplate);
-            const videoFactory = new VideoRenderer(template);
-            await videoFactory.initRender();
-        }
+        const template = this.templateService.createTemplate("funFactsTemplate", { subtitles }); // TODO - "funFactsTemplate" is temporary mocked
 
-        result.status(200).json({ result: "video controller GET" });
+        try {
+            if (!canRenderVideo) {
+                result.status(200).json({ result: "Video not created" });
+                return;
+            }
+
+            await this.videoService.generateVideo(template);
+
+            result.status(200).json({ result: "Video created" });
+        } catch (error) {
+            result.status(500).json({ error: "Internal server error" });
+        }
     }
 }

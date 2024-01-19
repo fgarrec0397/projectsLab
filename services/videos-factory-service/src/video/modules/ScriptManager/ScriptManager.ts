@@ -1,6 +1,6 @@
 import fs from "fs";
 
-import { FilesSystem } from "../../../core/modules/FilesSystem";
+import { FileSystem } from "../../../core/modules/FileSystem";
 import { TimedText } from "../../videoTypes";
 import { TextGeneratorStrategy } from "./Strategies/TextGeneratorStrategy/TextGeneratorStrategy";
 import { TimestampsGeneratorStrategy } from "./Strategies/TimestampsGeneratorStrategy/TimestampsGeneratorStrategy";
@@ -17,7 +17,7 @@ export class ScriptManager {
 
     private voiceBuffer: Buffer | undefined;
 
-    private voiceFilePath: string = FilesSystem.getAssetsPath("speech.flac");
+    private voiceFilePath: string = FileSystem.getAssetsPath("speech.flac");
 
     private text: string | undefined;
 

@@ -1,4 +1,4 @@
-import { FilesSystem } from "../../../core/modules/FilesSystem";
+import { FileSystem } from "../../../core/modules/FileSystem";
 import { VideoRenderer } from "../../modules/VideoRenderer/VideoRenderer";
 import { Template, TimedText } from "../../videoTypes";
 
@@ -14,13 +14,13 @@ export const funFactsTemplate = (data: FunFactsTemplateData): Template => ({
     elements: [
         new VideoRenderer.Video({
             name: "video1",
-            sourcePath: FilesSystem.getAssetsPath(
+            sourcePath: FileSystem.getAssetsPath(
                 "1 hour 20 minutes of relaxing Minecraft Parkour (Nostalgia, Scenery, No Ads).mp4"
             ),
         }),
         new VideoRenderer.Audio({
             name: "audio1",
-            sourcePath: FilesSystem.getAssetsPath("speech.mp3"),
+            sourcePath: FileSystem.getAssetsPath("speech.mp3"),
             isVideoLengthHandler: true,
         }),
         new VideoRenderer.Text({

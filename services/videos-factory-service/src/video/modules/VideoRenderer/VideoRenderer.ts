@@ -1,7 +1,7 @@
 import ffmpeg, { FfmpegCommand } from "fluent-ffmpeg";
 import { existsSync, promises } from "fs";
 
-import { FilesSystem } from "../../../core/modules/FilesSystem";
+import { FileSystem } from "../../../core/modules/FileSystem";
 import { Template } from "../../videoTypes";
 import { CanvasRenderer } from "../CanvasRenderer/CanvasRenderer";
 import { ComplexFilterBuilder } from "./Builders/ComplexFilterBuilder";
@@ -35,9 +35,9 @@ export class VideoRenderer {
 
     static Video = Video;
 
-    outputPath = FilesSystem.getAssetsPath("out/refactor-video.mp4");
+    outputPath = FileSystem.getAssetsPath("out/refactor-video.mp4");
 
-    tempOutputPath = FilesSystem.getAssetsPath("tmp/videos/temp-video.mov");
+    tempOutputPath = FileSystem.getAssetsPath("tmp/videos/temp-video.mov");
 
     assets: TemplateAsset[] = [];
 
@@ -152,7 +152,7 @@ export class VideoRenderer {
 
                 for (let i = 0; i < fragments.length; i += batchSize) {
                     const batch: string[] = fragments.slice(i, i + batchSize);
-                    this.tempOutputPath = FilesSystem.getAssetsPath(
+                    this.tempOutputPath = FileSystem.getAssetsPath(
                         `tmp/videos/intermediate_${i}.mov`
                     );
 
@@ -288,10 +288,10 @@ export class VideoRenderer {
 
     private async cleanUpDirectories() {
         for (const path of [
-            FilesSystem.getAssetsPath("out"),
-            FilesSystem.getAssetsPath("tmp/output"),
-            FilesSystem.getAssetsPath("tmp/inputs-list"),
-            FilesSystem.getAssetsPath("tmp/videos"),
+            FileSystem.getAssetsPath("out"),
+            FileSystem.getAssetsPath("tmp/output"),
+            FileSystem.getAssetsPath("tmp/inputs-list"),
+            FileSystem.getAssetsPath("tmp/videos"),
         ]) {
             if (existsSync(path)) {
                 await promises.rm(path, { recursive: true });

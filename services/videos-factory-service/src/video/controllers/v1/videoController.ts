@@ -23,7 +23,7 @@ export class VideoController {
         this.videoService = videoService;
     }
 
-    async get(_: Request, result: Response) {
+    get = async (_: Request, result: Response) => {
         const subtitles = await this.scriptService.generateScript();
 
         const template = this.templateService.createTemplate("funFactsTemplate", { subtitles }); // TODO - "funFactsTemplate" is temporary mocked
@@ -40,5 +40,5 @@ export class VideoController {
         } catch (error) {
             result.status(500).json({ error: "Internal server error" });
         }
-    }
+    };
 }

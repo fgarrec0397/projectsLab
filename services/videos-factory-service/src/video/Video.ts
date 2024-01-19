@@ -25,7 +25,6 @@ export class Video {
         const videoService = new VideoService(videoRenderer);
 
         const videoController = new VideoController(scriptService, templateService, videoService);
-        console.log(videoController, "videoController");
 
         return videoController;
     }

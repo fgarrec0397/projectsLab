@@ -23,28 +23,28 @@ export class OpenAITextGeneratorStrategy implements TextGeneratorStrategy {
 
     async generateText(): Promise<string> {
         const promptOptions = this.generatePrePromptOptions();
-        const dynamicPrompt = this.generatePrePrompt(promptOptions);
+        const preprompt = this.generatePrePrompt(promptOptions);
         const multiplier = Math.floor(Math.random() * 100);
         const seed = Date.now() * multiplier;
 
-        console.log(`Dynamic prompt generated: ${dynamicPrompt}`);
+        console.log(`Dynamic preprompt generated: ${preprompt}`);
 
         console.log(`Calling OpenAI with seed: ${seed}`);
 
-        const prePromptCompletion = await this.openAi.chat.completions.create({
+        const prepromptResultCompletion = await this.openAi.chat.completions.create({
             messages: [
-                { role: "system", content: dynamicPrompt[0] },
-                { role: "user", content: dynamicPrompt[1] },
+                { role: "system", content: preprompt[0] },
+                { role: "user", content: preprompt[1] },
             ],
             model: "gpt-4",
             seed,
         });
 
-        console.log("Returned pre-prompt from OpenAI: ", JSON.stringify(prePromptCompletion));
+        console.log("Returned pre-prompt from OpenAI: ", JSON.stringify(prepromptResultCompletion));
 
-        const preprompt = prePromptCompletion.choices[0].message.content || "";
+        const prepromptResult = prepromptResultCompletion.choices[0].message.content || "";
 
-        const prompt = this.generatePrompt(preprompt);
+        const prompt = this.generatePrompt(prepromptResult);
 
         const result = await this.openAi.chat.completions.create({
             messages: [{ role: "user", content: prompt }],
@@ -62,7 +62,7 @@ export class OpenAITextGeneratorStrategy implements TextGeneratorStrategy {
         const countryList = countries.join(", ");
 
         return [
-            `You are someone that has automated a tiktok account by creating a tiktok account with the following niche: “Some general fun facts compilation that no one would ever know before”.
+            `You are someone that has automated your content by creating contents with the following niche: “Some general fun facts compilation that no one would ever know before”.
             You need to create your next video and search for some ideas. We are ${date} and you are about to summarize briefly your next video of “Some general fun facts compilation that 
             no one would ever know before”.
             `,
@@ -85,7 +85,7 @@ export class OpenAITextGeneratorStrategy implements TextGeneratorStrategy {
         const maxAge = getRandomNumber(minAge, 80);
         const ageRange = `${minAge} and ${maxAge}`;
         const countries = this.getRandomCountries(factCount);
-        const date = format(new Date(), "PPPP p"); // Using date-fns for formatting
+        const date = format(new Date(), "PPPP p");
 
         return { factCount, ageRange, countries, date };
     }

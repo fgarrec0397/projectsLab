@@ -24,9 +24,11 @@ export class VideoController {
     }
 
     get = async (_: Request, result: Response) => {
-        const subtitles = await this.scriptService.generateScript();
+        const script = await this.scriptService.generateScript();
 
-        const template = this.templateService.createTemplate("funFactsTemplate", { subtitles }); // TODO - "funFactsTemplate" is temporary mocked
+        const template = this.templateService.createTemplate("funFactsTemplate", {
+            subtitles: script,
+        }); // TODO - "funFactsTemplate" is temporary mocked
 
         try {
             if (!canRenderVideo) {

@@ -1,4 +1,13 @@
-import { existsSync, promises, readFile, readFileSync } from "fs";
+import {
+    createReadStream,
+    createWriteStream,
+    existsSync,
+    promises,
+    readFile,
+    readFileSync,
+    ReadStream,
+    WriteStream,
+} from "fs";
 import path from "path";
 
 export class FileSystem {
@@ -46,6 +55,14 @@ export class FileSystem {
     static async createFile(filePath: string, data: string | Buffer): Promise<void> {
         await FileSystem.ensureDirectoryExists(filePath);
         await promises.writeFile(filePath, data);
+    }
+
+    static async createReadStream(filePath: string): Promise<ReadStream> {
+        return createReadStream(filePath);
+    }
+
+    static createWriteStream(filePath: string): WriteStream {
+        return createWriteStream(filePath);
     }
 
     static convertFileToBuffer(filePath: string): Promise<Buffer> {

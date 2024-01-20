@@ -10,7 +10,7 @@ export class VideoUtils {
                     reject(error.message);
                 })
                 .on("end", () => {
-                    console.log("Resampling finished !");
+                    console.log("Resampled finished: " + outputFile);
                     resolve();
                 })
                 .save(outputFile);

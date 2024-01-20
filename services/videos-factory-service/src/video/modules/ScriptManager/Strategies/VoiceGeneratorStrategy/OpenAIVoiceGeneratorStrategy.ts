@@ -1,4 +1,3 @@
-import fs from "fs";
 import OpenAI from "openai";
 
 import { FileSystem } from "../../../../../core/modules/FileSystem";
@@ -7,7 +6,7 @@ import { VideoUtils } from "../../../VideoRenderer/Utilities/VideoUtils";
 import { VoiceGeneratorStrategy } from "./VoiceGeneratorStrategy";
 
 export class OpenAIVoiceGeneratorStrategy implements VoiceGeneratorStrategy {
-    tempVoiceFilePath: string = FileSystem.getAssetsPath("speech-temp.flac");
+    tempVoiceFilePath: string = FileSystem.getAssetsPath("speech-temp.mp3");
 
     openai: OpenAI;
 
@@ -17,18 +16,18 @@ export class OpenAIVoiceGeneratorStrategy implements VoiceGeneratorStrategy {
         this.openai = OpenAIModule.getModule();
     }
 
-    async generateVoice(input: string, voiceFilePath: string): Promise<Buffer> {
+    async generateVoice(text: string, voiceFilePath: string): Promise<Buffer> {
         console.log("Create audio with OpenAI");
 
         const mp3 = await this.openai.audio.speech.create({
             model: "tts-1-hd",
             voice: "echo",
-            response_format: "flac",
-            input,
+            response_format: "mp3",
+            input: text,
         });
 
         const tempAudio = Buffer.from(await mp3.arrayBuffer());
-        await fs.promises.writeFile(this.tempVoiceFilePath, tempAudio);
+        await FileSystem.createFile(this.tempVoiceFilePath, tempAudio);
 
         console.log("Resample the audio");
         await VideoUtils.resampleAudio(this.tempVoiceFilePath, voiceFilePath);

@@ -1,5 +1,6 @@
 import { Canvas, CanvasRenderingContext2D, createCanvas } from "canvas";
-import { promises } from "fs";
+
+import { FileSystem } from "../../../core/modules/FileSystem";
 
 export type TextStylesProperties = {
     font?: string;
@@ -59,6 +60,6 @@ export class CanvasRenderer {
 
         const buffer = canvas.toBuffer("image/png");
 
-        await promises.writeFile(filename, buffer);
+        await FileSystem.createFile(filename, buffer);
     }
 }

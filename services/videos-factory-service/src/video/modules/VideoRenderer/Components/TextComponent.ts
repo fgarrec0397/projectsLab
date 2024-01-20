@@ -1,5 +1,4 @@
 import ffmpeg from "fluent-ffmpeg";
-import { existsSync, mkdirSync } from "fs";
 
 import { FileSystem } from "../../../../core/modules/FileSystem";
 import { TimedText } from "../../../videoTypes";
@@ -98,8 +97,8 @@ export class TextComponent
         const outputFolderPath = FileSystem.getAssetsPath(`tmp/output`);
         const outputFilePath = FileSystem.getAssetsPath(`tmp/output/text-${options.id}.png`);
 
-        if (!existsSync(outputFolderPath)) {
-            mkdirSync(outputFolderPath);
+        if (!FileSystem.isPathExistSync(outputFolderPath)) {
+            FileSystem.createDirectory(outputFolderPath);
         }
 
         await this.canvasRenderer.createTextImage(

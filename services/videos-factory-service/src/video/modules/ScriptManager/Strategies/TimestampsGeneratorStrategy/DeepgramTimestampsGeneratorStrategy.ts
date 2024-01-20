@@ -13,8 +13,13 @@ export class DeepgramTimestampsGeneratorStrategy implements TimestampsGeneratorS
 
     async generateTimestampsBasedOnAudio(input: Buffer) {
         console.log("Create the timestamps with Deepgram");
-        const result = await this.deepgramModule.listen.prerecorded.transcribeFile(input);
+        const result = await this.deepgramModule.listen.prerecorded.transcribeFile(input, {
+            smart_format: true,
+        });
 
+        console.log(JSON.stringify(result.result), "Deepgram transcribe result");
+
+        console.log("Timestamps created with Deepgram");
         return this.mapDataToTimedText(result.result);
     }
 
@@ -24,8 +29,8 @@ export class DeepgramTimestampsGeneratorStrategy implements TimestampsGeneratorS
         }
 
         return data.results.channels[0].alternatives[0].words.map(
-            ({ punctuated_word, start, end }) => ({
-                word: punctuated_word,
+            ({ punctuated_word, word, start, end }) => ({
+                word: punctuated_word || word,
                 start,
                 end,
             })

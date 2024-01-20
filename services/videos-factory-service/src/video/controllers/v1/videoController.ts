@@ -4,7 +4,7 @@ import { ScriptService } from "../../services/ScriptService";
 import { TemplateService } from "../../services/TemplateService";
 import { VideoService } from "../../services/VideoService";
 
-const canRenderVideo = false;
+const canRenderVideo = true;
 
 export class VideoController {
     scriptService: ScriptService;
@@ -40,7 +40,9 @@ export class VideoController {
 
             result.status(200).json({ result: "Video created" });
         } catch (error) {
-            result.status(500).json({ error: "Internal server error" });
+            console.log(error, "error");
+
+            result.status(500).json({ error });
         }
     };
 }

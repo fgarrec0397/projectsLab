@@ -1,5 +1,4 @@
 import ffmpeg, { FfmpegCommand } from "fluent-ffmpeg";
-import { existsSync, promises } from "fs";
 
 import { FileSystem } from "../../../core/modules/FileSystem";
 import { Template } from "../../videoTypes";
@@ -191,7 +190,6 @@ export class VideoRenderer {
                 .addOption("-map", audioMapping)
                 .videoCodec("prores_ks")
                 .outputOptions("-profile:v 3");
-            // console.log("batch command", command._getArguments().join(""));
 
             command
                 .on("start", (commandLine) => {
@@ -293,10 +291,8 @@ export class VideoRenderer {
             FileSystem.getAssetsPath("tmp/inputs-list"),
             FileSystem.getAssetsPath("tmp/videos"),
         ]) {
-            if (existsSync(path)) {
-                await promises.rm(path, { recursive: true });
-            }
-            await promises.mkdir(path, { recursive: true });
+            await FileSystem.removeFile(path);
+            await FileSystem.createDirectory(path);
         }
     }
 }

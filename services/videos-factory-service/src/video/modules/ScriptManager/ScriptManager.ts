@@ -1,5 +1,3 @@
-import fs from "fs";
-
 import { FileSystem } from "../../../core/modules/FileSystem";
 import { TimedText } from "../../videoTypes";
 import { TextGeneratorStrategy } from "./Strategies/TextGeneratorStrategy/TextGeneratorStrategy";
@@ -17,7 +15,7 @@ export class ScriptManager {
 
     private voiceBuffer: Buffer | undefined;
 
-    private voiceFilePath: string = FileSystem.getAssetsPath("speech.flac");
+    private voiceFilePath: string = FileSystem.getAssetsPath("speech.mp3");
 
     private text: string | undefined;
 
@@ -35,8 +33,8 @@ export class ScriptManager {
 
     async generateScript() {
         await this.generateText();
-        // await this.generateVoice();
-        // await this.generateTimestampsBasedOnAudio();
+        await this.generateVoice();
+        await this.generateTimestampsBasedOnAudio();
     }
 
     private async generateText() {
@@ -52,7 +50,7 @@ export class ScriptManager {
             this.text,
             this.voiceFilePath
         );
-        await fs.promises.writeFile(this.voiceFilePath, this.voiceBuffer);
+        await FileSystem.createFile(this.voiceFilePath, this.voiceBuffer);
     }
 
     private async generateTimestampsBasedOnAudio() {

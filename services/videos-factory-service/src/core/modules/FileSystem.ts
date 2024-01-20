@@ -1,4 +1,4 @@
-import { promises, readFile, readFileSync } from "fs";
+import { existsSync, promises, readFile, readFileSync } from "fs";
 import path from "path";
 
 export class FileSystem {
@@ -13,12 +13,12 @@ export class FileSystem {
     static async ensureDirectoryExists(filePath: string): Promise<void> {
         const directoryPath = path.dirname(filePath);
 
-        if (!(await FileSystem.fileExists(directoryPath))) {
+        if (!(await FileSystem.isPathExist(directoryPath))) {
             await FileSystem.createDirectory(directoryPath);
         }
     }
 
-    static async fileExists(filePath: string): Promise<boolean> {
+    static async isPathExist(filePath: string): Promise<boolean> {
         try {
             await promises.access(filePath);
             return true;
@@ -27,11 +27,23 @@ export class FileSystem {
         }
     }
 
+    static isPathExistSync(filePath: string) {
+        return existsSync(filePath);
+    }
+
+    static async removeFile(filePath: string): Promise<void> {
+        if (!FileSystem.isPathExistSync(filePath)) {
+            return;
+        }
+
+        await promises.rm(filePath, { recursive: true });
+    }
+
     static async createDirectory(directoryPath: string): Promise<void> {
         await promises.mkdir(directoryPath, { recursive: true });
     }
 
-    static async createFileWithDirectories(filePath: string, data: string | Buffer): Promise<void> {
+    static async createFile(filePath: string, data: string | Buffer): Promise<void> {
         await FileSystem.ensureDirectoryExists(filePath);
         await promises.writeFile(filePath, data);
     }

@@ -14,7 +14,9 @@ type OAuth2JSON = {
 class StorageManager {
     private drive: drive_v3.Drive;
 
-    private folderId: string = "11SxScRBf59VjL6GMJMPH-np2saa68i4j";
+    private rootFolderId: string = "11SxScRBf59VjL6GMJMPH-np2saa68i4j";
+
+    private assetsFolderId: string = "1WLRzddF6oqQRNaD6W8SS5renMbaumJvF";
 
     constructor() {
         const keys = FileSystem.loadJson<OAuth2JSON>("./credentials/oauth2.keys.json");
@@ -25,15 +27,19 @@ class StorageManager {
             keys?.web.redirect_uris[0]
         );
 
+        const tokens: { access_token?: string; refresh_token?: string } = {
+            access_token: process.env.GOOGLE_ACCESS_TOKEN,
+            refresh_token: process.env.GOOGLE_REFRESH_TOKEN,
+        };
+
+        oauth2Client.setCredentials(tokens);
+
         this.drive = google.drive({ version: "v3", auth: oauth2Client });
     }
 
-    async listFiles(): Promise<drive_v3.Schema$FileList> {
+    async getAssets(): Promise<drive_v3.Schema$FileList> {
         try {
-            const response = await this.drive.files.list({
-                q: `'${this.folderId}' in parents`,
-            });
-            return response.data;
+            return await this.fetchFilesFromFolder(this.assetsFolderId);
         } catch (error) {
             throw new Error("Error listing files: " + error);
         }
@@ -46,7 +52,7 @@ class StorageManager {
     ): Promise<drive_v3.Schema$File> {
         const fileMetadata = {
             name: fileName,
-            parents: [this.folderId],
+            parents: [this.rootFolderId],
         };
 
         const media = {
@@ -71,7 +77,7 @@ class StorageManager {
         try {
             const file = await this.drive.files.get({ fileId, fields: "parents" });
 
-            if (!file.data.parents || !file.data.parents.includes(this.folderId)) {
+            if (!file.data.parents || !file.data.parents.includes(this.rootFolderId)) {
                 throw new Error("File is not in the specified folder.");
             }
 
@@ -91,8 +97,17 @@ class StorageManager {
             throw new Error("Error downloading file: " + error);
         }
     }
+
+    private async fetchFilesFromFolder(folderId: string): Promise<drive_v3.Schema$FileList> {
+        try {
+            const response = await this.drive.files.list({
+                q: `'${folderId}' in parents`,
+            });
+            return response.data;
+        } catch (error) {
+            throw new Error("Error listing files: " + error);
+        }
+    }
 }
 
-const storageManager = new StorageManager();
-
-export default storageManager;
+export default StorageManager;

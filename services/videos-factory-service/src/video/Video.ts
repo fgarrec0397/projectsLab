@@ -1,4 +1,4 @@
-import { VideoController } from "./controllers/v1/VideoController";
+import { VideoController } from "./controllers/v1/videoController";
 import { OpenAITextGeneratorStrategy } from "./modules/ScriptManager/Strategies/TextGeneratorStrategy/OpenAITextGeneratorStrategy";
 import { DeepgramTimestampsGeneratorStrategy } from "./modules/ScriptManager/Strategies/TimestampsGeneratorStrategy/DeepgramTimestampsGeneratorStrategy";
 import { OpenAIVoiceGeneratorStrategy } from "./modules/ScriptManager/Strategies/VoiceGeneratorStrategy/OpenAIVoiceGeneratorStrategy";

@@ -1,14 +1,11 @@
 import { FileSystem } from "../../../core/modules/FileSystem";
+import { BaseTemplateData } from "../../modules/TemplateGenerator/TemplateGenerator";
 import { VideoRenderer } from "../../modules/VideoRenderer/VideoRenderer";
-import { Template, TimedText } from "../../videoTypes";
+import { Template } from "../../videoTypes";
 
-type FunFactsTemplateData = {
-    subtitles: TimedText[];
-};
+type FunFactsTemplateData = BaseTemplateData;
 
 export const funFactsTemplate = (data: FunFactsTemplateData): Template => {
-    console.log(JSON.stringify(data.subtitles), "data.subtitles");
-
     return {
         fps: 60,
         outputFormat: "mp4",
@@ -28,7 +25,7 @@ export const funFactsTemplate = (data: FunFactsTemplateData): Template => {
             }),
             new VideoRenderer.Text({
                 name: "text",
-                value: data.subtitles,
+                value: data.script,
             }),
         ],
     };

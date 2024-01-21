@@ -1,10 +1,14 @@
 import { Request, Response } from "express";
 
+import StorageManager from "../../../core/modules/StorageManager";
 import { ScriptService } from "../../services/ScriptService";
 import { TemplateService } from "../../services/TemplateService";
 import { VideoService } from "../../services/VideoService";
+import { Template, TimedText } from "../../videoTypes";
 
-const canRenderVideo = true;
+const canRenderVideo = false;
+const canGenerateScript = false;
+const canGenerateTemplate = false;
 
 export class VideoController {
     scriptService: ScriptService;
@@ -24,11 +28,27 @@ export class VideoController {
     }
 
     get = async (_: Request, result: Response) => {
-        const script = await this.scriptService.generateScript();
+        let script: TimedText[] = [];
+        let template: Template | undefined = undefined;
+        const storageManager = new StorageManager();
 
-        const template = this.templateService.createTemplate("funFactsTemplate", {
-            subtitles: script,
-        }); // TODO - "funFactsTemplate" is temporary mocked
+        const filesList = await storageManager.getAssets();
+        const mappedFilesName = filesList.files?.map((x) => ({
+            name: x.name,
+            type: x.mimeType,
+        }));
+
+        console.log(JSON.stringify(filesList), "filesList");
+        console.log(mappedFilesName, "mappedFilesName");
+
+        if (canGenerateScript) {
+            script = await this.scriptService.generateScript();
+        }
+
+        if (canGenerateTemplate) {
+            this.templateService.prepareTemplate("funFactsTemplate", script); // TODO - "funFactsTemplate" is temporary mocked
+            template = this.templateService.createTemplate();
+        }
 
         try {
             if (!canRenderVideo) {
@@ -36,7 +56,9 @@ export class VideoController {
                 return;
             }
 
-            await this.videoService.generateVideo(template);
+            if (template) {
+                await this.videoService.generateVideo(template);
+            }
 
             result.status(200).json({ result: "Video created" });
         } catch (error) {

@@ -1,13 +1,21 @@
-import { Template } from "../../videoTypes";
+import { Template, TimedText } from "../../videoTypes";
 
-export class TemplateGenerator<T = any> {
+export type BaseTemplateData = {
+    script: TimedText[];
+};
+
+export type TemplateCallback = <T extends BaseTemplateData = BaseTemplateData>(
+    data?: T
+) => Template | undefined;
+
+export class TemplateGenerator<T extends BaseTemplateData = BaseTemplateData> {
     data?: T;
 
-    createTemplate(templateCallback: (data?: T) => Template) {
+    createTemplate(templateCallback: TemplateCallback) {
         return templateCallback(this.data);
     }
 
-    setData(data?: T) {
+    setTemplateData(data?: T) {
         this.data = data;
     }
 }

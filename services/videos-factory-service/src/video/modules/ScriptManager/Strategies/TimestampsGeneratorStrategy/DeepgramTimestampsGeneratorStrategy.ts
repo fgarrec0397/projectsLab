@@ -14,7 +14,12 @@ export class DeepgramTimestampsGeneratorStrategy implements TimestampsGeneratorS
     async generateTimestampsBasedOnAudio(input: Buffer) {
         console.log("Create the timestamps with Deepgram");
         const result = await this.deepgramModule.listen.prerecorded.transcribeFile(input, {
+            model: "nova-2",
+            language: "en",
             smart_format: true,
+            punctuate: true,
+            utterances: true,
+            utt_split: 1.2,
         });
 
         console.log(JSON.stringify(result.result), "Deepgram transcribe result");

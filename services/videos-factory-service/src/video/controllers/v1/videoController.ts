@@ -5,9 +5,9 @@ import { TemplateService } from "../../services/TemplateService";
 import { VideoService } from "../../services/VideoService";
 import { Template, TimedText } from "../../videoTypes";
 
-const canRenderVideo = false;
-const canGenerateScript = false;
+const canGenerateScript = true;
 const canGenerateTemplate = true;
+const canRenderVideo = true;
 
 export class VideoController {
     scriptService: ScriptService;

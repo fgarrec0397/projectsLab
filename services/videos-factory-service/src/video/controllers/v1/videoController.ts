@@ -1,6 +1,5 @@
 import { Request, Response } from "express";
 
-import StorageManager from "../../../core/modules/StorageManager";
 import { ScriptService } from "../../services/ScriptService";
 import { TemplateService } from "../../services/TemplateService";
 import { VideoService } from "../../services/VideoService";
@@ -8,7 +7,7 @@ import { Template, TimedText } from "../../videoTypes";
 
 const canRenderVideo = false;
 const canGenerateScript = false;
-const canGenerateTemplate = false;
+const canGenerateTemplate = true;
 
 export class VideoController {
     scriptService: ScriptService;
@@ -30,16 +29,6 @@ export class VideoController {
     get = async (_: Request, result: Response) => {
         let script: TimedText[] = [];
         let template: Template | undefined = undefined;
-        const storageManager = new StorageManager();
-
-        const filesList = await storageManager.getAssets();
-        const mappedFilesName = filesList.files?.map((x) => ({
-            name: x.name,
-            type: x.mimeType,
-        }));
-
-        console.log(JSON.stringify(filesList), "filesList");
-        console.log(mappedFilesName, "mappedFilesName");
 
         if (canGenerateScript) {
             script = await this.scriptService.generateScript();
@@ -47,7 +36,7 @@ export class VideoController {
 
         if (canGenerateTemplate) {
             this.templateService.prepareTemplate("funFactsTemplate", script); // TODO - "funFactsTemplate" is temporary mocked
-            template = this.templateService.createTemplate();
+            template = await this.templateService.createTemplate();
         }
 
         try {

@@ -45,11 +45,15 @@ export class TextComponent
 
     async fragmentProcess(
         ffmpegCommand: ffmpeg.FfmpegCommand,
-        fragments: string | TimedText[]
+        fragments: string | TimedText[] | undefined
     ): Promise<void> {
         const text = this.element;
 
         if (!text) {
+            return;
+        }
+
+        if (!fragments) {
             return;
         }
 

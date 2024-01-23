@@ -22,21 +22,35 @@ export class ElementComponentFactory {
     }
 
     createElementComponent(element: BaseElement): IElementComponent | undefined {
-        if (element instanceof Composition) {
-            const childComponents = element.elements.map(this.createElementComponent.bind(this));
-            return new CompositionComponent(element, childComponents, this.complexFilterBuilder);
+        if (element.type === "composition") {
+            const composition = element as Composition;
+
+            const childComponents = composition.elements.map(
+                this.createElementComponent.bind(this)
+            );
+            return new CompositionComponent(
+                composition,
+                childComponents,
+                this.complexFilterBuilder
+            );
         }
 
-        if (element instanceof Video) {
-            return new VideoComponent(element, this.complexFilterBuilder);
+        if (element.type === "video") {
+            const video = element as Video;
+
+            return new VideoComponent(video, this.complexFilterBuilder);
         }
 
-        if (element instanceof Audio) {
-            return new AudioComponent(element, this.complexFilterBuilder);
+        if (element.type === "audio") {
+            const audio = element as Audio;
+
+            return new AudioComponent(audio, this.complexFilterBuilder);
         }
 
-        if (element instanceof Text) {
-            return new TextComponent(element, this.complexFilterBuilder, this.canvasRenderer);
+        if (element.type === "text") {
+            const text = element as Text;
+
+            return new TextComponent(text, this.complexFilterBuilder, this.canvasRenderer);
         }
 
         throw new Error("Element not found");
@@ -44,7 +58,9 @@ export class ElementComponentFactory {
 
     createFragmentComponents(element: BaseElement): IElementComponent | undefined {
         if (element instanceof Text) {
-            return new TextComponent(element, this.complexFilterBuilder, this.canvasRenderer);
+            const text = element as Text;
+
+            return new TextComponent(text, this.complexFilterBuilder, this.canvasRenderer);
         }
     }
 }

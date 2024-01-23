@@ -1,9 +1,10 @@
 import { Request, Response } from "express";
 
+import { Script } from "../../modules/ScriptManager/ScriptManager";
 import { ScriptService } from "../../services/ScriptService";
 import { TemplateService } from "../../services/TemplateService";
 import { VideoService } from "../../services/VideoService";
-import { Template, TimedText } from "../../videoTypes";
+import { Template } from "../../videoTypes";
 
 const canGenerateScript = true;
 const canGenerateTemplate = true;
@@ -27,7 +28,7 @@ export class VideoController {
     }
 
     get = async (_: Request, result: Response) => {
-        let script: TimedText[] = [];
+        let script: Script = {};
         let template: Template | undefined = undefined;
 
         if (canGenerateScript) {

@@ -1,5 +1,5 @@
 import { FileSystem } from "../../../core/modules/FileSystem";
-import { TimedText } from "../../videoTypes";
+import { TimedSentence, TimedText } from "../../videoTypes";
 import { TextGeneratorStrategy } from "./Strategies/TextGeneratorStrategy/TextGeneratorStrategy";
 import { TimestampsGeneratorStrategy } from "./Strategies/TimestampsGeneratorStrategy/TimestampsGeneratorStrategy";
 import { VoiceGeneratorStrategy } from "./Strategies/VoiceGeneratorStrategy/VoiceGeneratorStrategy";
@@ -10,8 +10,16 @@ type ScriptManagerDependencies = {
     timestampsGeneratorStrategy: TimestampsGeneratorStrategy;
 };
 
+export type Script =
+    | {
+          duration?: number;
+          subtitles?: TimedText[];
+          sentences?: TimedSentence[];
+      }
+    | undefined;
+
 export class ScriptManager {
-    subtitles: TimedText[] = [];
+    private script: Script;
 
     private voiceBuffer: Buffer | undefined;
 
@@ -35,6 +43,8 @@ export class ScriptManager {
         await this.generateText();
         await this.generateVoice();
         await this.generateTimestampsBasedOnAudio();
+
+        return this.script;
     }
 
     private async generateText() {
@@ -57,7 +67,7 @@ export class ScriptManager {
         if (!this.voiceBuffer) {
             return;
         }
-        this.subtitles = await this.timestampsGeneratorStrategy.generateTimestampsBasedOnAudio(
+        this.script = await this.timestampsGeneratorStrategy.generateTimestampsBasedOnAudio(
             this.voiceBuffer
         );
     }

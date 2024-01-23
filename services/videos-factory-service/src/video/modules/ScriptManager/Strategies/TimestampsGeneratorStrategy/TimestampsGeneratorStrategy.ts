@@ -1,5 +1,5 @@
-import { TimedText } from "../../../../videoTypes";
+import { Script } from "../../ScriptManager";
 
 export interface TimestampsGeneratorStrategy {
-    generateTimestampsBasedOnAudio(input: Buffer): Promise<TimedText[]>;
+    generateTimestampsBasedOnAudio(input: Buffer): Promise<Script>;
 }

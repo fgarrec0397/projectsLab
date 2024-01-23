@@ -1,8 +1,7 @@
-import { ScriptManager } from "../modules/ScriptManager/ScriptManager";
+import { Script, ScriptManager } from "../modules/ScriptManager/ScriptManager";
 import { TextGeneratorStrategy } from "../modules/ScriptManager/Strategies/TextGeneratorStrategy/TextGeneratorStrategy";
 import { TimestampsGeneratorStrategy } from "../modules/ScriptManager/Strategies/TimestampsGeneratorStrategy/TimestampsGeneratorStrategy";
 import { VoiceGeneratorStrategy } from "../modules/ScriptManager/Strategies/VoiceGeneratorStrategy/VoiceGeneratorStrategy";
-import { TimedText } from "../videoTypes";
 
 export class ScriptService {
     private textGeneratorStrategy: TextGeneratorStrategy;
@@ -21,15 +20,13 @@ export class ScriptService {
         this.timestampsGeneratorStrategy = timestampsGeneratorStrategy;
     }
 
-    async generateScript(): Promise<TimedText[]> {
+    async generateScript(): Promise<Script> {
         const scriptManager = new ScriptManager({
             textGeneratorStrategy: this.textGeneratorStrategy,
             voiceGeneratorStrategy: this.voiceGeneratorStrategy,
             timestampsGeneratorStrategy: this.timestampsGeneratorStrategy,
         });
 
-        await scriptManager.generateScript();
-
-        return scriptManager.subtitles;
+        return scriptManager.generateScript();
     }
 }

@@ -1,16 +1,14 @@
+import { Script } from "../modules/ScriptManager/ScriptManager";
 import {
     TemplateCallback,
     TemplateGenerator,
 } from "../modules/TemplateGenerator/TemplateGenerator";
 import templates from "../templates/templates";
-import { TimedText } from "../videoTypes";
 
 export class TemplateService {
     private templateGenerator: TemplateGenerator;
 
     private templateKey: keyof typeof templates | undefined;
-
-    private templateData: any;
 
     constructor(templateGenerator: TemplateGenerator) {
         this.templateGenerator = templateGenerator;
@@ -27,7 +25,7 @@ export class TemplateService {
         return template;
     }
 
-    prepareTemplate(templateKey: keyof typeof templates, script: TimedText[]) {
+    prepareTemplate(templateKey: keyof typeof templates, script: Script) {
         this.templateKey = templateKey;
 
         this.templateGenerator.setTemplateData({

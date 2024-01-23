@@ -3,12 +3,12 @@ import { TextStylesProperties } from "../../CanvasRenderer/CanvasRenderer";
 import { BaseElement, BaseElementConfig } from "./BaseElement";
 
 type TextConfig = BaseElementConfig & {
-    value: string | TimedText[];
+    value: string | TimedText[] | undefined;
     styles?: TextStylesProperties;
 };
 
 export class Text extends BaseElement {
-    value: string | TimedText[];
+    value: string | TimedText[] | undefined;
 
     styles: TextStylesProperties | undefined;
 

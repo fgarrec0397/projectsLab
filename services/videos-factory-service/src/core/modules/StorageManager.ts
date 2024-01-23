@@ -1,5 +1,6 @@
 import { OAuth2Client } from "google-auth-library";
 import { drive_v3, google } from "googleapis";
+import path from "path";
 
 import { FileSystem } from "./FileSystem";
 
@@ -95,6 +96,26 @@ class StorageManager {
             });
         } catch (error) {
             throw new Error("Error downloading file: " + error);
+        }
+    }
+
+    async downloadFilesByIds(fileIds: string[], destinationFolder: string): Promise<void> {
+        try {
+            for (const fileId of fileIds) {
+                // Get file metadata to determine the file name
+                const fileMetadata = await this.drive.files.get({ fileId, fields: "name" });
+                const fileName = fileMetadata.data.name;
+
+                if (!fileName) {
+                    console.error(`File name not found for file ID: ${fileId}`);
+                    continue;
+                }
+
+                const filePath = path.join(destinationFolder, fileName);
+                await this.downloadFile(fileId, filePath);
+            }
+        } catch (error) {
+            throw new Error("Error downloading files: " + error);
         }
     }
 

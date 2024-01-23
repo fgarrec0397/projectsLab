@@ -1,5 +1,6 @@
 import OpenAI from "openai";
 
+import { FileSystem } from "../../../core/modules/FileSystem";
 import { OpenAIModule } from "../../../core/modules/OpenAI";
 import StorageManager from "../../../core/modules/StorageManager";
 import { Template } from "../../videoTypes";
@@ -19,7 +20,17 @@ export type MappedFetchedAsset = {
     type: string | null | undefined;
 };
 
+// TODO - better name this type  + better type it (type and name properties)
+export type TemplateAIElement = {
+    type: string;
+    name: string;
+    start: number;
+    end: number;
+};
+
 export class TemplateGenerator<T extends BaseTemplateData = BaseTemplateData> {
+    templateJson: TemplateAIElement[] | undefined;
+
     mappedFetchedAssets: MappedFetchedAsset[] | undefined = [];
 
     openAi: OpenAI;
@@ -39,6 +50,7 @@ export class TemplateGenerator<T extends BaseTemplateData = BaseTemplateData> {
     async createTemplate(templateCallback: TemplateCallback) {
         await this.fetchAvailableAssets();
         await this.generateTemplateByAI();
+        await this.downloadNeededAssets();
 
         const template = templateCallback(this.data);
         console.log(JSON.stringify(template), "template");
@@ -60,6 +72,16 @@ export class TemplateGenerator<T extends BaseTemplateData = BaseTemplateData> {
 
         console.log(JSON.stringify(filesList), "filesList");
         console.log(this.mappedFetchedAssets, "this.mappedFetchedAssets");
+    }
+
+    private async downloadNeededAssets() {
+        const filesNames = this.templateJson?.map((x) => x.name);
+
+        if (!filesNames?.length) {
+            return;
+        }
+
+        this.storageManager.downloadFilesByIds(filesNames, FileSystem.getAssetsPath());
     }
 
     private async generateTemplateByAI() {
@@ -118,9 +140,9 @@ export class TemplateGenerator<T extends BaseTemplateData = BaseTemplateData> {
                 return;
             }
 
-            const templateJson = JSON.parse(resultContent);
+            this.templateJson = JSON.parse(resultContent);
 
-            console.log(templateJson, "templateJson");
+            console.log(this.templateJson, "templateJson returned by AI");
         } catch (error) {
             console.log(error);
         }

@@ -11,8 +11,8 @@ import {
 import path from "path";
 
 export class FileSystem {
-    static getAssetsPath(assetPath: string) {
-        return FileSystem.getPath("./assets/poc", assetPath); // TODO - config - "./assets/poc"
+    static getAssetsPath(assetPath?: string) {
+        return FileSystem.getPath("./assets/poc", assetPath || ""); // TODO - config - "./assets/poc"
     }
 
     static getPath(...filePath: string[]) {

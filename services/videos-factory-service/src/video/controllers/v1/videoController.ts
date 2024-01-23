@@ -8,7 +8,7 @@ import { Template } from "../../videoTypes";
 
 const canGenerateScript = true;
 const canGenerateTemplate = true;
-const canRenderVideo = true;
+const canRenderVideo = false;
 
 export class VideoController {
     scriptService: ScriptService;

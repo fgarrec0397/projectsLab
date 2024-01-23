@@ -16,6 +16,7 @@ export type TemplateCallback = <T extends BaseTemplateData = BaseTemplateData>(
 ) => Template | undefined;
 
 export type MappedFetchedAsset = {
+    id: string | null | undefined;
     name: string | null | undefined;
     type: string | null | undefined;
 };
@@ -29,7 +30,7 @@ export type TemplateAIElement = {
 };
 
 export class TemplateGenerator<T extends BaseTemplateData = BaseTemplateData> {
-    templateJson: TemplateAIElement[] | undefined;
+    templateElements: TemplateAIElement[] | undefined;
 
     mappedFetchedAssets: MappedFetchedAsset[] | undefined = [];
 
@@ -52,8 +53,8 @@ export class TemplateGenerator<T extends BaseTemplateData = BaseTemplateData> {
         await this.generateTemplateByAI();
         await this.downloadNeededAssets();
 
-        const template = templateCallback(this.data);
-        console.log(JSON.stringify(template), "template");
+        // const template = templateCallback(this.data);
+        // console.log(JSON.stringify(template), "template");
 
         return templateCallback(this.data);
     }
@@ -66,6 +67,7 @@ export class TemplateGenerator<T extends BaseTemplateData = BaseTemplateData> {
         const filesList = await this.storageManager.getAssets();
 
         this.mappedFetchedAssets = filesList.files?.map((x) => ({
+            id: x.id,
             name: x.name,
             type: x.mimeType,
         }));
@@ -75,13 +77,15 @@ export class TemplateGenerator<T extends BaseTemplateData = BaseTemplateData> {
     }
 
     private async downloadNeededAssets() {
-        const filesNames = this.templateJson?.map((x) => x.name);
+        const filesIds = this.templateElements?.map((x) => {
+            return this.mappedFetchedAssets?.find((asset) => asset.name === x.name);
+        });
 
-        if (!filesNames?.length) {
+        if (!filesIds?.length) {
             return;
         }
 
-        this.storageManager.downloadFilesByIds(filesNames, FileSystem.getAssetsPath());
+        this.storageManager.downloadFilesByIds(filesIds, FileSystem.getAssetsPath());
     }
 
     private async generateTemplateByAI() {
@@ -140,9 +144,9 @@ export class TemplateGenerator<T extends BaseTemplateData = BaseTemplateData> {
                 return;
             }
 
-            this.templateJson = JSON.parse(resultContent);
+            this.templateElements = JSON.parse(resultContent).elements;
 
-            console.log(this.templateJson, "templateJson returned by AI");
+            console.log(resultContent, "resultContent returned by AI");
         } catch (error) {
             console.log(error);
         }

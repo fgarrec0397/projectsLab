@@ -78,9 +78,9 @@ class StorageManager {
         try {
             const file = await this.drive.files.get({ fileId, fields: "parents" });
 
-            if (!file.data.parents || !file.data.parents.includes(this.rootFolderId)) {
-                throw new Error("File is not in the specified folder.");
-            }
+            // if (!file.data.parents || !file.data.parents.includes(this.assetsFolderId)) {
+            //     throw new Error("File is not in the specified folder.");
+            // }
 
             const response = await this.drive.files.get(
                 { fileId, alt: "media" },
@@ -100,23 +100,31 @@ class StorageManager {
     }
 
     async downloadFilesByIds(fileIds: string[], destinationFolder: string): Promise<void> {
-        try {
-            for (const fileId of fileIds) {
-                // Get file metadata to determine the file name
-                const fileMetadata = await this.drive.files.get({ fileId, fields: "name" });
-                const fileName = fileMetadata.data.name;
+        for (const fileId of fileIds) {
+            const fileMetadata = await this.drive.files.get({ fileId, fields: "name" });
+            const fileName = fileMetadata.data.name;
 
-                if (!fileName) {
-                    console.error(`File name not found for file ID: ${fileId}`);
-                    continue;
-                }
+            console.log({
+                fileId,
+                destinationFolder,
+                fileName,
+                fileMetadata,
+            });
 
-                const filePath = path.join(destinationFolder, fileName);
-                await this.downloadFile(fileId, filePath);
+            if (!fileName) {
+                console.error(`File name not found for file ID: ${fileId}`);
+                continue;
             }
-        } catch (error) {
-            throw new Error("Error downloading files: " + error);
+
+            const filePath = path.join(destinationFolder, fileName);
+            console.log({ filePath });
+
+            // await this.downloadFile(fileId, filePath);
         }
+        // try {
+        // } catch (error) {
+        //     throw new Error("Error downloading files: " + error);
+        // }
     }
 
     private async fetchFilesFromFolder(folderId: string): Promise<drive_v3.Schema$FileList> {

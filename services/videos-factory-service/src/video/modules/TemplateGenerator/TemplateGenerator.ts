@@ -2,7 +2,7 @@ import OpenAI from "openai";
 
 import { FileSystem } from "../../../core/modules/FileSystem";
 import { OpenAIModule } from "../../../core/modules/OpenAI";
-import StorageManager from "../../../core/modules/StorageManager";
+import StorageManager from "../../../core/modules/StorageManager/StorageManager";
 import { Template } from "../../videoTypes";
 import { Script } from "../ScriptManager/ScriptManager";
 import { TemplatePromptBuilder } from "./Builders/TemplatePromptBuilder";
@@ -77,9 +77,11 @@ export class TemplateGenerator<T extends BaseTemplateData = BaseTemplateData> {
     }
 
     private async downloadNeededAssets() {
-        const filesIds = this.templateElements?.map((x) => {
-            return this.mappedFetchedAssets?.find((asset) => asset.name === x.name);
-        });
+        const filesIds = this.templateElements
+            ?.map((x) => {
+                return this.mappedFetchedAssets?.find((asset) => asset.name === x.name)?.id;
+            })
+            .filter((x) => x !== undefined && x !== null) as string[];
 
         if (!filesIds?.length) {
             return;

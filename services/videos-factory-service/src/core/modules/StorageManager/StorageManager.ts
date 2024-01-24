@@ -2,7 +2,7 @@ import { OAuth2Client } from "google-auth-library";
 import { drive_v3, google } from "googleapis";
 import path from "path";
 
-import { FileSystem } from "./FileSystem";
+import { FileSystem } from "../FileSystem";
 
 type OAuth2JSON = {
     web: {
@@ -78,9 +78,9 @@ class StorageManager {
         try {
             const file = await this.drive.files.get({ fileId, fields: "parents" });
 
-            // if (!file.data.parents || !file.data.parents.includes(this.assetsFolderId)) {
-            //     throw new Error("File is not in the specified folder.");
-            // }
+            if (!file.data.parents || !file.data.parents.includes(this.assetsFolderId)) {
+                throw new Error("File is not in the specified folder.");
+            }
 
             const response = await this.drive.files.get(
                 { fileId, alt: "media" },
@@ -100,31 +100,24 @@ class StorageManager {
     }
 
     async downloadFilesByIds(fileIds: string[], destinationFolder: string): Promise<void> {
-        for (const fileId of fileIds) {
-            const fileMetadata = await this.drive.files.get({ fileId, fields: "name" });
-            const fileName = fileMetadata.data.name;
+        try {
+            for (const fileId of fileIds) {
+                const fileMetadata = await this.drive.files.get({ fileId, fields: "name" });
+                const fileName = fileMetadata.data.name;
 
-            console.log({
-                fileId,
-                destinationFolder,
-                fileName,
-                fileMetadata,
-            });
+                if (!fileName) {
+                    console.error(`File name not found for file ID: ${fileId}`);
+                    continue;
+                }
 
-            if (!fileName) {
-                console.error(`File name not found for file ID: ${fileId}`);
-                continue;
+                const filePath = path.join(destinationFolder, fileName);
+                console.log({ filePath });
+
+                await this.downloadFile(fileId, filePath);
             }
-
-            const filePath = path.join(destinationFolder, fileName);
-            console.log({ filePath });
-
-            // await this.downloadFile(fileId, filePath);
+        } catch (error) {
+            throw new Error("Error downloading files: " + error);
         }
-        // try {
-        // } catch (error) {
-        //     throw new Error("Error downloading files: " + error);
-        // }
     }
 
     private async fetchFilesFromFolder(folderId: string): Promise<drive_v3.Schema$FileList> {

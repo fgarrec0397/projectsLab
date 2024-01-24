@@ -7,7 +7,7 @@ class S3StorageManager {
 
     private bucketName: string;
 
-    constructor(bucketName: string) {
+    constructor() {
         config.update({
             accessKeyId: process.env.AWS_ACCESS_KEY_ID,
             secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
@@ -15,23 +15,31 @@ class S3StorageManager {
         });
 
         this.s3 = new AWS.S3();
-        this.bucketName = bucketName;
+        this.bucketName = process.env.AWS_BUCKET_NAME || "";
     }
 
-    async listFiles(): Promise<AWS.S3.ListObjectsV2Output> {
+    static getFileExtension(key: string) {
+        const extensionMatch = key?.match(/\.[0-9a-z]+$/i);
+        return extensionMatch ? extensionMatch[0] : null;
+    }
+
+    async listFiles(folderPath?: string): Promise<AWS.S3.ObjectList> {
         try {
-            const params = {
+            const params: AWS.S3.ListObjectsV2Request = {
                 Bucket: this.bucketName,
+                Prefix: folderPath ? `${folderPath}/` : undefined,
             };
-            return await this.s3.listObjectsV2(params).promise();
+            const response = await this.s3.listObjectsV2(params).promise();
+
+            return response.Contents || [];
         } catch (error) {
             throw new Error("Error listing files: " + error);
         }
     }
 
-    async uploadFile(fileName: string, filePath: string): Promise<AWS.S3.ManagedUpload.SendData> {
+    async uploadFile(fileName: string, destinationPath: string) {
         try {
-            const fileContent = fs.readFileSync(filePath);
+            const fileContent = fs.readFileSync(destinationPath);
             const params = {
                 Bucket: this.bucketName,
                 Key: fileName,
@@ -43,7 +51,7 @@ class S3StorageManager {
         }
     }
 
-    async downloadFile(fileName: string, destinationPath: string): Promise<void> {
+    async downloadFile(fileName: string, destinationPath: string) {
         try {
             const params = {
                 Bucket: this.bucketName,
@@ -54,6 +62,15 @@ class S3StorageManager {
         } catch (error) {
             throw new Error("Error downloading file: " + error);
         }
+    }
+
+    getSignedFileUrl(key: string, expirySeconds: number = 3600): string {
+        const params = {
+            Bucket: this.bucketName,
+            Key: key,
+            Expires: expirySeconds,
+        };
+        return this.s3.getSignedUrl("getObject", params);
     }
 }
 

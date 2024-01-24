@@ -1,8 +1,7 @@
 import OpenAI from "openai";
 
-import { FileSystem } from "../../../core/modules/FileSystem";
 import { OpenAIModule } from "../../../core/modules/OpenAI";
-import StorageManager from "../../../core/modules/StorageManager/StorageManager";
+import S3StorageManager from "../../../core/modules/S3StorageManager";
 import { Template } from "../../videoTypes";
 import { Script } from "../ScriptManager/ScriptManager";
 import { TemplatePromptBuilder } from "./Builders/TemplatePromptBuilder";
@@ -36,7 +35,7 @@ export class TemplateGenerator<T extends BaseTemplateData = BaseTemplateData> {
 
     openAi: OpenAI;
 
-    storageManager: StorageManager;
+    storageManager: S3StorageManager;
 
     templatePromptBuilder: TemplatePromptBuilder;
 
@@ -44,7 +43,7 @@ export class TemplateGenerator<T extends BaseTemplateData = BaseTemplateData> {
 
     constructor() {
         this.openAi = OpenAIModule.getModule();
-        this.storageManager = new StorageManager();
+        this.storageManager = new S3StorageManager();
         this.templatePromptBuilder = new TemplatePromptBuilder();
     }
 
@@ -64,16 +63,16 @@ export class TemplateGenerator<T extends BaseTemplateData = BaseTemplateData> {
     }
 
     private async fetchAvailableAssets() {
-        const filesList = await this.storageManager.getAssets();
+        const filesList = await this.storageManager.listFiles();
 
-        this.mappedFetchedAssets = filesList.files?.map((x) => ({
-            id: x.id,
-            name: x.name,
-            type: x.mimeType,
-        }));
+        // this.mappedFetchedAssets = filesList?.map((x) => ({
+        //     id: x.id,
+        //     name: x.name,
+        //     type: x.mimeType,
+        // }));
 
-        console.log(JSON.stringify(filesList), "filesList");
-        console.log(this.mappedFetchedAssets, "this.mappedFetchedAssets");
+        console.log(JSON.stringify(filesList), "TemplateGenerator filesList");
+        // console.log(this.mappedFetchedAssets, "this.mappedFetchedAssets");
     }
 
     private async downloadNeededAssets() {
@@ -87,7 +86,7 @@ export class TemplateGenerator<T extends BaseTemplateData = BaseTemplateData> {
             return;
         }
 
-        this.storageManager.downloadFilesByIds(filesIds, FileSystem.getAssetsPath());
+        // this.storageManager.downloadFilesByIds(filesIds, FileSystem.getAssetsPath());
     }
 
     private async generateTemplateByAI() {

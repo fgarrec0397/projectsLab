@@ -1,13 +1,14 @@
 import { Request, Response } from "express";
 
+import S3StorageManager from "../../../core/modules/S3StorageManager";
 import { Script } from "../../modules/ScriptManager/ScriptManager";
 import { ScriptService } from "../../services/ScriptService";
 import { TemplateService } from "../../services/TemplateService";
 import { VideoService } from "../../services/VideoService";
 import { Template } from "../../videoTypes";
 
-const canGenerateScript = true;
-const canGenerateTemplate = true;
+const canGenerateScript = false;
+const canGenerateTemplate = false;
 const canRenderVideo = false;
 
 export class VideoController {
@@ -30,6 +31,11 @@ export class VideoController {
     get = async (_: Request, result: Response) => {
         let script: Script = {};
         let template: Template | undefined = undefined;
+
+        const storageManager = new S3StorageManager();
+        const filesList = await storageManager.listFiles("assets");
+
+        console.log(JSON.stringify(filesList), "filesList from get");
 
         if (canGenerateScript) {
             script = await this.scriptService.generateScript();

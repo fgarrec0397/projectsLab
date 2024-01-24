@@ -18,8 +18,23 @@ class S3StorageManager {
         this.bucketName = process.env.AWS_BUCKET_NAME || "";
     }
 
-    static getFileExtension(key: string) {
+    static extractFileName(key: string | undefined) {
+        if (!key) {
+            return;
+        }
+
+        const baseName = key.split("/").pop() || key;
+
+        return baseName;
+    }
+
+    static getFileExtension(key: string | undefined) {
+        if (!key) {
+            return;
+        }
+
         const extensionMatch = key?.match(/\.[0-9a-z]+$/i);
+
         return extensionMatch ? extensionMatch[0] : null;
     }
 
@@ -64,7 +79,11 @@ class S3StorageManager {
         }
     }
 
-    getSignedFileUrl(key: string, expirySeconds: number = 3600): string {
+    getSignedFileUrl(key: string | undefined, expirySeconds: number = 3600) {
+        if (!key) {
+            return;
+        }
+
         const params = {
             Bucket: this.bucketName,
             Key: key,

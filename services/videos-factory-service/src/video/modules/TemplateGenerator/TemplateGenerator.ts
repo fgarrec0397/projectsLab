@@ -1,9 +1,13 @@
 import OpenAI from "openai";
 
+import { FileSystem } from "../../../core/modules/FileSystem";
 import { OpenAIModule } from "../../../core/modules/OpenAI";
 import S3StorageManager from "../../../core/modules/S3StorageManager";
 import { Template } from "../../videoTypes";
 import { Script } from "../ScriptManager/ScriptManager";
+import { BaseElement } from "../VideoRenderer/Entities/BaseElement";
+import { SourceableElementConfig } from "../VideoRenderer/Entities/SourceableElement";
+import { VideoRenderer } from "../VideoRenderer/VideoRenderer";
 import { TemplatePromptBuilder } from "./Builders/TemplatePromptBuilder";
 
 export type BaseTemplateData = {
@@ -18,15 +22,11 @@ export type MappedFetchedAsset = {
     id: string | null | undefined;
     name: string | null | undefined;
     type: string | null | undefined;
+    url: string | null | undefined;
 };
 
 // TODO - better name this type  + better type it (type and name properties)
-export type TemplateAIElement = {
-    type: string;
-    name: string;
-    start: number;
-    end: number;
-};
+export type TemplateAIElement = SourceableElementConfig;
 
 export class TemplateGenerator<T extends BaseTemplateData = BaseTemplateData> {
     templateElements: TemplateAIElement[] | undefined;
@@ -50,12 +50,14 @@ export class TemplateGenerator<T extends BaseTemplateData = BaseTemplateData> {
     async createTemplate(templateCallback: TemplateCallback) {
         await this.fetchAvailableAssets();
         await this.generateTemplateByAI();
-        await this.downloadNeededAssets();
+
+        const template = this.mapAITemplateElementsToTemplateElements();
 
         // const template = templateCallback(this.data);
-        // console.log(JSON.stringify(template), "template");
+        console.log(JSON.stringify(template), "template");
 
-        return templateCallback(this.data);
+        return template;
+        // return templateCallback(this.data);
     }
 
     setTemplateData(data?: T) {
@@ -63,30 +65,17 @@ export class TemplateGenerator<T extends BaseTemplateData = BaseTemplateData> {
     }
 
     private async fetchAvailableAssets() {
-        const filesList = await this.storageManager.listFiles();
+        const filesList = await this.storageManager.listFiles("assets");
 
-        // this.mappedFetchedAssets = filesList?.map((x) => ({
-        //     id: x.id,
-        //     name: x.name,
-        //     type: x.mimeType,
-        // }));
+        this.mappedFetchedAssets = filesList?.map((x) => ({
+            id: x.Key,
+            name: S3StorageManager.extractFileName(x.Key),
+            type: S3StorageManager.getFileExtension(x.Key),
+            url: this.storageManager.getSignedFileUrl(x.Key),
+        }));
 
         console.log(JSON.stringify(filesList), "TemplateGenerator filesList");
-        // console.log(this.mappedFetchedAssets, "this.mappedFetchedAssets");
-    }
-
-    private async downloadNeededAssets() {
-        const filesIds = this.templateElements
-            ?.map((x) => {
-                return this.mappedFetchedAssets?.find((asset) => asset.name === x.name)?.id;
-            })
-            .filter((x) => x !== undefined && x !== null) as string[];
-
-        if (!filesIds?.length) {
-            return;
-        }
-
-        // this.storageManager.downloadFilesByIds(filesIds, FileSystem.getAssetsPath());
+        console.log(this.mappedFetchedAssets, "this.mappedFetchedAssets");
     }
 
     private async generateTemplateByAI() {
@@ -95,7 +84,8 @@ export class TemplateGenerator<T extends BaseTemplateData = BaseTemplateData> {
                 `You are a video editor and your job is to create a video based
                 on the script that will be given to you. The script will be formatted as following: "The first sentence. (start: 0, end: 12), The second sentence. (start: 12, end: 20)"
                 You will also be provided with a list of mp4
-                videos and maybe mp3 audio, and your task is to generate a json that that will follow the
+                videos and maybe mp3 audio. The videos and audios lists will be formatted as follow: name: video_name.mp4, url: the/aws/s3/url/path/video_name.mp4?additionalparam1=paramvalues1&additionalparam2=paramvalues2 | name: video_name.mp4, url: the/aws/s3/url/path/video_name.mp4, etc.
+                Base your asset choice by the name. The name should match as much as possible with the script. You should output the whole asset url in the sourcePath field. Your task is to generate a json that that will follow the
                 given structure to create that video. You will choose which asset you want to appear in the video
                 as long as some sound effect if there is any. The json should be formatted as follow: 
                 {
@@ -103,12 +93,14 @@ export class TemplateGenerator<T extends BaseTemplateData = BaseTemplateData> {
                         {
                             "type": "video",
                             "name": "video_name.mp4",
+                            "sourcePath": "the/aws/s3/url/path/video_name.mp4?additionalparam1=paramvalues1&additionalparam2=paramvalues2",
                             "start": 0,
                             "end": 10
                         },
                         {
                             "type": "audio",
                             "name": "audio_name.mp3",
+                            "sourcePath": "the/aws/s3/url/path/audio_name.mp3?additionalparam1=paramvalues1&additionalparam2=paramvalues2",
                             "start": 0,
                             "end": 10
                         }
@@ -123,7 +115,7 @@ export class TemplateGenerator<T extends BaseTemplateData = BaseTemplateData> {
         `
             )
             .addUserPrompt(
-                `The list of all available assets are the following: ${this.printAssetsNames()}`
+                `The list of all available assets links are the following: ${this.printAssets()}`
             )
             .addUserPrompt(`The script: ${this.printTimedSentence()}`).addUserPrompt(`
                 The duration is ${this.data?.script?.duration} seconds.
@@ -145,7 +137,12 @@ export class TemplateGenerator<T extends BaseTemplateData = BaseTemplateData> {
                 return;
             }
 
-            this.templateElements = JSON.parse(resultContent).elements;
+            this.templateElements = JSON.parse(resultContent).elements.map(
+                (x: SourceableElementConfig) => ({
+                    ...x,
+                    track: 1,
+                })
+            );
 
             console.log(resultContent, "resultContent returned by AI");
         } catch (error) {
@@ -153,17 +150,56 @@ export class TemplateGenerator<T extends BaseTemplateData = BaseTemplateData> {
         }
     }
 
-    private printAssetsNames() {
-        const assetsNamesTextArray: string[] = [];
+    private mapAITemplateElementsToTemplateElements() {
+        const elements = (this.templateElements
+            ?.map((x) => {
+                if (x.type === "video") {
+                    return new VideoRenderer.Video(x);
+                }
+
+                if (x.type === "audio") {
+                    return new VideoRenderer.Audio(x);
+                }
+            })
+            .filter((x) => x !== undefined && x !== null) || []) as BaseElement[];
+
+        elements.push(
+            new VideoRenderer.Audio({
+                name: "audio1",
+                sourcePath: FileSystem.getAssetsPath("speech.mp3"),
+                isVideoLengthHandler: true,
+            }),
+            new VideoRenderer.Text({
+                name: "text",
+                value: this.data?.script?.subtitles,
+            })
+        );
+
+        const template: Template = {
+            fps: 60,
+            outputFormat: "mp4",
+            width: 1080,
+            height: 1920,
+            elements,
+        };
+
+        return template;
+    }
+
+    private printAssets() {
+        const assetsArray: string[] = [];
 
         this.mappedFetchedAssets?.forEach((x) => {
-            if (typeof x.name !== "string") {
+            if (typeof x.url !== "string" && typeof x.name !== "string") {
                 return;
             }
-            assetsNamesTextArray.push(x.name);
+
+            assetsArray.push(`name: ${x.name}, url: ${x.url}`);
         });
 
-        return assetsNamesTextArray.join(", ");
+        console.log(assetsArray.join(" | "), "printed assets");
+
+        return assetsArray.join(" | ");
     }
 
     private printTimedSentence() {

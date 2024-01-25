@@ -1,6 +1,5 @@
 import { Request, Response } from "express";
 
-import S3StorageManager from "../../../core/modules/S3StorageManager";
 import { Script } from "../../modules/ScriptManager/ScriptManager";
 import { ScriptService } from "../../services/ScriptService";
 import { TemplateService } from "../../services/TemplateService";
@@ -32,17 +31,12 @@ export class VideoController {
         let script: Script = {};
         let template: Template | undefined = undefined;
 
-        const storageManager = new S3StorageManager();
-        const filesList = await storageManager.listFiles("assets");
-
-        console.log(JSON.stringify(filesList), "filesList from get");
-
         if (canGenerateScript) {
             script = await this.scriptService.generateScript();
         }
 
         if (canGenerateTemplate) {
-            this.templateService.prepareTemplate("funFactsTemplate", script); // TODO - "funFactsTemplate" is temporary mocked
+            this.templateService.prepareTemplate(script);
             template = await this.templateService.createTemplate();
         }
 

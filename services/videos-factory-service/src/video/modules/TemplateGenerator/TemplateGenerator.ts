@@ -14,10 +14,6 @@ export type BaseTemplateData = {
     script: Script;
 };
 
-export type TemplateCallback = <T extends BaseTemplateData = BaseTemplateData>(
-    data?: T
-) => Template | undefined;
-
 export type MappedFetchedAsset = {
     id: string | null | undefined;
     name: string | null | undefined;
@@ -25,7 +21,6 @@ export type MappedFetchedAsset = {
     url: string | null | undefined;
 };
 
-// TODO - better name this type  + better type it (type and name properties)
 export type TemplateAIElement = SourceableElementConfig;
 
 export class TemplateGenerator<T extends BaseTemplateData = BaseTemplateData> {
@@ -47,17 +42,15 @@ export class TemplateGenerator<T extends BaseTemplateData = BaseTemplateData> {
         this.templatePromptBuilder = new TemplatePromptBuilder();
     }
 
-    async createTemplate(templateCallback: TemplateCallback) {
+    async createTemplate() {
         await this.fetchAvailableAssets();
         await this.generateTemplateByAI();
 
         const template = this.mapAITemplateElementsToTemplateElements();
 
-        // const template = templateCallback(this.data);
-        console.log(JSON.stringify(template), "template");
+        console.log(JSON.stringify(template), "Created template");
 
         return template;
-        // return templateCallback(this.data);
     }
 
     setTemplateData(data?: T) {

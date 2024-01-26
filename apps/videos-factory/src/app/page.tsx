@@ -1,9 +1,18 @@
-import Button from "@/features/Button/Button";
+"use client";
 
-export default function Home() {
-    return (
-        <main>
-            <Button />
-        </main>
-    );
+import { useEffect } from "react";
+
+import { PATH_AFTER_LOGIN } from "@/config-global";
+import { useRouter } from "@/routes/hooks";
+
+// ----------------------------------------------------------------------
+
+export default function HomePage() {
+    const router = useRouter();
+
+    useEffect(() => {
+        router.push(PATH_AFTER_LOGIN);
+    }, [router]);
+
+    return null;
 }

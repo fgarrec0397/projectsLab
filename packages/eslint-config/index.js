@@ -59,6 +59,7 @@ module.exports = {
       "@typescript-eslint/explicit-module-boundary-types": "off",
       "@typescript-eslint/member-ordering": "error",
       "@typescript-eslint/no-non-null-assertion": "off",
+      "@typescript-eslint/no-unused-vars": "warn",
       "import/prefer-default-export": "off",
       "import/no-named-as-default": "off",
       "import/extensions": [

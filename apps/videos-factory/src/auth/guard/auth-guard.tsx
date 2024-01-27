@@ -10,6 +10,7 @@ import { useAuthContext } from "../hooks";
 
 const loginPaths: Record<string, string> = {
     jwt: paths.auth.jwt.login,
+    firebase: paths.auth.firebase.login,
 };
 
 // ----------------------------------------------------------------------
@@ -40,6 +41,8 @@ function Container({ children }: Props) {
             }).toString();
 
             const loginPath = loginPaths[method];
+
+            console.log(loginPath, "loginPath");
 
             const href = `${loginPath}?${searchParams}`;
 

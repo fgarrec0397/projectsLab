@@ -1,6 +1,6 @@
 import "@/global.css";
 
-import { AuthProvider } from "@/auth/context/jwt";
+import { AuthProvider } from "@/auth/context/firebase";
 import { MotionLazy } from "@/components/animate/motion-lazy";
 import ProgressBar from "@/components/progress-bar";
 import { SettingsDrawer, SettingsProvider } from "@/components/settings";

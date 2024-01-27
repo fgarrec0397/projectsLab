@@ -3,7 +3,7 @@
 const withPWA = require("@projectslab/next-pwa")({
     dest: "public",
     buildExcludes: [/app-build-manifest\.json/],
-    disable: false,
+    disable: true,
 });
 
 const nextConfig = {

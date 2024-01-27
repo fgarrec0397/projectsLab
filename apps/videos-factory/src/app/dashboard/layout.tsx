@@ -10,8 +10,6 @@ type Props = {
 };
 
 export default function Layout({ children }: Props) {
-    console.log("AuthGuard");
-
     return (
         <AuthGuard>
             <DashboardLayout>{children}</DashboardLayout>

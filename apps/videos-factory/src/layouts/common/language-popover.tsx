@@ -20,21 +20,6 @@ export const allLangs = [
         value: "fr",
         icon: "flagpack:fr",
     },
-    {
-        label: "Vietnamese",
-        value: "vi",
-        icon: "flagpack:vn",
-    },
-    {
-        label: "Chinese",
-        value: "cn",
-        icon: "flagpack:cn",
-    },
-    {
-        label: "Arabic",
-        value: "ar",
-        icon: "flagpack:sa",
-    },
 ];
 
 export default function LanguagePopover() {

@@ -1,3 +1,4 @@
+import { Button } from "@mui/material";
 import AppBar from "@mui/material/AppBar";
 import IconButton from "@mui/material/IconButton";
 import Stack from "@mui/material/Stack";
@@ -40,6 +41,14 @@ export default function Header({ onOpenNav }: Props) {
 
     const offsetTop = offset && !isNavHorizontal;
 
+    const showSearch = false;
+
+    const showLanguages = false;
+
+    const showContacts = false;
+
+    const showNotification = false;
+
     const renderContent = (
         <>
             {lgUp && isNavHorizontal && <Logo sx={{ mr: 2.5 }} />}
@@ -50,7 +59,7 @@ export default function Header({ onOpenNav }: Props) {
                 </IconButton>
             )}
 
-            <Searchbar />
+            {showSearch && <Searchbar />}
 
             <Stack
                 flexGrow={1}
@@ -59,11 +68,15 @@ export default function Header({ onOpenNav }: Props) {
                 justifyContent="flex-end"
                 spacing={{ xs: 0.5, sm: 1 }}
             >
-                <LanguagePopover />
+                {showLanguages && <LanguagePopover />}
 
-                <NotificationsPopover />
+                {showNotification && <NotificationsPopover />}
 
-                <ContactsPopover />
+                {showContacts && <ContactsPopover />}
+
+                <Button variant="contained" color="primary">
+                    Create
+                </Button>
 
                 <SettingsButton />
 

@@ -3,9 +3,9 @@ import { useTheme } from "@mui/material/styles";
 import Toolbar from "@mui/material/Toolbar";
 import { memo } from "react";
 
+import { useAuthContext } from "@/auth/hooks";
 import { NavSectionHorizontal } from "@/components/nav-section";
 import Scrollbar from "@/components/scrollbar";
-import { useMockedUser } from "@/hooks/use-mocked-user";
 import { bgBlur } from "@/theme/css";
 
 import HeaderShadow from "../common/header-shadow";
@@ -17,7 +17,7 @@ import { useNavData } from "./config-navigation";
 function NavHorizontal() {
     const theme = useTheme();
 
-    const { user } = useMockedUser();
+    const { user } = useAuthContext();
 
     const navData = useNavData();
 

@@ -17,6 +17,7 @@ export const viewport = {
     maximumScale: 1,
 };
 
+// TODO - change metadata
 export const metadata = {
     title: "Minimal UI Kit",
     description:

@@ -3,10 +3,10 @@ import Drawer from "@mui/material/Drawer";
 import Stack from "@mui/material/Stack";
 import { useEffect } from "react";
 
+import { useAuthContext } from "@/auth/hooks";
 import Logo from "@/components/logo";
 import { NavSectionVertical } from "@/components/nav-section";
 import Scrollbar from "@/components/scrollbar";
-import { useMockedUser } from "@/hooks/use-mocked-user";
 import { useResponsive } from "@/hooks/use-responsive";
 import { usePathname } from "@/routes/hooks";
 
@@ -23,13 +23,15 @@ type Props = {
 };
 
 export default function NavVertical({ openNav, onCloseNav }: Props) {
-    const { user } = useMockedUser();
+    const { user } = useAuthContext();
 
     const pathname = usePathname();
 
     const lgUp = useResponsive("up", "lg");
 
     const navData = useNavData();
+
+    const showNavUpgrade = false;
 
     useEffect(() => {
         if (openNav) {
@@ -60,7 +62,7 @@ export default function NavVertical({ openNav, onCloseNav }: Props) {
 
             <Box sx={{ flexGrow: 1 }} />
 
-            <NavUpgrade />
+            {showNavUpgrade && <NavUpgrade />}
         </Scrollbar>
     );
 

@@ -1,9 +1,9 @@
 import Box from "@mui/material/Box";
 import Stack from "@mui/material/Stack";
 
+import { useAuthContext } from "@/auth/hooks";
 import Logo from "@/components/logo";
 import { NavSectionMini } from "@/components/nav-section";
-import { useMockedUser } from "@/hooks/use-mocked-user";
 import { hideScroll } from "@/theme/css";
 
 import NavToggleButton from "../common/nav-toggle-button";
@@ -13,7 +13,7 @@ import { useNavData } from "./config-navigation";
 // ----------------------------------------------------------------------
 
 export default function NavMini() {
-    const { user } = useMockedUser();
+    const { user } = useAuthContext();
 
     const navData = useNavData();
 

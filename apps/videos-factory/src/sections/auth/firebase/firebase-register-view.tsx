@@ -166,7 +166,7 @@ export default function FirebaseRegisterView() {
 
             <LoadingButton
                 fullWidth
-                color="inherit"
+                color="primary"
                 size="large"
                 type="submit"
                 variant="contained"

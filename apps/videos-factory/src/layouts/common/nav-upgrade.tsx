@@ -4,14 +4,14 @@ import Button from "@mui/material/Button";
 import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
 
+import { useAuthContext } from "@/auth/hooks";
 import Label from "@/components/label";
-import { useMockedUser } from "@/hooks/use-mocked-user";
 import { paths } from "@/routes/paths";
 
 // ----------------------------------------------------------------------
 
 export default function NavUpgrade() {
-    const { user } = useMockedUser();
+    const { user } = useAuthContext();
 
     return (
         <Stack

@@ -11,7 +11,6 @@ import { m } from "framer-motion";
 import { useAuthContext } from "@/auth/hooks";
 import { varHover } from "@/components/animate";
 import CustomPopover, { usePopover } from "@/components/custom-popover";
-import { useMockedUser } from "@/hooks/use-mocked-user";
 import { useRouter } from "@/routes/hooks";
 
 // ----------------------------------------------------------------------
@@ -36,7 +35,7 @@ const OPTIONS = [
 export default function AccountPopover() {
     const router = useRouter();
 
-    const { user } = useMockedUser();
+    const { user } = useAuthContext();
 
     const { logout } = useAuthContext();
 

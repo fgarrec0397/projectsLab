@@ -51,7 +51,7 @@ export default function FirebaseForgotPasswordView() {
                 email: data.email,
             }).toString();
 
-            const href = `${paths.auth.firebase.verify}?${searchParams}`;
+            const href = `${paths.auth.verify}?${searchParams}`;
             router.push(href);
         } catch (error) {
             console.error(error);
@@ -74,7 +74,7 @@ export default function FirebaseForgotPasswordView() {
 
             <Link
                 component={RouterLink}
-                href={paths.auth.firebase.login}
+                href={paths.auth.login}
                 color="inherit"
                 variant="subtitle2"
                 sx={{

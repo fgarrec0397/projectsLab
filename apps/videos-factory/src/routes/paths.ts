@@ -11,16 +11,10 @@ export const paths = {
     minimalUI: "https://mui.com/store/items/minimal-dashboard/",
     // AUTH
     auth: {
-        jwt: {
-            login: `${ROOTS.AUTH}/jwt/login`,
-            register: `${ROOTS.AUTH}/jwt/register`,
-        },
-        firebase: {
-            login: `${ROOTS.AUTH}/firebase/login`,
-            verify: `${ROOTS.AUTH}/firebase/verify`,
-            register: `${ROOTS.AUTH}/firebase/register`,
-            forgotPassword: `${ROOTS.AUTH}/firebase/forgot-password`,
-        },
+        login: `${ROOTS.AUTH}/login`,
+        verify: `${ROOTS.AUTH}/verify`,
+        register: `${ROOTS.AUTH}/register`,
+        forgotPassword: `${ROOTS.AUTH}/forgot-password`,
     },
     // DASHBOARD
     dashboard: {

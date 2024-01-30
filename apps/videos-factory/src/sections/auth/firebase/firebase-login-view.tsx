@@ -103,11 +103,7 @@ export default function FirebaseLoginView() {
             <Stack direction="row" spacing={0.5}>
                 <Typography variant="body2">New user?</Typography>
 
-                <Link
-                    component={RouterLink}
-                    href={paths.auth.firebase.register}
-                    variant="subtitle2"
-                >
+                <Link component={RouterLink} href={paths.auth.register} variant="subtitle2">
                     Create an account
                 </Link>
             </Stack>
@@ -139,7 +135,7 @@ export default function FirebaseLoginView() {
 
             <Link
                 component={RouterLink}
-                href={paths.auth.firebase.forgotPassword}
+                href={paths.auth.forgotPassword}
                 variant="body2"
                 color="inherit"
                 underline="always"

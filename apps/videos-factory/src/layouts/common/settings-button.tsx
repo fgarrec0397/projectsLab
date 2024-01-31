@@ -5,8 +5,8 @@ import { SxProps, Theme } from "@mui/material/styles";
 import { m } from "framer-motion";
 
 import { varHover } from "@/components/animate";
-import Iconify from "@/components/iconify";
 import { useSettingsContext } from "@/components/settings";
+import { icon } from "@/theme/icons";
 
 // ----------------------------------------------------------------------
 
@@ -53,7 +53,7 @@ export default function SettingsButton({ sx }: Props) {
                         height: 40,
                     }}
                 >
-                    <Iconify icon="solar:settings-bold-duotone" width={24} />
+                    {icon("settings", { width: 24 })}
                 </IconButton>
             </Box>
         </Badge>

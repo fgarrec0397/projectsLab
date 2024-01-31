@@ -23,16 +23,6 @@ const Logo = forwardRef<HTMLDivElement, LogoProps>(
 
         const PRIMARY_DARKER = theme.palette.primary.darker;
 
-        // OR using local (public folder)
-        // -------------------------------------------------------
-        // const logo = (
-        //   <Box
-        //     component="img"
-        //     src="/logo/logo_single.svg" => your path
-        //     sx={{ width: 40, height: 40, cursor: 'pointer', ...sx }}
-        //   />
-        // );
-
         const logo = (
             <Box
                 ref={ref}
@@ -53,8 +43,8 @@ const Logo = forwardRef<HTMLDivElement, LogoProps>(
                     xmlns="http://www.w3.org/2000/svg"
                 >
                     <path
-                        fill-rule="evenodd"
-                        clip-rule="evenodd"
+                        fillRule="evenodd"
+                        clipRule="evenodd"
                         d="M113.701 49.5349C107.358 46.4861 100.139 44.747 92.361 44.747C65.1358 44.747 44.7677 66.0511 44.7677 90.257C44.7677 114.463 65.1358 135.767 92.361 135.767C104.686 135.767 115.606 131.401 123.867 124.376L162.365 149.111C145.428 168.317 120.348 180.476 92.361 180.476C41.3513 180.476 0 140.084 0 90.257C0 40.4304 41.3513 0.0378418 92.361 0.0378418C113.501 0.0378418 132.983 6.97577 148.549 18.6478L113.701 49.5349Z"
                         fill={PRIMARY_LIGHT}
                     />

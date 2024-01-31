@@ -1,11 +1,11 @@
-import ThreeView from "@/sections/three/view";
+import VideosCreateView from "@/sections/videos/videos-create-view";
 
 // ----------------------------------------------------------------------
 
 export const metadata = {
-    title: "Dashboard: Three",
+    title: "Create a video|Creatify",
 };
 
 export default function Page() {
-    return <ThreeView />;
+    return <VideosCreateView />;
 }

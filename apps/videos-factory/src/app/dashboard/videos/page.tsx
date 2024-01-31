@@ -1,4 +1,4 @@
-import OneView from "@/sections/one/view";
+import VideosView from "@/sections/videos/view";
 
 // ----------------------------------------------------------------------
 
@@ -7,5 +7,5 @@ export const metadata = {
 };
 
 export default function Page() {
-    return <OneView />;
+    return <VideosView />;
 }

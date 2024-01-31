@@ -9,12 +9,12 @@ import { useSettingsContext } from "@/components/settings";
 
 // ----------------------------------------------------------------------
 
-export default function ThreeView() {
+export default function VideosView() {
     const settings = useSettingsContext();
 
     return (
         <Container maxWidth={settings.themeStretch ? false : "xl"}>
-            <Typography variant="h4"> Page Three </Typography>
+            <Typography variant="h4"> Videos </Typography>
 
             <Box
                 sx={{

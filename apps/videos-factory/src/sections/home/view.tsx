@@ -9,12 +9,12 @@ import { useSettingsContext } from "@/components/settings";
 
 // ----------------------------------------------------------------------
 
-export default function OneView() {
+export default function HomeView() {
     const settings = useSettingsContext();
 
     return (
         <Container maxWidth={settings.themeStretch ? false : "xl"}>
-            <Typography variant="h4"> Page One </Typography>
+            <Typography variant="h4"> Home </Typography>
 
             <Box
                 sx={{

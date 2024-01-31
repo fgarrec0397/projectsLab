@@ -9,12 +9,12 @@ import { useSettingsContext } from "@/components/settings";
 
 // ----------------------------------------------------------------------
 
-export default function TwoView() {
+export default function VideosCreateView() {
     const settings = useSettingsContext();
 
     return (
         <Container maxWidth={settings.themeStretch ? false : "xl"}>
-            <Typography variant="h4"> Page Two </Typography>
+            <Typography variant="h4"> Videos </Typography>
 
             <Box
                 sx={{

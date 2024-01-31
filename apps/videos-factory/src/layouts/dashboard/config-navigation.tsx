@@ -16,6 +16,7 @@ const ICONS = {
     invoice: icon("bill-list"),
     calendar: icon("calendar"),
     external: icon("square-arrow-right-up"),
+    videos: icon("video-library"),
 };
 
 // ----------------------------------------------------------------------
@@ -26,15 +27,10 @@ export function useNavData() {
             // OVERVIEW
             // ----------------------------------------------------------------------
             {
-                subheader: "overview v5.7.0",
+                subheader: "overview",
                 items: [
-                    { title: "one", path: paths.dashboard.root, icon: ICONS.home },
-                    { title: "two", path: paths.dashboard.two, icon: ICONS.job },
-                    {
-                        title: "three",
-                        path: paths.dashboard.three,
-                        icon: ICONS.mail,
-                    },
+                    { title: "home", path: paths.dashboard.root, icon: ICONS.home },
+                    { title: "videos", path: paths.dashboard.videos.root, icon: ICONS.videos },
                 ],
             },
 

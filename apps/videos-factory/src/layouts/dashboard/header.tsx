@@ -1,4 +1,3 @@
-import { Button } from "@mui/material";
 import AppBar from "@mui/material/AppBar";
 import IconButton from "@mui/material/IconButton";
 import Stack from "@mui/material/Stack";
@@ -14,6 +13,7 @@ import { bgBlur } from "@/theme/css";
 
 import AccountPopover from "../common/account-popover";
 import ContactsPopover from "../common/contacts-popover";
+import CreateButtonPopover from "../common/create-button-popover";
 import LanguagePopover from "../common/language-popover";
 import NotificationsPopover from "../common/notifications-popover";
 import Searchbar from "../common/searchbar";
@@ -74,9 +74,7 @@ export default function Header({ onOpenNav }: Props) {
 
                 {showContacts && <ContactsPopover />}
 
-                <Button variant="contained" color="primary">
-                    Create
-                </Button>
+                <CreateButtonPopover />
 
                 <SettingsButton />
 

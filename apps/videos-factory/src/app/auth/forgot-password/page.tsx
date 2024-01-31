@@ -3,7 +3,7 @@ import { FirebaseForgotPasswordView } from "@/sections/auth/firebase";
 // ----------------------------------------------------------------------
 
 export const metadata = {
-    title: "Firebase: Forgot Password",
+    title: "Forgot Password | Createify",
 };
 
 export default function ForgotPasswordPage() {

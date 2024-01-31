@@ -3,7 +3,7 @@ import { FirebaseRegisterView } from "@/sections/auth/firebase";
 // ----------------------------------------------------------------------
 
 export const metadata = {
-    title: "Firebase: Register",
+    title: "Register | Createify",
 };
 
 export default function RegisterPage() {

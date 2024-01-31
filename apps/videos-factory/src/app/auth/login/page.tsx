@@ -3,7 +3,7 @@ import { FirebaseLoginView } from "@/sections/auth/firebase";
 // ----------------------------------------------------------------------
 
 export const metadata = {
-    title: "Firebase: Login",
+    title: "Login | Createify",
 };
 
 export default function LoginPage() {

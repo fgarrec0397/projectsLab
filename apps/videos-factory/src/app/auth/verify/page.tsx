@@ -3,7 +3,7 @@ import { FirebaseVerifyView } from "@/sections/auth/firebase";
 // ----------------------------------------------------------------------
 
 export const metadata = {
-    title: "Firebase: Verify",
+    title: "Verify | Createify",
 };
 
 export default function VerifyPage() {

@@ -27,6 +27,7 @@ export const paths = {
             root: `${ROOTS.DASHBOARD}/videos`,
             create: `${ROOTS.DASHBOARD}/videos/create`,
         },
+        fileManager: `${ROOTS.DASHBOARD}/file-manager`,
         group: {
             root: `${ROOTS.DASHBOARD}/group`,
             five: `${ROOTS.DASHBOARD}/group/five`,

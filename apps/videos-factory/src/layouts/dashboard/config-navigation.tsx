@@ -31,6 +31,11 @@ export function useNavData() {
                 items: [
                     { title: "home", path: paths.dashboard.root, icon: ICONS.home },
                     { title: "videos", path: paths.dashboard.videos.root, icon: ICONS.videos },
+                    {
+                        title: "file manager",
+                        path: paths.dashboard.fileManager,
+                        icon: ICONS.file,
+                    },
                 ],
             },
 

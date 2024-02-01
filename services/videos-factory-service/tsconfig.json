@@ -3,6 +3,7 @@
     "compilerOptions": {
         "outDir": "dist",
         "moduleResolution": "Node16",
+        "resolveJsonModule": true
     },
     "include": ["src", "index.ts"],
     "exclude": ["node_modules"],

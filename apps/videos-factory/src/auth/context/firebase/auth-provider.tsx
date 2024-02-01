@@ -71,6 +71,7 @@ export function AuthProvider({ children }: Props) {
     const initialize = useCallback(() => {
         try {
             onAuthStateChanged(AUTH, async (user) => {
+                const idToken = await user?.getIdToken(); // TODO - send this to the backend
                 if (user) {
                     if (user.emailVerified) {
                         const userProfile = doc(DB, "users", user.uid);
@@ -177,7 +178,7 @@ export function AuthProvider({ children }: Props) {
     const loginWithGoogle = useCallback(async () => {
         const provider = new GoogleAuthProvider();
 
-        await signInWithPopup(AUTH, provider);
+        const result = await signInWithPopup(AUTH, provider);
     }, []);
 
     const loginWithGithub = useCallback(async () => {

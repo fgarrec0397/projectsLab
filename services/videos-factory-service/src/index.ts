@@ -1,6 +1,7 @@
 import "dotenv/config";
 import "module-alias/register";
 
+import cookieParser from "cookie-parser";
 import cors from "cors";
 import express, { json } from "express";
 import ffmpegStatic from "ffmpeg-static";
@@ -15,6 +16,7 @@ setFfmpegPath(ffmpegStatic || "");
 const port = process.env.PORT || 3002;
 
 app.use(json());
+app.use(cookieParser());
 
 const allowedOrigins = ["http://localhost:3000"]; // Add your allowed origins
 

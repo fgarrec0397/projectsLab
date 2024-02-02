@@ -6,7 +6,7 @@ import { VideoService } from "./services/video.service";
 import { VideoController } from "./video.controller";
 
 @Module({
-    providers: [VideoService, ScriptService, TemplateService],
     controllers: [VideoController],
+    providers: [VideoService, ScriptService, TemplateService],
 })
 export class VideoModule {}

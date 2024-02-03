@@ -1,7 +1,7 @@
 import type { ServiceAccount } from "firebase-admin";
 import * as admin from "firebase-admin";
 
-import serviceAccount from "../../credentials/firebase-serviceAccountKey.json";
+const serviceAccount = require("../../credentials/firebase-serviceAccountKey.json");
 
 export class FirebaseAdmin {
     private static instance: admin.app.App;

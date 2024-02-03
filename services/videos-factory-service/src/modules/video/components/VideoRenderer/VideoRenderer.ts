@@ -1,3 +1,4 @@
+import { Injectable } from "@nestjs/common";
 import ffmpeg, { FfmpegCommand } from "fluent-ffmpeg";
 
 import { FileSystem } from "../../../../common/FileSystem";
@@ -25,6 +26,7 @@ export type TemplateSize = {
     height: number;
 };
 
+@Injectable()
 export class VideoRenderer {
     static Audio = Audio;
 

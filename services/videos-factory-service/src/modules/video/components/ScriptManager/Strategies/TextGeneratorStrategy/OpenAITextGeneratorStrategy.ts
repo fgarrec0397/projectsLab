@@ -1,3 +1,4 @@
+import { Injectable } from "@nestjs/common";
 import { format, getRandomNumber } from "@projectslab/helpers";
 import OpenAI from "openai";
 
@@ -12,6 +13,7 @@ type PromptOptions = {
     date: string;
 };
 
+@Injectable()
 export class OpenAITextGeneratorStrategy implements TextGeneratorStrategy {
     openAi: OpenAI;
 

@@ -1,12 +1,21 @@
 {
-  "extends": "@projectslab/typescript-config/base.json",
   "compilerOptions": {
-    "baseUrl": "./src",
-    "paths": {
-        "@helpers/*": ["./*"],
-    },
+    "target": "es2018",        // or whatever ECMAScript version your environment supports
+    "module": "commonjs",      // for Node.js
+    "outDir": "./dist",        // where to place the transpiled files
+    "rootDir": "./src",        // where your TypeScript files are located
+    "strict": true,            // enable all strict type-checking options
+    "esModuleInterop": true,   // enables `import foo from 'foo'` instead of `import * as foo from 'foo'`
+    "skipLibCheck": true,      // skip type checking of all declaration files (*.d.ts)
+    "declaration": true,       // generate corresponding '.d.ts' file
+    "sourceMap": true          // generate corresponding '.map' file
   },
   "include": [
-    "src",
+    "src/**/*"                 // specify the files to transpile
   ],
+  "exclude": [
+    "node_modules",            // exclude the node_modules directory
+    "**/*.spec.ts",            // exclude test files
+    "dist"                     // exclude the output directory
+  ]
 }

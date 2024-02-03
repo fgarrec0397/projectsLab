@@ -1,9 +1,11 @@
 import { DeepgramClient, SyncPrerecordedResponse } from "@deepgram/sdk";
+import { Injectable } from "@nestjs/common";
 
 import { DeepgramModule } from "../../../../../../common/Deepgram";
 import { TimedSentence, TimedText } from "../../../../videoTypes";
 import { TimestampsGeneratorStrategy } from "./TimestampsGeneratorStrategy";
 
+@Injectable()
 export class DeepgramTimestampsGeneratorStrategy implements TimestampsGeneratorStrategy {
     deepgramModule: DeepgramClient;
 

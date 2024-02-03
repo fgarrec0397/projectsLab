@@ -1,10 +1,12 @@
 {
   "name": "@projectslab/helpers",
   "version": "0.0.0",
-  "main": "./src/index.ts",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
   "scripts": {
     "audit": "npm audit",
     "audit:fix": "npm audit fix",
+    "build": "tsc",
     "lint": "eslint --ext .ts,.tsx src --fix",
     "format": "prettier --write ./src",
     "update:check": "ncu",

@@ -1,4 +1,4 @@
-import { Controller, Post } from "@nestjs/common";
+import { Controller, HttpException, HttpStatus, Post } from "@nestjs/common";
 
 import { Script } from "./components/ScriptManager/ScriptManager";
 import { ScriptService } from "./services/script.service";
@@ -16,7 +16,9 @@ export class VideoController {
         private readonly scriptService: ScriptService,
         private readonly templateService: TemplateService,
         private readonly videoService: VideoService
-    ) {}
+    ) {
+        console.log(scriptService, "scriptService in the constructor");
+    }
 
     @Post()
     async createVideo() {
@@ -24,6 +26,8 @@ export class VideoController {
         let template: Template | undefined = undefined;
 
         if (canGenerateScript) {
+            console.log(this.scriptService, "this.scriptService");
+
             script = await this.scriptService.generateScript();
         }
 
@@ -34,21 +38,16 @@ export class VideoController {
 
         try {
             if (!canRenderVideo) {
-                result.status(200).json({ result: "Video not created" });
-                return;
+                return { result: "Video not created" };
             }
 
             if (template) {
                 await this.videoService.generateVideo(template);
             }
 
-            result.status(200).json({ result: "Video created" });
+            return { result: "Video created" };
         } catch (error) {
-            console.log(error, "error");
-
-            result.status(500).json({ error });
+            throw new HttpException(error as Record<string, any>, HttpStatus.BAD_REQUEST);
         }
-
-        return "create a video";
     }
 }

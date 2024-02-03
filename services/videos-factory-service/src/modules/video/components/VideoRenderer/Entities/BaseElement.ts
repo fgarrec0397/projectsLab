@@ -6,6 +6,7 @@ export const elementTypes = {
     ...sourceableElementTypes,
     composition: "composition",
     text: "text",
+
     none: "none",
 };
 

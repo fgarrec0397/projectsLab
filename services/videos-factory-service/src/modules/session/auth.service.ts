@@ -14,4 +14,12 @@ export class AuthService {
             throw new Error("Unable to verify ID token");
         }
     }
+
+    async revokeRefreshTokens(uid: string): Promise<void> {
+        try {
+            await admin.auth().revokeRefreshTokens(uid);
+        } catch (error) {
+            throw new Error("Could not revoke tokens");
+        }
+    }
 }

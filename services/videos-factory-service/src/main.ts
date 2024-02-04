@@ -15,6 +15,7 @@ async function bootstrap() {
             resave: false,
             saveUninitialized: false,
             cookie: { maxAge: 86400000 },
+            name: "createify.session",
         })
     );
 

@@ -12,10 +12,6 @@ export async function loginWithIdToken(idToken: string | undefined) {
             }
         );
 
-        if (!response.ok) {
-            throw new Error("Login failed");
-        }
-
         const data = await response.json();
         return data;
     } catch (error) {

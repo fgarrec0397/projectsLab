@@ -1,9 +1,20 @@
 import { Module } from "@nestjs/common";
 import { ConfigModule } from "@nestjs/config";
+import { PassportModule } from "@nestjs/passport";
 
+import { FirebaseAdminModule } from "./common/firebase-admin.module";
+import { AuthModule } from "./modules/session/auth.module";
+import { SessionSerializer } from "./modules/session/session.serializer";
 import { VideoModule } from "./modules/video/video.module";
 
 @Module({
-    imports: [ConfigModule.forRoot(), VideoModule],
+    imports: [
+        ConfigModule.forRoot(),
+        PassportModule.register({ session: true }),
+        FirebaseAdminModule,
+        VideoModule,
+        AuthModule,
+    ],
+    providers: [SessionSerializer],
 })
 export class AppModule {}

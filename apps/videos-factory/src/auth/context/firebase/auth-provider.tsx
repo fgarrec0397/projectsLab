@@ -16,6 +16,8 @@ import {
 import { collection, doc, getDoc, getFirestore, setDoc } from "firebase/firestore";
 import { useCallback, useEffect, useMemo, useReducer } from "react";
 
+import { loginWithIdToken } from "@/services/authService";
+
 import { ActionMapType, AuthStateType, AuthUserType } from "../../types";
 import { AuthContext } from "./auth-context";
 import { firebaseApp } from "./lib";
@@ -71,7 +73,10 @@ export function AuthProvider({ children }: Props) {
     const initialize = useCallback(() => {
         try {
             onAuthStateChanged(AUTH, async (user) => {
-                const idToken = await user?.getIdToken(); // TODO - send this to the backend
+                const idToken = await user?.getIdToken();
+
+                await loginWithIdToken(idToken);
+
                 if (user) {
                     if (user.emailVerified) {
                         const userProfile = doc(DB, "users", user.uid);
@@ -119,53 +124,6 @@ export function AuthProvider({ children }: Props) {
         }
     }, []);
 
-    /*
-     * (1) If skip emailVerified
-     * Remove the condition (if/else) : user.emailVerified
-     */
-    /*
-  const initialize = useCallback(() => {
-    try {
-      onAuthStateChanged(AUTH, async (user) => {
-        if (user) {
-          const userProfile = doc(DB, 'users', user.uid);
-
-          const docSnap = await getDoc(userProfile);
-
-          const profile = docSnap.data();
-
-          dispatch({
-            type: Types.INITIAL,
-            payload: {
-              user: {
-                ...user,
-                ...profile,
-                id: user.uid,
-                role: 'admin',
-              },
-            },
-          });
-        } else {
-          dispatch({
-            type: Types.INITIAL,
-            payload: {
-              user: null,
-            },
-          });
-        }
-      });
-    } catch (error) {
-      console.error(error);
-      dispatch({
-        type: Types.INITIAL,
-        payload: {
-          user: null,
-        },
-      });
-    }
-  }, []);
-*/
-
     useEffect(() => {
         initialize();
     }, [initialize]);
@@ -178,7 +136,7 @@ export function AuthProvider({ children }: Props) {
     const loginWithGoogle = useCallback(async () => {
         const provider = new GoogleAuthProvider();
 
-        const result = await signInWithPopup(AUTH, provider);
+        await signInWithPopup(AUTH, provider);
     }, []);
 
     const loginWithGithub = useCallback(async () => {

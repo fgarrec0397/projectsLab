@@ -1,5 +1,6 @@
-import { Controller, HttpException, HttpStatus, Post } from "@nestjs/common";
+import { Controller, Get, HttpException, HttpStatus, Post, UseGuards } from "@nestjs/common";
 
+import { FirebaseAuthGuard } from "../session/auth.guard";
 import { Script } from "./components/ScriptManager/ScriptManager";
 import { ScriptService } from "./services/script.service";
 import { TemplateService } from "./services/template.service";
@@ -16,8 +17,12 @@ export class VideoController {
         private readonly scriptService: ScriptService,
         private readonly templateService: TemplateService,
         private readonly videoService: VideoService
-    ) {
-        console.log(scriptService, "scriptService in the constructor");
+    ) {}
+
+    @Get()
+    @UseGuards(FirebaseAuthGuard)
+    async getVideo() {
+        return "authenticated route";
     }
 
     @Post()
@@ -26,8 +31,6 @@ export class VideoController {
         let template: Template | undefined = undefined;
 
         if (canGenerateScript) {
-            console.log(this.scriptService, "this.scriptService");
-
             script = await this.scriptService.generateScript();
         }
 

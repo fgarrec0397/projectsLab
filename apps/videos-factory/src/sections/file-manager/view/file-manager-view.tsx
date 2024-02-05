@@ -17,6 +17,7 @@ import { useSettingsContext } from "@/components/settings";
 import { useSnackbar } from "@/components/snackbar";
 import { getComparator, useTable } from "@/components/table";
 import { useBoolean } from "@/hooks/use-boolean";
+import { useGetFiles } from "@/services/filesService";
 import { IFile, IFileFilters, IFileFilterValue } from "@/types/file";
 import { isAfter, isBetween } from "@/utils/format-time";
 
@@ -51,6 +52,8 @@ export default function FileManagerView() {
     const upload = useBoolean();
 
     const [view, setView] = useState("list");
+
+    const files = useGetFiles();
 
     const [tableData, setTableData] = useState<IFile[]>(allFiles);
 

@@ -30,7 +30,7 @@ import { firebaseApp } from "./lib";
  */
 // ----------------------------------------------------------------------
 
-const AUTH = getAuth(firebaseApp);
+export const AUTH = getAuth(firebaseApp);
 
 const DB = getFirestore(firebaseApp);
 

@@ -6,6 +6,6 @@ export const metadata = {
     title: "File Manager|Creatify",
 };
 
-export default function FileManagerPage() {
+export default async function FileManagerPage() {
     return <FileManagerView />;
 }

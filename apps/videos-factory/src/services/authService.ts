@@ -1,19 +1,20 @@
+import axios from "axios";
+
+import { endpoints } from "@/routes/endpoints";
+
 export async function sessionLogin(idToken: string | undefined) {
     try {
-        const response = await fetch(
-            `${process.env.NEXT_PUBLIC_CREATEIFY_SERVICE_URL}/auth/sessionLogin`,
+        return await axios.post(
+            endpoints.auth.login,
+            { idToken },
             {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
                 },
-                body: JSON.stringify({ idToken }),
-                credentials: "include",
+                withCredentials: true,
             }
         );
-
-        const data = await response.json();
-        return data;
     } catch (error) {
         console.error("An error occurred during login:", error);
         throw error;
@@ -22,17 +23,10 @@ export async function sessionLogin(idToken: string | undefined) {
 
 export async function sessionLogout() {
     try {
-        const response = await fetch(
-            `${process.env.NEXT_PUBLIC_CREATEIFY_SERVICE_URL}/auth/logout`,
-            {
-                method: "POST",
-                credentials: "include",
-            }
-        );
-
-        if (!response.ok) {
-            throw new Error("Failed to log out from backend");
-        }
+        return await axios.post(endpoints.auth.logout, undefined, {
+            method: "POST",
+            withCredentials: true,
+        });
     } catch (error) {
         console.error("Logout error:", error);
     }

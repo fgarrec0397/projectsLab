@@ -1,8 +1,9 @@
+import { Injectable } from "@nestjs/common";
 import OpenAI from "openai";
+import S3StorageManager from "src/common/services/s3-storage-manager.service";
 
 import { FileSystem } from "../../../../common/FileSystem";
 import { OpenAIModule } from "../../../../common/OpenAI";
-import S3StorageManager from "../../../../common/S3StorageManager";
 import { Template } from "../../videoTypes";
 import { Script } from "../ScriptManager/ScriptManager";
 import { BaseElement } from "../VideoRenderer/Entities/BaseElement";
@@ -23,6 +24,7 @@ export type MappedFetchedAsset = {
 
 export type TemplateAIElement = SourceableElementConfig;
 
+@Injectable()
 export class TemplateGenerator<T extends BaseTemplateData = BaseTemplateData> {
     templateElements: TemplateAIElement[] | undefined;
 
@@ -30,15 +32,12 @@ export class TemplateGenerator<T extends BaseTemplateData = BaseTemplateData> {
 
     openAi: OpenAI;
 
-    storageManager: S3StorageManager;
-
     templatePromptBuilder: TemplatePromptBuilder;
 
     data?: T;
 
-    constructor() {
+    constructor(private storageManager: S3StorageManager) {
         this.openAi = OpenAIModule.getModule();
-        this.storageManager = new S3StorageManager();
         this.templatePromptBuilder = new TemplatePromptBuilder();
     }
 
@@ -62,8 +61,8 @@ export class TemplateGenerator<T extends BaseTemplateData = BaseTemplateData> {
 
         this.mappedFetchedAssets = filesList?.map((x) => ({
             id: x.Key,
-            name: S3StorageManager.extractFileName(x.Key),
-            type: S3StorageManager.getFileExtension(x.Key),
+            name: this.storageManager.extractFileName(x.Key),
+            type: this.storageManager.getFileExtension(x.Key),
             url: this.storageManager.getSignedFileUrl(x.Key),
         }));
 

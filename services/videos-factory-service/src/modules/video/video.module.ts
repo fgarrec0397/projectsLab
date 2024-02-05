@@ -1,4 +1,5 @@
 import { Module } from "@nestjs/common";
+import S3StorageManager from "src/common/services/s3-storage-manager.service";
 
 import {
     TEXT_GENERATOR_STRATEGY_TOKEN,
@@ -18,6 +19,7 @@ import { VideoController } from "./video.controller";
 const servicesProviders = [VideoService, ScriptService, TemplateService];
 
 const customProviders = [
+    S3StorageManager,
     {
         provide: TEXT_GENERATOR_STRATEGY_TOKEN,
         useClass: OpenAITextGeneratorStrategy,

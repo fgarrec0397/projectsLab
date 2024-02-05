@@ -1,24 +1,27 @@
+import { Injectable } from "@nestjs/common";
+import { ConfigService } from "@nestjs/config";
 import AWS, { config } from "aws-sdk";
 import fs from "fs";
 import path from "path";
 
-class S3StorageManager {
+@Injectable()
+export class S3StorageManager {
     private s3: AWS.S3;
 
     private bucketName: string;
 
-    constructor() {
+    constructor(private configService: ConfigService) {
         config.update({
-            accessKeyId: process.env.AWS_ACCESS_KEY_ID,
-            secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
-            region: process.env.AWS_REGION,
+            accessKeyId: this.configService.get<string>("AWS_ACCESS_KEY_ID"),
+            secretAccessKey: this.configService.get<string>("AWS_SECRET_ACCESS_KEY"),
+            region: this.configService.get<string>("AWS_REGION"),
         });
 
         this.s3 = new AWS.S3();
-        this.bucketName = process.env.AWS_BUCKET_NAME || "";
+        this.bucketName = this.configService.get<string>("AWS_BUCKET_NAME", "");
     }
 
-    static extractFileName(key: string | undefined) {
+    extractFileName(key: string | undefined) {
         if (!key) {
             return;
         }
@@ -28,7 +31,7 @@ class S3StorageManager {
         return baseName;
     }
 
-    static getFileExtension(key: string | undefined) {
+    getFileExtension(key: string | undefined) {
         if (!key) {
             return;
         }

@@ -1,4 +1,4 @@
-import { Controller, Get, UseGuards } from "@nestjs/common";
+import { Controller, Get, Param, UseGuards } from "@nestjs/common";
 
 import { FirebaseAuthGuard } from "../session/auth.guard";
 import { FilesService } from "./files.service";
@@ -9,7 +9,7 @@ export class FilesController {
 
     @Get()
     @UseGuards(FirebaseAuthGuard)
-    async getVideo() {
-        return "authenticated route";
+    async getFiles(@Param("userId") userId: string) {
+        return this.filesService.getUserFiles(userId);
     }
 }

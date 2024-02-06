@@ -17,7 +17,7 @@ import { useSettingsContext } from "@/components/settings";
 import { useSnackbar } from "@/components/snackbar";
 import { getComparator, useTable } from "@/components/table";
 import { useBoolean } from "@/hooks/use-boolean";
-import { useGetFiles } from "@/services/filesService";
+import { useGetFiles } from "@/services/filesService/hooks/useGetFiles";
 import { IFile, IFileFilters, IFileFilterValue } from "@/types/file";
 import { isAfter, isBetween } from "@/utils/format-time";
 

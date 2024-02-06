@@ -4,8 +4,6 @@ import * as admin from "firebase-admin";
 @Injectable()
 export class AuthService {
     async verifyIdToken(idToken: string): Promise<admin.auth.DecodedIdToken> {
-        console.log(idToken, "idToken");
-
         try {
             return await admin.auth().verifyIdToken(idToken);
         } catch (error) {

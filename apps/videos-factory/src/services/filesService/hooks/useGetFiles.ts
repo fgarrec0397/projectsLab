@@ -1,30 +1,13 @@
-import axios from "axios";
-import { useMemo } from "react";
-import useSWR from "swr";
-
 import { useAuthContext } from "@/auth/hooks";
-import { endpoints } from "@/routes/endpoints";
-import { fetcher } from "@/utils/axios";
+import { getFiles } from "@/services/filesService/filesService";
 
-export const getFiles = async (idToken: string) => {
-    const response = await axios.get(endpoints.files.get, {
-        headers: {
-            Accept: "application/json",
-            Authorization: `Bearer ${idToken}`,
-        },
-    });
-
-    console.log(response, "response");
-};
-
-export async function useGetFiles() {
+export const useGetFiles = async () => {
     const auth = useAuthContext();
     console.log({ auth });
 
     // const idToken = await auth.user?.getIdToken();
-    const URL = `${endpoints.files.get}`;
 
-    const data = await getFiles(auth.user?.accessToken);
+    const data = await getFiles(auth.user?.accessToken, auth.user?.id);
     // const { data, isLoading, error, isValidating } = useSWR(URL, fetcher);
 
     console.log(data, "data");
@@ -41,4 +24,4 @@ export async function useGetFiles() {
     // );
 
     // return memoizedValue;
-}
+};

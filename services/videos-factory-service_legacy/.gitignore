@@ -1,9 +1,0 @@
-assets
-
-node_modules
-
-src/logs.log
-
-.env
-
-credentials

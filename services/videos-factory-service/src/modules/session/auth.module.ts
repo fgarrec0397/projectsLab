@@ -4,7 +4,7 @@ import * as admin from "firebase-admin";
 
 import { AuthController } from "./auth.controller";
 import { AuthService } from "./auth.service";
-import { FirebaseStrategy } from "./firebase.strategy";
+import { FirebaseStrategy } from "./strategies/firebase.strategy";
 
 @Module({
     imports: [PassportModule.register({ session: true })],

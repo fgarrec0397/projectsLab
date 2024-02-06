@@ -1,15 +1,25 @@
-import { HttpException, HttpStatus, Injectable } from "@nestjs/common";
+import { HttpException, HttpStatus, Injectable, UnauthorizedException } from "@nestjs/common";
 import { PassportStrategy } from "@nestjs/passport";
-import * as admin from "firebase-admin";
+import { Request } from "express";
 import { Strategy } from "passport-custom";
+
+import { AuthService } from "../auth.service";
 
 @Injectable()
 export class FirebaseStrategy extends PassportStrategy(Strategy, "firebase-auth") {
+    constructor(private readonly authService: AuthService) {
+        super();
+    }
+
     async validate(request: Request): Promise<any> {
-        const idToken = (request.body as any).idToken;
+        const idToken = request.headers.authorization?.split("Bearer ")[1];
+
+        if (!idToken) throw new UnauthorizedException("ID token is missing");
+
         try {
-            const decodedToken = await admin.auth().verifyIdToken(idToken);
+            const decodedToken = await this.authService.verifyIdToken(idToken);
             const user = { uid: decodedToken.uid };
+
             return user;
         } catch (error) {
             throw new HttpException(

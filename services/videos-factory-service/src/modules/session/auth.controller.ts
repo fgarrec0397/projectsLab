@@ -3,6 +3,11 @@ import { Request, Response } from "express";
 
 import { AuthService } from "./auth.service";
 
+/**
+ * The sign in / sign out endpoints are technically useless since Firebase already sign the token for us.
+ * However, we will let it there for any future use
+ */
+
 @Controller("auth")
 export class AuthController {
     constructor(private readonly authService: AuthService) {}
@@ -15,8 +20,6 @@ export class AuthController {
 
             return { success: true };
         } catch (error) {
-            console.log(error, "error");
-
             throw new HttpException("Unauthorized", HttpStatus.UNAUTHORIZED);
         }
     }

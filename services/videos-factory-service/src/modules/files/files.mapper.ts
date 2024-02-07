@@ -6,10 +6,7 @@ import { InjectStorageConfig, StorageConfig } from "src/config/storage-config.mo
 export class FilesMapper {
     constructor(@InjectStorageConfig() private readonly storageConfig: StorageConfig) {}
 
-    async map(
-        userId: string,
-        callback: (id: string) => Promise<AWS.S3.ObjectList> | Promise<AWS.S3.Object>
-    ) {
+    async map(userId: string, callback: StorageConfig["getFiles"] | StorageConfig["getFile"]) {
         const serviceData = await callback(userId);
 
         if (Array.isArray(serviceData)) {

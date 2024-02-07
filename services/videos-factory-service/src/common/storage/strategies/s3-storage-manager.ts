@@ -7,6 +7,7 @@ import path from "path";
 import { StorageStrategy } from "../storage-manager";
 
 type S3StorageManagerTypes = {
+    getFile: AWS.S3.GetObjectOutput;
     getFiles: AWS.S3.ObjectList;
     uploadFile: AWS.S3.ManagedUpload.SendData;
     downloadFile: void;
@@ -68,6 +69,19 @@ export class S3StorageManager implements StorageStrategy<S3StorageManagerTypes> 
             Expires: expirySeconds,
         };
         return this.s3.getSignedUrl("getObject", params);
+    }
+
+    async getFile(key: string): Promise<AWS.S3.GetObjectOutput> {
+        try {
+            const params = {
+                Bucket: this.bucketName,
+                Key: key,
+            };
+            const data = await this.s3.getObject(params).promise();
+            return data;
+        } catch (error) {
+            throw new Error(`Error retrieving file with key ${key}: ${error}`);
+        }
     }
 
     async getFiles(folderPath?: string): Promise<AWS.S3.ObjectList> {

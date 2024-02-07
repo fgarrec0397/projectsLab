@@ -1,6 +1,7 @@
 import { Inject, Injectable } from "@nestjs/common";
 
 export type StorageManagerTypes = {
+    getFile: unknown;
     getFiles: unknown[];
     uploadFile: unknown;
     downloadFile: unknown;
@@ -12,6 +13,7 @@ export interface StorageStrategy<T extends StorageManagerTypes> {
     getFileName(fileId: string): string;
     getFileExtension(fileId: string): string;
     getFileUrl(fileId: string): string;
+    getFile(id: string): Promise<T["getFile"]>;
     getFiles(path: string): Promise<T["getFiles"]>;
     uploadFile(fileName: string, destinationPath: string): Promise<T["uploadFile"]>;
     downloadFile(fileName: string, destinationPath: string): Promise<T["downloadFile"]>;
@@ -45,6 +47,10 @@ export class StorageManager<T extends StorageManagerTypes> {
 
     getFileUrl(fileId: string | undefined) {
         return this.storageStrategy.getFileUrl(fileId);
+    }
+
+    async getFile(id?: string): Promise<T["getFile"]> {
+        return this.storageStrategy.getFiles(id);
     }
 
     async getFiles(path?: string): Promise<T["getFiles"]> {

@@ -1,10 +1,9 @@
-import { Inject, Injectable } from "@nestjs/common";
-import { STORAGE_MANAGER_TOKEN } from "src/common/storage/storage-manager";
-import { StorageConfig } from "src/config/storage-config.module";
+import { Injectable } from "@nestjs/common";
+import { InjectStorageConfig, StorageConfig } from "src/config/storage-config.module";
 
 @Injectable()
 export class FilesService {
-    constructor(@Inject(STORAGE_MANAGER_TOKEN) private readonly storageConfig: StorageConfig) {}
+    constructor(@InjectStorageConfig() private readonly storageConfig: StorageConfig) {}
 
     getUserFiles = async (userId: string) => {
         console.log(this, "this");

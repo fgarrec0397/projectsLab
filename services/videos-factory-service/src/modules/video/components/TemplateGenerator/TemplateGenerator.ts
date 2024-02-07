@@ -1,7 +1,6 @@
-import { Inject, Injectable } from "@nestjs/common";
+import { Injectable } from "@nestjs/common";
 import OpenAI from "openai";
-import { STORAGE_MANAGER_TOKEN } from "src/common/storage/storage-manager";
-import { StorageConfig } from "src/config/storage-config.module";
+import { InjectStorageConfig, StorageConfig } from "src/config/storage-config.module";
 
 import { FileSystem } from "../../../../common/FileSystem";
 import { OpenAIModule } from "../../../../common/OpenAI";
@@ -37,7 +36,7 @@ export class TemplateGenerator<T extends BaseTemplateData = BaseTemplateData> {
 
     data?: T;
 
-    constructor(@Inject(STORAGE_MANAGER_TOKEN) private storageConfig: StorageConfig) {
+    constructor(@InjectStorageConfig() private storageConfig: StorageConfig) {
         this.openAi = OpenAIModule.getModule();
         this.templatePromptBuilder = new TemplatePromptBuilder();
     }

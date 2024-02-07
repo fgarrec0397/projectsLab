@@ -1,11 +1,10 @@
-import { Inject, Injectable } from "@nestjs/common";
+import { Injectable } from "@nestjs/common";
 import AWS from "aws-sdk";
-import { STORAGE_MANAGER_TOKEN } from "src/common/storage/storage-manager";
-import { StorageConfig } from "src/config/storage-config.module";
+import { InjectStorageConfig, StorageConfig } from "src/config/storage-config.module";
 
 @Injectable()
 export class FilesMapper {
-    constructor(@Inject(STORAGE_MANAGER_TOKEN) private readonly storageConfig: StorageConfig) {}
+    constructor(@InjectStorageConfig() private readonly storageConfig: StorageConfig) {}
 
     async map(
         userId: string,

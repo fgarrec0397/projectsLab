@@ -1,4 +1,4 @@
-import { Global, Module } from "@nestjs/common";
+import { Global, Inject, Module } from "@nestjs/common";
 import StorageManager, { STORAGE_MANAGER_TOKEN } from "src/common/storage/storage-manager";
 import S3StorageManager from "src/common/storage/strategies/s3-storage-manager";
 
@@ -8,6 +8,8 @@ const provider = {
 };
 
 export type StorageConfig = S3StorageManager;
+
+export const InjectStorageConfig = () => Inject(STORAGE_MANAGER_TOKEN);
 
 @Global()
 @Module({

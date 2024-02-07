@@ -21,6 +21,10 @@ export class S3StorageManager {
         this.bucketName = this.configService.get<string>("AWS_BUCKET_NAME", "");
     }
 
+    getBucketName() {
+        return this.bucketName;
+    }
+
     extractFileName(key: string | undefined) {
         if (!key) {
             return;

@@ -1,3 +1,5 @@
+import AWS from "aws-sdk";
+
 // ----------------------------------------------------------------------
 
 export type IFileFilterValue = string | string[] | Date | null;
@@ -25,10 +27,6 @@ export type IFolderManager = {
     size: number;
     type: string;
     url: string;
-    tags: string[];
-    totalFiles?: number;
-    isFavorited: boolean;
-    shared: IFileShared[] | null;
     createdAt: Date | number | string;
     modifiedAt: Date | number | string;
 };
@@ -39,11 +37,12 @@ export type IFileManager = {
     size: number;
     type: string;
     url: string;
-    tags: string[];
-    isFavorited: boolean;
-    shared: IFileShared[] | null;
     createdAt: Date | number | string;
     modifiedAt: Date | number | string;
 };
 
 export type IFile = IFileManager | IFolderManager;
+
+// ----------------------------------------------------------------------
+
+export type IFileDTO = AWS.S3.Object;

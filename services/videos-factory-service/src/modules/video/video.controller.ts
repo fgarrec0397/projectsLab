@@ -1,5 +1,4 @@
 import { Controller, Get, HttpException, HttpStatus, Post, UseGuards } from "@nestjs/common";
-import { AuthGuard } from "@nestjs/passport";
 
 import { FirebaseAuthGuard } from "../session/auth.guard";
 import { Script } from "./components/ScriptManager/ScriptManager";

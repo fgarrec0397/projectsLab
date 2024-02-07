@@ -1,14 +1,20 @@
 import { Module } from "@nestjs/common";
-import { ConfigModule } from "@nestjs/config";
-import { PassportModule } from "@nestjs/passport";
+import { ConfigModule as EnvConfigModule } from "@nestjs/config";
 
+import { ConfigModule } from "./config.module";
 import { FilesModule } from "./modules/files/files.module";
 import { AuthModule } from "./modules/session/auth.module";
 import { SessionSerializer } from "./modules/session/session.serializer";
 import { VideoModule } from "./modules/video/video.module";
 
 @Module({
-    imports: [ConfigModule.forRoot({ isGlobal: true }), AuthModule, VideoModule, FilesModule],
+    imports: [
+        EnvConfigModule.forRoot({ isGlobal: true }),
+        ConfigModule,
+        AuthModule,
+        VideoModule,
+        FilesModule,
+    ],
     providers: [SessionSerializer],
 })
 export class AppModule {}

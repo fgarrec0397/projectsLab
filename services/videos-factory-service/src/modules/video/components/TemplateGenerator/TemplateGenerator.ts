@@ -1,6 +1,7 @@
-import { Injectable } from "@nestjs/common";
+import { Inject, Injectable } from "@nestjs/common";
 import OpenAI from "openai";
-import S3StorageManager from "src/common/services/s3-storage-manager.service";
+import { STORAGE_MANAGER_TOKEN } from "src/common/storage/storage-manager";
+import { StorageConfig } from "src/config/storage-config.module";
 
 import { FileSystem } from "../../../../common/FileSystem";
 import { OpenAIModule } from "../../../../common/OpenAI";
@@ -36,7 +37,7 @@ export class TemplateGenerator<T extends BaseTemplateData = BaseTemplateData> {
 
     data?: T;
 
-    constructor(private storageManager: S3StorageManager) {
+    constructor(@Inject(STORAGE_MANAGER_TOKEN) private storageConfig: StorageConfig) {
         this.openAi = OpenAIModule.getModule();
         this.templatePromptBuilder = new TemplatePromptBuilder();
     }
@@ -57,13 +58,13 @@ export class TemplateGenerator<T extends BaseTemplateData = BaseTemplateData> {
     }
 
     private async fetchAvailableAssets() {
-        const filesList = await this.storageManager.listFiles("assets");
+        const filesList = await this.storageConfig.getFiles("assets");
 
         this.mappedFetchedAssets = filesList?.map((x) => ({
             id: x.Key,
-            name: this.storageManager.extractFileName(x.Key),
-            type: this.storageManager.getFileExtension(x.Key),
-            url: this.storageManager.getSignedFileUrl(x.Key),
+            name: this.storageConfig.getFileName(x.Key),
+            type: this.storageConfig.getFileExtension(x.Key),
+            url: this.storageConfig.getFileUrl(x.Key),
         }));
 
         console.log(JSON.stringify(filesList), "TemplateGenerator filesList");

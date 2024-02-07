@@ -4,13 +4,23 @@ import AWS, { config } from "aws-sdk";
 import fs from "fs";
 import path from "path";
 
+import { StorageStrategy } from "../storage-manager";
+
+type S3StorageManagerTypes = {
+    getFiles: AWS.S3.ObjectList;
+    uploadFile: AWS.S3.ManagedUpload.SendData;
+    downloadFile: void;
+};
+
 @Injectable()
-export class S3StorageManager {
+export class S3StorageManager implements StorageStrategy<S3StorageManagerTypes> {
     private s3: AWS.S3;
 
     private bucketName: string;
 
-    constructor(private configService: ConfigService) {
+    constructor(private readonly configService: ConfigService) {}
+
+    init() {
         config.update({
             accessKeyId: this.configService.get<string>("AWS_ACCESS_KEY_ID"),
             secretAccessKey: this.configService.get<string>("AWS_SECRET_ACCESS_KEY"),
@@ -21,11 +31,11 @@ export class S3StorageManager {
         this.bucketName = this.configService.get<string>("AWS_BUCKET_NAME", "");
     }
 
-    getBucketName() {
-        return this.bucketName;
+    getBaseUrl() {
+        return `https://${this.bucketName}.s3.amazonaws.com`;
     }
 
-    extractFileName(key: string | undefined) {
+    getFileName(key: string | undefined) {
         if (!key) {
             return;
         }
@@ -45,7 +55,22 @@ export class S3StorageManager {
         return extensionMatch ? extensionMatch[0] : null;
     }
 
-    async listFiles(folderPath?: string): Promise<AWS.S3.ObjectList> {
+    getFileUrl(key: string | undefined) {
+        const expirySeconds: number = 3600;
+
+        if (!key) {
+            return;
+        }
+
+        const params = {
+            Bucket: this.bucketName,
+            Key: key,
+            Expires: expirySeconds,
+        };
+        return this.s3.getSignedUrl("getObject", params);
+    }
+
+    async getFiles(folderPath?: string): Promise<AWS.S3.ObjectList> {
         try {
             const params: AWS.S3.ListObjectsV2Request = {
                 Bucket: this.bucketName,
@@ -84,19 +109,6 @@ export class S3StorageManager {
         } catch (error) {
             throw new Error("Error downloading file: " + error);
         }
-    }
-
-    getSignedFileUrl(key: string | undefined, expirySeconds: number = 3600) {
-        if (!key) {
-            return;
-        }
-
-        const params = {
-            Bucket: this.bucketName,
-            Key: key,
-            Expires: expirySeconds,
-        };
-        return this.s3.getSignedUrl("getObject", params);
     }
 }
 

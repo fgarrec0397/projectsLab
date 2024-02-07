@@ -1,19 +1,17 @@
-import { Injectable } from "@nestjs/common";
+import { Inject, Injectable } from "@nestjs/common";
 import AWS from "aws-sdk";
-import S3StorageManager from "src/common/services/s3-storage-manager.service";
+import { STORAGE_MANAGER_TOKEN } from "src/common/storage/storage-manager";
+import { StorageConfig } from "src/config/storage-config.module";
 
 @Injectable()
 export class FilesMapper {
-    constructor(private readonly s3StorageManager: S3StorageManager) {}
+    constructor(@Inject(STORAGE_MANAGER_TOKEN) private readonly storageConfig: StorageConfig) {}
 
     async map(
         userId: string,
         callback: (id: string) => Promise<AWS.S3.ObjectList> | Promise<AWS.S3.Object>
     ) {
         const serviceData = await callback(userId);
-
-        console.log(this, "this");
-        console.log(this.s3StorageManager, "this.s3StorageManager");
 
         if (Array.isArray(serviceData)) {
             return serviceData.map((x) => this.mapFile(x));
@@ -25,12 +23,10 @@ export class FilesMapper {
     private mapFile(file: AWS.S3.Object) {
         return {
             id: file.Key || "",
-            name: this.s3StorageManager.extractFileName(file.Key) || "",
+            name: this.storageConfig.getFileName(file.Key) || "",
             size: file.Size || 0,
-            type: this.s3StorageManager.getFileExtension(file.Key) || "",
-            url: `https://${this.s3StorageManager.getBucketName()}.s3.amazonaws.com/${encodeURIComponent(
-                file.Key
-            )}`,
+            type: this.storageConfig.getFileExtension(file.Key) || "",
+            url: `${this.storageConfig.getBaseUrl()}/${encodeURIComponent(file.Key)}`,
             createdAt: file.LastModified?.toISOString() ?? new Date().toISOString(),
             modifiedAt: file.LastModified?.toISOString() ?? new Date().toISOString(),
         };

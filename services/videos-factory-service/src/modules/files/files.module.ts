@@ -1,5 +1,5 @@
 import { Module } from "@nestjs/common";
-import S3StorageManager from "src/common/services/s3-storage-manager.service";
+import S3StorageManager from "src/common/storage/strategies/s3-storage-manager";
 
 import { FilesController } from "./files.controller";
 import { FilesMapper } from "./files.mapper";

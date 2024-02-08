@@ -37,6 +37,7 @@ export class S3StorageManager implements StorageStrategy<S3StorageManagerTypes> 
     }
 
     getFileName(key: string | undefined) {
+        // TODO - handle folders name
         if (!key) {
             return;
         }

@@ -13,13 +13,13 @@ export class FilesController {
 
     @Get()
     @UseGuards(FirebaseAuthGuard)
-    async getFiles(@Query("userId") userId: string) {
-        console.log({ userId });
-
+    async getFiles(@Query("userId") userId: string, @Query("path") path: string | undefined) {
         if (!userId) {
             throw new HttpException("No user id received.", HttpStatus.BAD_REQUEST);
         }
 
-        return this.filesMapper.map(userId, this.filesService.getUserFiles);
+        const result = this.filesMapper.map({ userId, path }, this.filesService.getUserFiles);
+
+        return result;
     }
 }

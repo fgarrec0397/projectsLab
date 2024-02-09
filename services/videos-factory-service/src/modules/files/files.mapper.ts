@@ -2,32 +2,48 @@ import { Injectable } from "@nestjs/common";
 import AWS from "aws-sdk";
 import { InjectStorageConfig, StorageConfig } from "src/config/storage-config.module";
 
+import { FilesService } from "./files.service";
 import { FolderStructure } from "./files.type";
 
 type UnwrappedPromise<T> = T extends Promise<infer U> ? U : T;
 
+type FilesMapperData = {
+    userId: string;
+    path?: string;
+};
+
 @Injectable()
 export class FilesMapper {
+    data: FilesMapperData;
+
     constructor(@InjectStorageConfig() private readonly storageConfig: StorageConfig) {}
 
-    async map(userId: string, callback: StorageConfig["getFiles"] | StorageConfig["getFile"]) {
-        const serviceData = await callback(userId);
+    async map(data: FilesMapperData, callback: FilesService["getUserFiles"]) {
+        const serviceData = await callback(data.userId, data.path);
+
+        this.data = data;
 
         if (Array.isArray(serviceData)) {
-            console.log(JSON.stringify(serviceData), "serviceData");
+            // console.log(JSON.stringify(serviceData), "serviceData");
 
-            return this.buildFolderStructure(serviceData);
+            // return this.buildFolderStructure(serviceData);
+            return serviceData.map(this.mapFile);
         }
 
         return this.mapFile(serviceData);
     }
 
-    private mapFile(file: AWS.S3.Object) {
+    private mapFile = (file: AWS.S3.Object) => {
         const pathArray = file.Key.split("/");
 
         pathArray.shift();
 
         const path = pathArray.join("/");
+        const name = this.storageConfig.getFileName(file.Key);
+
+        if (name === this.data.userId) {
+            return;
+        }
 
         return {
             id: file.Key || "",
@@ -39,7 +55,7 @@ export class FilesMapper {
             createdAt: file.LastModified?.toISOString() ?? new Date().toISOString(),
             modifiedAt: file.LastModified?.toISOString() ?? new Date().toISOString(),
         };
-    }
+    };
 
     private buildFolderStructure = (
         files: UnwrappedPromise<ReturnType<StorageConfig["getFiles"]>>

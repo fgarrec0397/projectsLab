@@ -1,6 +1,7 @@
 import { Injectable } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import AWS, { config } from "aws-sdk";
+import { CommonPrefix } from "aws-sdk/clients/s3";
 import fs from "fs";
 import path from "path";
 
@@ -37,14 +38,20 @@ export class S3StorageManager implements StorageStrategy<S3StorageManagerTypes> 
     }
 
     getFileName(key: string | undefined) {
-        // TODO - handle folders name
         if (!key) {
             return;
         }
 
-        const baseName = key.split("/").pop() || key;
+        const pathArray = key.split("/");
 
-        return baseName;
+        let baseName = pathArray.pop();
+
+        // if is folder
+        if (baseName === "") {
+            baseName = pathArray.pop();
+        }
+
+        return baseName || key;
     }
 
     getFileExtension(key: string | undefined) {
@@ -89,11 +96,18 @@ export class S3StorageManager implements StorageStrategy<S3StorageManagerTypes> 
         try {
             const params: AWS.S3.ListObjectsV2Request = {
                 Bucket: this.bucketName,
-                Prefix: folderPath ? `${folderPath}/` : undefined,
+                Prefix: folderPath ? `${folderPath.replaceAll("\\", "/")}/` : undefined,
+                Delimiter: "/",
             };
-            const response = await this.s3.listObjectsV2(params).promise();
 
-            return response.Contents || [];
+            const response = await this.s3.listObjectsV2(params).promise();
+            const files = response.Contents?.filter((item) => !item.Key.endsWith("/")) ?? [];
+            const folders = response.CommonPrefixes ?? [];
+
+            const objectFolders = folders.map(this.commonPrefixToObject);
+            const objects = [...objectFolders, ...files];
+
+            return objects || [];
         } catch (error) {
             throw new Error("Error listing files: " + error);
         }
@@ -125,6 +139,12 @@ export class S3StorageManager implements StorageStrategy<S3StorageManagerTypes> 
             throw new Error("Error downloading file: " + error);
         }
     }
+
+    private commonPrefixToObject = (commonPrefix: CommonPrefix): AWS.S3.Object => {
+        return {
+            Key: commonPrefix.Prefix,
+        };
+    };
 }
 
 export default S3StorageManager;

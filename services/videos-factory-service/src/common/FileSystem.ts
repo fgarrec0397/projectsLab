@@ -72,7 +72,6 @@ export class FileSystem {
                     reject(err);
                     return;
                 }
-                console.log("convertMp3ToBuffer finished");
 
                 resolve(data);
             });

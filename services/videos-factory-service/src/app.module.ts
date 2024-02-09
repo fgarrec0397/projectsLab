@@ -1,6 +1,7 @@
 import { Module } from "@nestjs/common";
 import { ConfigModule as EnvConfigModule } from "@nestjs/config";
 
+import { CacheModule } from "./common/cache/cache.module";
 import { ConfigModule } from "./config.module";
 import { FilesModule } from "./modules/files/files.module";
 import { AuthModule } from "./modules/session/auth.module";
@@ -11,6 +12,7 @@ import { VideoModule } from "./modules/video/video.module";
     imports: [
         EnvConfigModule.forRoot({ isGlobal: true }),
         ConfigModule,
+        CacheModule,
         AuthModule,
         VideoModule,
         FilesModule,

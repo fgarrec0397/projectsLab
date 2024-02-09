@@ -1,4 +1,5 @@
 import { Controller, Get, HttpException, HttpStatus, Query, UseGuards } from "@nestjs/common";
+import { UseCache } from "src/common/cache/cache.interceptor";
 
 import { FirebaseAuthGuard } from "../session/auth.guard";
 import { FilesMapper } from "./files.mapper";
@@ -12,6 +13,7 @@ export class FilesController {
     ) {}
 
     @Get()
+    @UseCache()
     @UseGuards(FirebaseAuthGuard)
     async getFiles(@Query("userId") userId: string, @Query("path") path: string | undefined) {
         if (!userId) {

@@ -23,6 +23,7 @@ import { fData } from "@/utils/format-number";
 import { fDate, fTime } from "@/utils/format-time";
 
 import FileManagerFileDetails from "./file-manager-file-details";
+import { useFolderNavigation } from "./hooks/use-folder-navigation";
 
 // ----------------------------------------------------------------------
 
@@ -35,6 +36,7 @@ type Props = {
 
 export default function FileManagerTableRow({ row, selected, onSelectRow, onDeleteRow }: Props) {
     const theme = useTheme();
+    const { goTo } = useFolderNavigation();
 
     const { name, size, type, modifiedAt } = row;
 
@@ -52,7 +54,9 @@ export default function FileManagerTableRow({ row, selected, onSelectRow, onDele
         click: () => {
             details.onTrue();
         },
-        doubleClick: () => console.info("DOUBLE CLICK"),
+        doubleClick: () => {
+            goTo(row.path);
+        },
     });
 
     const handleCopy = useCallback(() => {

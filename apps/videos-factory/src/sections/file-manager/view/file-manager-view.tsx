@@ -5,10 +5,10 @@ import Container from "@mui/material/Container";
 import Stack from "@mui/material/Stack";
 import ToggleButton from "@mui/material/ToggleButton";
 import ToggleButtonGroup from "@mui/material/ToggleButtonGroup";
-import Typography from "@mui/material/Typography";
 import { useCallback, useEffect, useState } from "react";
 
 import { FILE_TYPE_OPTIONS } from "@/_mock";
+import CustomBreadcrumbs from "@/components/custom-breadcrumbs";
 import { ConfirmDialog } from "@/components/custom-dialog";
 import EmptyContent from "@/components/empty-content";
 import { fileFormat } from "@/components/file-thumbnail";
@@ -19,6 +19,7 @@ import { useSnackbar } from "@/components/snackbar";
 import { getComparator, useTable } from "@/components/table";
 import { useBoolean } from "@/hooks/use-boolean";
 import { useGetFiles } from "@/services/filesService/hooks/useGetFiles";
+import { pxToRem } from "@/theme/typography";
 import { IFile, IFileFilters, IFileFilterValue } from "@/types/file";
 import { isAfter, isBetween } from "@/utils/format-time";
 
@@ -27,6 +28,8 @@ import FileManagerFiltersResult from "../file-manager-filters-result";
 import FileManagerGridView from "../file-manager-grid-view";
 import FileManagerNewFolderDialog from "../file-manager-new-folder-dialog";
 import FileManagerTable from "../file-manager-table";
+import { useFolderBreadcrumbs } from "../hooks/use-folder-breadcrumbs";
+import { useFolderNavigation } from "../hooks/use-folder-navigation";
 
 // ----------------------------------------------------------------------
 
@@ -40,6 +43,7 @@ const defaultFilters: IFileFilters = {
 // ----------------------------------------------------------------------
 
 export default function FileManagerView() {
+    const breadcrumbsLinks = useFolderBreadcrumbs();
     const { enqueueSnackbar } = useSnackbar();
 
     const table = useTable({ defaultRowsPerPage: 10 });
@@ -178,8 +182,17 @@ export default function FileManagerView() {
     return (
         <>
             <Container maxWidth={settings.themeStretch ? false : "lg"}>
-                <Stack direction="row" alignItems="center" justifyContent="space-between">
-                    <Typography variant="h4">File Manager</Typography>
+                <Stack direction="row" alignItems="flex-start" justifyContent="space-between">
+                    <CustomBreadcrumbs
+                        heading="File Manager"
+                        links={[
+                            { name: "Components", href: "paths.components" },
+                            { name: "Copy To Clipboard" },
+                        ]}
+                        sx={{
+                            marginTop: pxToRem(-5),
+                        }}
+                    />
                     <Button
                         variant="contained"
                         startIcon={<Iconify icon="eva:cloud-upload-fill" />}

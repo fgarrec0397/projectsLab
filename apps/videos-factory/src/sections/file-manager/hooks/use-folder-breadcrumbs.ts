@@ -1,40 +1,44 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { BreadcrumbsLinkProps } from "@/components/custom-breadcrumbs";
+import { paths } from "@/routes/paths";
 
 import { useFolderNavigation } from "./use-folder-navigation";
 
 export const useFolderBreadcrumbs = () => {
+    const { currentPath } = useFolderNavigation();
     const rootLink: BreadcrumbsLinkProps = useMemo(
         () => ({
             name: "My Files",
+            href: currentPath ? paths.dashboard.fileManager : undefined,
         }),
-        []
+        [currentPath]
     );
 
-    const { currentPath } = useFolderNavigation();
     const [breadcrumbsLinks, setLinks] = useState<BreadcrumbsLinkProps[]>([rootLink]);
+
+    const createPathParam = () => {};
 
     const buildLinks = useCallback(() => {
         const pathArray = currentPath?.split("/");
         const links: BreadcrumbsLinkProps[] = [rootLink];
-        console.log(pathArray, "pathArray");
 
-        const test = pathArray?.reduce((prev, current, currentIndex) => {
-            console.log("reduce");
-
-            console.log({ prev, current });
+        pathArray?.reduce((prev, current, currentIndex) => {
+            const filesPath = prev !== "" ? `${prev}/${current}` : current;
+            console.log({ filesPath, prev, current });
 
             links.push({
                 name: current,
-                href: currentIndex === pathArray.length - 1 ? `${prev}/${current}` : undefined,
+                href:
+                    currentIndex === pathArray.length - 1
+                        ? undefined
+                        : `${paths.dashboard.fileManager}?path=${filesPath}`,
             });
 
-            return current;
-        });
+            return filesPath;
+        }, "");
 
-        console.log(test, "test");
-        console.log(links, "links");
+        setLinks(links);
     }, [currentPath, rootLink]);
 
     useEffect(() => {

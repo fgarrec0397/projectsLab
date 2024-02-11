@@ -185,10 +185,7 @@ export default function FileManagerView() {
                 <Stack direction="row" alignItems="flex-start" justifyContent="space-between">
                     <CustomBreadcrumbs
                         heading="File Manager"
-                        links={[
-                            { name: "Components", href: "paths.components" },
-                            { name: "Copy To Clipboard" },
-                        ]}
+                        links={breadcrumbsLinks}
                         sx={{
                             marginTop: pxToRem(-5),
                         }}

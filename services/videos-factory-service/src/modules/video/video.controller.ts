@@ -1,6 +1,6 @@
-import { Controller, Get, HttpException, HttpStatus, Post, UseGuards } from "@nestjs/common";
+import { Controller, Get, HttpException, HttpStatus, Post } from "@nestjs/common";
 
-import { FirebaseAuthGuard } from "../session/auth.guard";
+import { UseAuthGuard } from "../auth/auth.guard";
 import { Script } from "./components/ScriptManager/ScriptManager";
 import { ScriptService } from "./services/script.service";
 import { TemplateService } from "./services/template.service";
@@ -20,7 +20,7 @@ export class VideoController {
     ) {}
 
     @Get()
-    @UseGuards(FirebaseAuthGuard)
+    @UseAuthGuard()
     async getVideo() {
         return "authenticated route";
     }

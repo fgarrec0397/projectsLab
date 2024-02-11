@@ -6,18 +6,19 @@ import Stack from "@mui/material/Stack";
 import ToggleButton from "@mui/material/ToggleButton";
 import ToggleButtonGroup from "@mui/material/ToggleButtonGroup";
 import Typography from "@mui/material/Typography";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
-import { allFiles, FILE_TYPE_OPTIONS } from "@/_mock";
+import { FILE_TYPE_OPTIONS } from "@/_mock";
 import { ConfirmDialog } from "@/components/custom-dialog";
 import EmptyContent from "@/components/empty-content";
 import { fileFormat } from "@/components/file-thumbnail";
 import Iconify from "@/components/iconify";
+import { LoadingScreen } from "@/components/loading-screen";
 import { useSettingsContext } from "@/components/settings";
 import { useSnackbar } from "@/components/snackbar";
 import { getComparator, useTable } from "@/components/table";
 import { useBoolean } from "@/hooks/use-boolean";
-import { useGetFiles } from "@/services/filesService/hooks/useGetFiles.1";
+import { useGetFiles } from "@/services/filesService/hooks/useGetFiles";
 import { IFile, IFileFilters, IFileFilterValue } from "@/types/file";
 import { isAfter, isBetween } from "@/utils/format-time";
 
@@ -53,9 +54,9 @@ export default function FileManagerView() {
 
     const [view, setView] = useState("list");
 
-    const files = useGetFiles();
+    const { files, isFilesLoading } = useGetFiles();
 
-    const [tableData, setTableData] = useState<IFile[]>(allFiles);
+    const [tableData, setTableData] = useState<IFile[]>([]);
 
     const [filters, setFilters] = useState(defaultFilters);
 
@@ -77,6 +78,10 @@ export default function FileManagerView() {
         !!filters.name || !!filters.type.length || (!!filters.startDate && !!filters.endDate);
 
     const notFound = (!dataFiltered.length && canReset) || !dataFiltered.length;
+
+    useEffect(() => {
+        setTableData(files);
+    }, [files]);
 
     const handleChangeView = useCallback(
         (event: React.MouseEvent<HTMLElement>, newView: string | null) => {
@@ -195,6 +200,7 @@ export default function FileManagerView() {
                     {canReset && renderResults}
                 </Stack>
 
+                {isFilesLoading && <LoadingScreen />}
                 {notFound ? (
                     <EmptyContent
                         filled
@@ -291,7 +297,7 @@ function applyFilter({
 
     if (!dateError) {
         if (startDate && endDate) {
-            inputData = inputData.filter((file) => isBetween(file.createdAt, startDate, endDate));
+            inputData = inputData.filter((file) => isBetween(file.modifiedAt, startDate, endDate));
         }
     }
 

@@ -15,7 +15,7 @@ export interface StorageStrategy<T extends StorageManagerTypes> {
     getFileUrl(fileId: string): string;
     getFile(id: string): Promise<T["getFile"]>;
     getFiles(path: string): Promise<T["getFiles"]>;
-    uploadFile(fileName: string, destinationPath: string): Promise<T["uploadFile"]>;
+    uploadFile(file: Express.Multer.File, name: string): Promise<T["uploadFile"]>;
     downloadFile(fileName: string, destinationPath: string): Promise<T["downloadFile"]>;
 }
 
@@ -57,8 +57,8 @@ export class StorageManager<T extends StorageManagerTypes> {
         return this.storageStrategy.getFiles(path);
     }
 
-    async uploadFile(fileName: string, destinationPath: string) {
-        return this.storageStrategy.uploadFile(fileName, destinationPath);
+    async uploadFile(file: Express.Multer.File, name: string) {
+        return this.storageStrategy.uploadFile(file, name);
     }
 
     async downloadFile(fileName: string, destinationPath: string) {

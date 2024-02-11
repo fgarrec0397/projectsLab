@@ -1,5 +1,3 @@
-import Avatar from "@mui/material/Avatar";
-import AvatarGroup, { avatarGroupClasses } from "@mui/material/AvatarGroup";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import { CardProps } from "@mui/material/Card";
@@ -18,17 +16,15 @@ import Iconify from "@/components/iconify";
 import { useSnackbar } from "@/components/snackbar";
 import { useBoolean } from "@/hooks/use-boolean";
 import { useCopyToClipboard } from "@/hooks/use-copy-to-clipboard";
-import { IFolderManager } from "@/types/file";
-import { fData } from "@/utils/format-number";
+import { IFile } from "@/types/file";
 
 import FileManagerFileDetails from "./file-manager-file-details";
 import FileManagerNewFolderDialog from "./file-manager-new-folder-dialog";
-import FileManagerShareDialog from "./file-manager-share-dialog";
 
 // ----------------------------------------------------------------------
 
 interface Props extends CardProps {
-    folder: IFolderManager;
+    folder: IFile;
     selected?: boolean;
     onSelect?: VoidFunction;
     onDelete: VoidFunction;
@@ -46,8 +42,6 @@ export default function FileManagerFolderItem({
 
     const { copy } = useCopyToClipboard();
 
-    const [inviteEmail, setInviteEmail] = useState("");
-
     const [folderName, setFolderName] = useState(folder.name);
 
     const editFolder = useBoolean();
@@ -61,12 +55,6 @@ export default function FileManagerFolderItem({
     const confirm = useBoolean();
 
     const details = useBoolean();
-
-    const favorite = useBoolean(folder.isFavorited);
-
-    const handleChangeInvite = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
-        setInviteEmail(event.target.value);
-    }, []);
 
     const handleChangeFolderName = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
         setFolderName(event.target.value);
@@ -87,14 +75,6 @@ export default function FileManagerFolderItem({
                 position: "absolute",
             }}
         >
-            <Checkbox
-                color="warning"
-                icon={<Iconify icon="eva:star-outline" />}
-                checkedIcon={<Iconify icon="eva:star-fill" />}
-                checked={favorite.value}
-                onChange={favorite.onToggle}
-            />
-
             <IconButton color={popover.open ? "inherit" : "default"} onClick={popover.onOpen}>
                 <Iconify icon="eva:more-vertical-fill" />
             </IconButton>
@@ -123,22 +103,6 @@ export default function FileManagerFolderItem({
         <ListItemText
             onClick={details.onTrue}
             primary={folder.name}
-            secondary={
-                <>
-                    {fData(folder.size)}
-                    <Box
-                        component="span"
-                        sx={{
-                            mx: 0.75,
-                            width: 2,
-                            height: 2,
-                            borderRadius: "50%",
-                            bgcolor: "currentColor",
-                        }}
-                    />
-                    {folder.totalFiles} files
-                </>
-            }
             primaryTypographyProps={{
                 noWrap: true,
                 typography: "subtitle1",
@@ -152,25 +116,6 @@ export default function FileManagerFolderItem({
                 display: "inline-flex",
             }}
         />
-    );
-
-    const renderAvatar = (
-        <AvatarGroup
-            max={3}
-            sx={{
-                [`& .${avatarGroupClasses.avatar}`]: {
-                    width: 24,
-                    height: 24,
-                    "&:first-of-type": {
-                        fontSize: 12,
-                    },
-                },
-            }}
-        >
-            {folder.shared?.map((person) => (
-                <Avatar key={person.id} alt={person.name} src={person.avatarUrl} />
-            ))}
-        </AvatarGroup>
     );
 
     return (
@@ -202,8 +147,6 @@ export default function FileManagerFolderItem({
                 {renderAction}
 
                 {renderText}
-
-                {!!folder?.shared?.length && renderAvatar}
             </Stack>
 
             <CustomPopover
@@ -258,26 +201,12 @@ export default function FileManagerFolderItem({
 
             <FileManagerFileDetails
                 item={folder}
-                favorited={favorite.value}
-                onFavorite={favorite.onToggle}
                 onCopyLink={handleCopy}
                 open={details.value}
                 onClose={details.onFalse}
                 onDelete={() => {
                     details.onFalse();
                     onDelete();
-                }}
-            />
-
-            <FileManagerShareDialog
-                open={share.value}
-                shared={folder.shared}
-                inviteEmail={inviteEmail}
-                onChangeInvite={handleChangeInvite}
-                onCopyLink={handleCopy}
-                onClose={() => {
-                    share.onFalse();
-                    setInviteEmail("");
                 }}
             />
 

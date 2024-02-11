@@ -1,7 +1,3 @@
-export type FolderStructure = {
-    [key: string]: FolderStructure | File;
-};
-
 export type File = {
     id: string;
     name: string;

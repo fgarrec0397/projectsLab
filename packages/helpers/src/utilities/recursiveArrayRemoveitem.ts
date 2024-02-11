@@ -1,4 +1,4 @@
-import { RecursiveArrayOfIds } from "@projectslab/helpers";
+import { RecursiveArrayOfIds } from "../types";
 
 const recursiveArrayRemoveitem = <ArrayType extends RecursiveArrayOfIds<string>, IDType>(
     array: ArrayType,

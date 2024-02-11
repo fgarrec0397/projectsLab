@@ -3,9 +3,6 @@ import AWS from "aws-sdk";
 import { InjectStorageConfig, StorageConfig } from "src/config/storage-config.module";
 
 import { FilesService } from "./files.service";
-import { FolderStructure } from "./files.type";
-
-type UnwrappedPromise<T> = T extends Promise<infer U> ? U : T;
 
 type FilesMapperData = {
     userId: string;
@@ -24,9 +21,6 @@ export class FilesMapper {
         this.data = data;
 
         if (Array.isArray(serviceData)) {
-            // console.log(JSON.stringify(serviceData), "serviceData");
-
-            // return this.buildFolderStructure(serviceData);
             return serviceData.map(this.mapFile);
         }
 
@@ -49,46 +43,11 @@ export class FilesMapper {
             id: file.Key || "",
             name: this.storageConfig.getFileName(file.Key) || "",
             size: file.Size || 0,
-            type: this.storageConfig.getFileExtension(file.Key) || "",
+            type: this.storageConfig.getFileExtension(file.Key) || "folder",
             path,
             url: `${this.storageConfig.getBaseUrl()}/${encodeURIComponent(file.Key)}`,
             createdAt: file.LastModified?.toISOString() ?? new Date().toISOString(),
             modifiedAt: file.LastModified?.toISOString() ?? new Date().toISOString(),
         };
-    };
-
-    private buildFolderStructure = (
-        files: UnwrappedPromise<ReturnType<StorageConfig["getFiles"]>>
-    ): FolderStructure => {
-        const root: FolderStructure = {};
-
-        files.forEach((file) => {
-            const parts = file.Key.split("/");
-            let currentLevel = root;
-
-            parts.shift();
-
-            parts.forEach((part, index) => {
-                // if (part !== "") {
-                // Check if we are at the last part (the file)
-                if (index === parts.length - 1) {
-                    currentLevel[part] = this.mapFile(file);
-                } else {
-                    // If the folder doesn't exist, create it
-                    if (!currentLevel[part]) {
-                        currentLevel[part] = {};
-                    }
-                    // Move down the tree
-                    currentLevel = currentLevel[part] as FolderStructure;
-                }
-                // }
-            });
-        });
-
-        return root;
-    };
-
-    private bytesToGigabytes = (bytes: number): number => {
-        return bytes / Math.pow(1024, 3);
     };
 }

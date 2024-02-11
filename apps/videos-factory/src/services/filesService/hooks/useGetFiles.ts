@@ -1,38 +1,35 @@
-// import { useRouter } from "next/router";
+"use client";
+
+import { useSearchParams } from "next/navigation";
+import { useMemo } from "react";
 import useSWR from "swr";
 
 import { useAuthContext } from "@/auth/hooks";
-import { getFiles, getFilesFetcher } from "@/services/filesService/filesService";
-import { fetcher } from "@/utils/axios";
+import { GetFilesParams } from "@/services/filesService/filesService";
 
-export const useGetFiles = async () => {
+import { getFilesFetcher } from "../filesFetchers";
+
+export const useGetFiles = () => {
     const auth = useAuthContext();
-    // const router = useRouter();
+    const params = useSearchParams();
 
-    // const pathParam = router.query.path as string;
-    const pathParam = "";
-    console.log({ auth, pathParam });
+    const pathParam = params.get("path") || undefined;
 
-    const swrKey =
-        auth.user?.accessToken && auth.user?.id && pathParam
-            ? [auth.user.accessToken as string, auth.user.id as string, pathParam]
-            : null;
+    const swrKey: GetFilesParams = useMemo(
+        () => [auth.user?.accessToken, auth.user?.id, pathParam],
+        [auth.user?.accessToken, auth.user?.id, pathParam]
+    );
 
-    const response = await getFiles(auth.user?.accessToken, auth.user?.id);
     const { data, isLoading, error, isValidating } = useSWR(swrKey, getFilesFetcher);
 
-    console.log(data, "data");
-
-    // const memoizedValue = useMemo(
-    //     () => ({
-    //         products: (data?.products as IProductItem[]) || [],
-    //         productsLoading: isLoading,
-    //         productsError: error,
-    //         productsValidating: isValidating,
-    //         productsEmpty: !isLoading && !data?.products.length,
-    //     }),
-    //     [data?.products, error, isLoading, isValidating]
-    // );
-
-    // return memoizedValue;
+    const memoizedResponse = useMemo(
+        () => ({
+            files: data || [],
+            isFilesLoading: isLoading,
+            filesError: error,
+            isFilesValidating: isValidating,
+        }),
+        [error, data, isLoading, isValidating]
+    );
+    return memoizedResponse;
 };

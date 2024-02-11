@@ -24,10 +24,9 @@ export type IFileShared = {
 export type IFolderManager = {
     id: string;
     name: string;
-    size: number;
-    type: string;
+    size: 0;
+    type: "folder";
     url: string;
-    createdAt: Date | number | string;
     modifiedAt: Date | number | string;
 };
 
@@ -37,7 +36,6 @@ export type IFileManager = {
     size: number;
     type: string;
     url: string;
-    createdAt: Date | number | string;
     modifiedAt: Date | number | string;
 };
 

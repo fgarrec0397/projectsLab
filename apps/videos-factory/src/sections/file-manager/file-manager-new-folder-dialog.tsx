@@ -7,8 +7,10 @@ import Stack from "@mui/material/Stack";
 import TextField from "@mui/material/TextField";
 import { useCallback, useEffect, useState } from "react";
 
+import { useAuthContext } from "@/auth/hooks";
 import Iconify from "@/components/iconify";
 import { Upload } from "@/components/upload";
+import { uploadFiles } from "@/services/filesService/filesService";
 
 // ----------------------------------------------------------------------
 
@@ -37,13 +39,18 @@ export default function FileManagerNewFolderDialog({
     onChangeFolderName,
     ...other
 }: Props) {
-    const [files, setFiles] = useState<(File | string)[]>([]);
+    const { user } = useAuthContext();
+    const [files, setFiles] = useState<File[]>([]);
 
     useEffect(() => {
         if (!open) {
             setFiles([]);
         }
     }, [open]);
+
+    useEffect(() => {
+        console.log(files, "files");
+    }, [files]);
 
     const handleDrop = useCallback(
         (acceptedFiles: File[]) => {
@@ -58,9 +65,10 @@ export default function FileManagerNewFolderDialog({
         [files]
     );
 
-    const handleUpload = () => {
+    const handleUpload = async () => {
         onClose();
         console.info("ON UPLOAD");
+        await uploadFiles(user?.accessToken, user?.id as string, undefined, files);
     };
 
     const handleRemoveFile = (inputFile: File | string) => {

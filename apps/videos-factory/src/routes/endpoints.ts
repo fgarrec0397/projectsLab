@@ -7,5 +7,6 @@ export const endpoints = {
     },
     files: {
         get: `${baseURL}/files`,
+        post: `${baseURL}/files`,
     },
 };

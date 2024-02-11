@@ -45,9 +45,9 @@ export class S3StorageManager implements StorageStrategy<S3StorageManagerTypes> 
         const pathArray = key.split("/");
 
         let baseName = pathArray.pop();
+        const isFolder = baseName === "";
 
-        // if is folder
-        if (baseName === "") {
+        if (isFolder) {
             baseName = pathArray.pop();
         }
 
@@ -93,10 +93,11 @@ export class S3StorageManager implements StorageStrategy<S3StorageManagerTypes> 
     }
 
     async getFiles(folderPath?: string): Promise<AWS.S3.ObjectList> {
+        const regex = /\\\\?/gm;
         try {
             const params: AWS.S3.ListObjectsV2Request = {
                 Bucket: this.bucketName,
-                Prefix: folderPath ? `${folderPath.replaceAll("\\", "/")}/` : undefined,
+                Prefix: folderPath ? `${folderPath.replaceAll(regex, "/")}/` : undefined,
                 Delimiter: "/",
             };
 
@@ -113,15 +114,15 @@ export class S3StorageManager implements StorageStrategy<S3StorageManagerTypes> 
         }
     }
 
-    async uploadFile(fileName: string, destinationPath: string) {
+    async uploadFile(file: Express.Multer.File, fileName: string) {
         try {
-            const fileContent = fs.readFileSync(destinationPath);
-            const params = {
-                Bucket: this.bucketName,
-                Key: fileName,
-                Body: fileContent,
-            };
-            return await this.s3.upload(params).promise();
+            return await this.s3
+                .upload({
+                    Bucket: this.bucketName,
+                    Key: fileName,
+                    Body: file.buffer,
+                })
+                .promise();
         } catch (error) {
             throw new Error("Error uploading file: " + error);
         }

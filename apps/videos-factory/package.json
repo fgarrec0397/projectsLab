@@ -13,6 +13,7 @@
   "dependencies": {
     "@projectslab/eslint-config": "*",
     "@projectslab/helpers": "*",
+    "@projectslab/helpers-client": "*",
     "@projectslab/prettier-config": "*",
     "@projectslab/next-pwa": "*",
     "@projectslab/typescript-config": "*",

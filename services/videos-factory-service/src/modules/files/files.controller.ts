@@ -46,4 +46,14 @@ export class FilesController {
 
         return { message: `files uploaded successfully!` };
     }
+
+    @Post("createFolder")
+    @UseAuthGuard()
+    async createFolder(@Query("userId") userId: string, @Query("folderName") folderName: string) {
+        console.log(folderName, "folderName in backend");
+
+        await this.filesService.createFolder(userId, folderName);
+
+        return { message: `files uploaded successfully!` };
+    }
 }

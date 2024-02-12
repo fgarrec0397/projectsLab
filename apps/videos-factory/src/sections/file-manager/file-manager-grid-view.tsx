@@ -4,9 +4,11 @@ import Collapse from "@mui/material/Collapse";
 import Divider from "@mui/material/Divider";
 import { useCallback, useRef, useState } from "react";
 
+import { useAuthContext } from "@/auth/hooks";
 import Iconify from "@/components/iconify";
 import { TableProps } from "@/components/table";
 import { useBoolean } from "@/hooks/use-boolean";
+import { createFolder } from "@/services/filesService/filesService";
 import { IFile } from "@/types/file";
 
 import FileManagerActionSelected from "./file-manager-action-selected";
@@ -14,7 +16,6 @@ import FileManagerFileItem from "./file-manager-file-item";
 import FileManagerFolderItem from "./file-manager-folder-item";
 import FileManagerNewFolderDialog from "./file-manager-new-folder-dialog";
 import FileManagerPanel from "./file-manager-panel";
-import FileManagerShareDialog from "./file-manager-share-dialog";
 
 // ----------------------------------------------------------------------
 
@@ -31,13 +32,13 @@ export default function FileManagerGridView({
     onDeleteItem,
     onOpenConfirm,
 }: Props) {
+    const { user } = useAuthContext();
+
     const { selected, onSelectRow: onSelectItem, onSelectAllRows: onSelectAllItems } = table;
 
     const containerRef = useRef(null);
 
     const [folderName, setFolderName] = useState("");
-
-    const [inviteEmail, setInviteEmail] = useState("");
 
     const share = useBoolean();
 
@@ -49,13 +50,16 @@ export default function FileManagerGridView({
 
     const folders = useBoolean();
 
-    const handleChangeInvite = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
-        setInviteEmail(event.target.value);
-    }, []);
-
     const handleChangeFolderName = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
         setFolderName(event.target.value);
     }, []);
+
+    const onCreateFolder = async () => {
+        newFolder.onFalse();
+        console.info("CREATE NEW FOLDER", folderName);
+        setFolderName("");
+        await createFolder(user?.accessToken, user?.id as string, folderName);
+    };
 
     return (
         <>
@@ -173,27 +177,13 @@ export default function FileManagerGridView({
                 )}
             </Box>
 
-            <FileManagerShareDialog
-                open={share.value}
-                inviteEmail={inviteEmail}
-                onChangeInvite={handleChangeInvite}
-                onClose={() => {
-                    share.onFalse();
-                    setInviteEmail("");
-                }}
-            />
-
             <FileManagerNewFolderDialog open={upload.value} onClose={upload.onFalse} />
 
             <FileManagerNewFolderDialog
                 open={newFolder.value}
                 onClose={newFolder.onFalse}
                 title="New Folder"
-                onCreate={() => {
-                    newFolder.onFalse();
-                    setFolderName("");
-                    console.info("CREATE NEW FOLDER", folderName);
-                }}
+                onCreate={onCreateFolder}
                 folderName={folderName}
                 onChangeFolderName={handleChangeFolderName}
             />

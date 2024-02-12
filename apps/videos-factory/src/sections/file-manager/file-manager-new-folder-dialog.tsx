@@ -48,10 +48,6 @@ export default function FileManagerNewFolderDialog({
         }
     }, [open]);
 
-    useEffect(() => {
-        console.log(files, "files");
-    }, [files]);
-
     const handleDrop = useCallback(
         (acceptedFiles: File[]) => {
             const newFiles = acceptedFiles.map((file) =>
@@ -67,7 +63,7 @@ export default function FileManagerNewFolderDialog({
 
     const handleUpload = async () => {
         onClose();
-        console.info("ON UPLOAD");
+
         await uploadFiles(user?.accessToken, user?.id as string, undefined, files);
     };
 

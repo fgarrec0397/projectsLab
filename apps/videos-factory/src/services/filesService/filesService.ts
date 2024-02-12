@@ -33,7 +33,7 @@ export const getFiles = async (
 export const uploadFiles = async (
     accessToken: string | undefined,
     userId: string | undefined,
-    path: string | undefined,
+    path: string | undefined, // TODO - implement upload file in a specific folder later
     files: File[]
 ) => {
     const formData = new FormData();
@@ -50,7 +50,27 @@ export const uploadFiles = async (
                 Authorization: `Bearer ${accessToken}`,
             },
         });
-        return response.data; // Assuming the server responds with JSON containing upload details
+        return response.data;
+    } catch (error) {
+        throw error;
+    }
+};
+
+export const createFolder = async (
+    accessToken: string | undefined,
+    userId: string | undefined,
+    folderName: string | undefined
+) => {
+    const url = `${endpoints.files.createFolder}?userId=${userId}&folderName=${folderName}`;
+
+    try {
+        const response = await axios.post(url, undefined, {
+            headers: {
+                Accept: "application/json",
+                Authorization: `Bearer ${accessToken}`,
+            },
+        });
+        return response.data;
     } catch (error) {
         throw error;
     }

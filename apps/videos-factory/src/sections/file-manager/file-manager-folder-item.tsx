@@ -16,10 +16,13 @@ import Iconify from "@/components/iconify";
 import { useSnackbar } from "@/components/snackbar";
 import { useBoolean } from "@/hooks/use-boolean";
 import { useCopyToClipboard } from "@/hooks/use-copy-to-clipboard";
+import { useDoubleClick } from "@/hooks/use-double-click";
 import { IFile } from "@/types/file";
+import { fData } from "@/utils/format-number";
 
 import FileManagerFileDetails from "./file-manager-file-details";
 import FileManagerNewFolderDialog from "./file-manager-new-folder-dialog";
+import { useFolderNavigation } from "./hooks/use-folder-navigation";
 
 // ----------------------------------------------------------------------
 
@@ -38,6 +41,8 @@ export default function FileManagerFolderItem({
     sx,
     ...other
 }: Props) {
+    const { goTo } = useFolderNavigation();
+
     const { enqueueSnackbar } = useSnackbar();
 
     const { copy } = useCopyToClipboard();
@@ -55,6 +60,12 @@ export default function FileManagerFolderItem({
     const confirm = useBoolean();
 
     const details = useBoolean();
+
+    const handleClick = useDoubleClick({
+        doubleClick: () => {
+            goTo(folder.path);
+        },
+    });
 
     const handleChangeFolderName = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
         setFolderName(event.target.value);
@@ -103,6 +114,7 @@ export default function FileManagerFolderItem({
         <ListItemText
             onClick={details.onTrue}
             primary={folder.name}
+            secondary={fData(folder.size)}
             primaryTypographyProps={{
                 noWrap: true,
                 typography: "subtitle1",
@@ -125,6 +137,7 @@ export default function FileManagerFolderItem({
                 variant="outlined"
                 spacing={1}
                 alignItems="flex-start"
+                onClick={handleClick}
                 sx={{
                     p: 2.5,
                     maxWidth: 222,

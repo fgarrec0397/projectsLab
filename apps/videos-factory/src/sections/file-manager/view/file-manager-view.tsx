@@ -5,6 +5,8 @@ import Container from "@mui/material/Container";
 import Stack from "@mui/material/Stack";
 import ToggleButton from "@mui/material/ToggleButton";
 import ToggleButtonGroup from "@mui/material/ToggleButtonGroup";
+import { isEqual } from "@projectslab/helpers";
+import { usePrevious } from "@projectslab/helpers-client";
 import { useCallback, useEffect, useState } from "react";
 
 import { FILE_TYPE_OPTIONS } from "@/_mock";
@@ -29,7 +31,6 @@ import FileManagerGridView from "../file-manager-grid-view";
 import FileManagerNewFolderDialog from "../file-manager-new-folder-dialog";
 import FileManagerTable from "../file-manager-table";
 import { useFolderBreadcrumbs } from "../hooks/use-folder-breadcrumbs";
-import { useFolderNavigation } from "../hooks/use-folder-navigation";
 
 // ----------------------------------------------------------------------
 
@@ -44,6 +45,9 @@ const defaultFilters: IFileFilters = {
 
 export default function FileManagerView() {
     const breadcrumbsLinks = useFolderBreadcrumbs();
+
+    const previousBreadcrumbsLinks = usePrevious(breadcrumbsLinks);
+
     const { enqueueSnackbar } = useSnackbar();
 
     const table = useTable({ defaultRowsPerPage: 10 });
@@ -82,6 +86,12 @@ export default function FileManagerView() {
         !!filters.name || !!filters.type.length || (!!filters.startDate && !!filters.endDate);
 
     const notFound = (!dataFiltered.length && canReset) || !dataFiltered.length;
+
+    useEffect(() => {
+        if (!isEqual(breadcrumbsLinks, previousBreadcrumbsLinks)) {
+            table.onChangePage(undefined, 0);
+        }
+    }, [breadcrumbsLinks, previousBreadcrumbsLinks, table]);
 
     useEffect(() => {
         setTableData(files);

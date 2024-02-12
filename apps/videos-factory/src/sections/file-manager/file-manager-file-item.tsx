@@ -1,5 +1,3 @@
-import Avatar from "@mui/material/Avatar";
-import AvatarGroup, { avatarGroupClasses } from "@mui/material/AvatarGroup";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import { CardProps } from "@mui/material/Card";
@@ -10,7 +8,7 @@ import MenuItem from "@mui/material/MenuItem";
 import Paper from "@mui/material/Paper";
 import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
-import { useCallback, useState } from "react";
+import { useCallback } from "react";
 
 import { ConfirmDialog } from "@/components/custom-dialog";
 import CustomPopover, { usePopover } from "@/components/custom-popover";
@@ -20,12 +18,13 @@ import { useSnackbar } from "@/components/snackbar";
 import TextMaxLine from "@/components/text-max-line";
 import { useBoolean } from "@/hooks/use-boolean";
 import { useCopyToClipboard } from "@/hooks/use-copy-to-clipboard";
+import { useDoubleClick } from "@/hooks/use-double-click";
 import { IFileManager } from "@/types/file";
 import { fData } from "@/utils/format-number";
 import { fDateTime } from "@/utils/format-time";
 
 import FileManagerFileDetails from "./file-manager-file-details";
-import FileManagerShareDialog from "./file-manager-share-dialog";
+import { useFolderNavigation } from "./hooks/use-folder-navigation";
 
 // ----------------------------------------------------------------------
 
@@ -44,11 +43,11 @@ export default function FileManagerFileItem({
     sx,
     ...other
 }: Props) {
+    const { goTo } = useFolderNavigation();
+
     const { enqueueSnackbar } = useSnackbar();
 
     const { copy } = useCopyToClipboard();
-
-    const [inviteEmail, setInviteEmail] = useState("");
 
     const checkbox = useBoolean();
 
@@ -58,13 +57,16 @@ export default function FileManagerFileItem({
 
     const details = useBoolean();
 
-    const favorite = useBoolean(file.isFavorited);
-
     const popover = usePopover();
 
-    const handleChangeInvite = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
-        setInviteEmail(event.target.value);
-    }, []);
+    const handleClick = useDoubleClick({
+        click: () => {
+            details.onTrue();
+        },
+        doubleClick: () => {
+            goTo(file.path);
+        },
+    });
 
     const handleCopy = useCallback(() => {
         enqueueSnackbar("Copied!");
@@ -87,14 +89,6 @@ export default function FileManagerFileItem({
 
     const renderAction = (
         <Stack direction="row" alignItems="center" sx={{ top: 8, right: 8, position: "absolute" }}>
-            <Checkbox
-                color="warning"
-                icon={<Iconify icon="eva:star-outline" />}
-                checkedIcon={<Iconify icon="eva:star-fill" />}
-                checked={favorite.value}
-                onChange={favorite.onToggle}
-            />
-
             <IconButton color={popover.open ? "inherit" : "default"} onClick={popover.onOpen}>
                 <Iconify icon="eva:more-vertical-fill" />
             </IconButton>
@@ -142,32 +136,13 @@ export default function FileManagerFileItem({
         </>
     );
 
-    const renderAvatar = (
-        <AvatarGroup
-            max={3}
-            sx={{
-                mt: 1,
-                [`& .${avatarGroupClasses.avatar}`]: {
-                    width: 24,
-                    height: 24,
-                    "&:first-of-type": {
-                        fontSize: 12,
-                    },
-                },
-            }}
-        >
-            {file.shared?.map((person) => (
-                <Avatar key={person.id} alt={person.name} src={person.avatarUrl} />
-            ))}
-        </AvatarGroup>
-    );
-
     return (
         <>
             <Stack
                 component={Paper}
                 variant="outlined"
                 alignItems="flex-start"
+                onClick={handleClick}
                 sx={{
                     p: 2.5,
                     borderRadius: 2,
@@ -187,8 +162,6 @@ export default function FileManagerFileItem({
                 </Box>
 
                 {renderText}
-
-                {renderAvatar}
 
                 {renderAction}
             </Stack>
@@ -235,26 +208,12 @@ export default function FileManagerFileItem({
 
             <FileManagerFileDetails
                 item={file}
-                favorited={favorite.value}
-                onFavorite={favorite.onToggle}
                 onCopyLink={handleCopy}
                 open={details.value}
                 onClose={details.onFalse}
                 onDelete={() => {
                     details.onFalse();
                     onDelete();
-                }}
-            />
-
-            <FileManagerShareDialog
-                open={share.value}
-                shared={file.shared}
-                inviteEmail={inviteEmail}
-                onChangeInvite={handleChangeInvite}
-                onCopyLink={handleCopy}
-                onClose={() => {
-                    share.onFalse();
-                    setInviteEmail("");
                 }}
             />
 

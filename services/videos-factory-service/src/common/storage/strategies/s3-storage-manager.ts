@@ -128,6 +128,16 @@ export class S3StorageManager implements StorageStrategy<S3StorageManagerTypes> 
         }
     }
 
+    async createFolder(folderName: string) {
+        const folderKey = folderName.endsWith("/") ? folderName : `${folderName}/`;
+
+        try {
+            return await this.s3.putObject({ Bucket: this.bucketName, Key: folderKey }).promise();
+        } catch (error) {
+            console.error("Error creating folder:", error);
+        }
+    }
+
     async downloadFile(fileName: string, destinationPath: string) {
         try {
             const params = {

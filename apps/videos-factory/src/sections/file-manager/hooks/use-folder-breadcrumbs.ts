@@ -17,15 +17,12 @@ export const useFolderBreadcrumbs = () => {
 
     const [breadcrumbsLinks, setLinks] = useState<BreadcrumbsLinkProps[]>([rootLink]);
 
-    const createPathParam = () => {};
-
     const buildLinks = useCallback(() => {
         const pathArray = currentPath?.split("/");
         const links: BreadcrumbsLinkProps[] = [rootLink];
 
         pathArray?.reduce((prev, current, currentIndex) => {
             const filesPath = prev !== "" ? `${prev}/${current}` : current;
-            console.log({ filesPath, prev, current });
 
             links.push({
                 name: current,

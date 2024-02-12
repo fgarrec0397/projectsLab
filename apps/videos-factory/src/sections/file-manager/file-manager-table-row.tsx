@@ -36,6 +36,7 @@ type Props = {
 
 export default function FileManagerTableRow({ row, selected, onSelectRow, onDeleteRow }: Props) {
     const theme = useTheme();
+
     const { goTo } = useFolderNavigation();
 
     const { name, size, type, modifiedAt } = row;

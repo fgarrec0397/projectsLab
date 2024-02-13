@@ -43,6 +43,8 @@ const defaultFilters: IFileFilters = {
 
 // ----------------------------------------------------------------------
 
+const showDisplayToggles = false;
+
 export default function FileManagerView() {
     const breadcrumbsLinks = useFolderBreadcrumbs();
 
@@ -60,7 +62,7 @@ export default function FileManagerView() {
 
     const upload = useBoolean();
 
-    const [view, setView] = useState("list");
+    const [view, setView] = useState("grid");
 
     const { files, isFilesLoading } = useGetFiles();
 
@@ -69,6 +71,8 @@ export default function FileManagerView() {
     const [filters, setFilters] = useState(defaultFilters);
 
     const dateError = isAfter(filters.startDate, filters.endDate);
+
+    console.log(table, "table");
 
     const dataFiltered = applyFilter({
         inputData: tableData,
@@ -165,15 +169,17 @@ export default function FileManagerView() {
                 typeOptions={FILE_TYPE_OPTIONS}
             />
 
-            <ToggleButtonGroup size="small" value={view} exclusive onChange={handleChangeView}>
-                <ToggleButton value="list">
-                    <Iconify icon="solar:list-bold" />
-                </ToggleButton>
+            {showDisplayToggles && (
+                <ToggleButtonGroup size="small" value={view} exclusive onChange={handleChangeView}>
+                    <ToggleButton value="list">
+                        <Iconify icon="solar:list-bold" />
+                    </ToggleButton>
 
-                <ToggleButton value="grid">
-                    <Iconify icon="mingcute:dot-grid-fill" />
-                </ToggleButton>
-            </ToggleButtonGroup>
+                    <ToggleButton value="grid">
+                        <Iconify icon="mingcute:dot-grid-fill" />
+                    </ToggleButton>
+                </ToggleButtonGroup>
+            )}
         </Stack>
     );
 
@@ -296,6 +302,7 @@ function applyFilter({
     const { name, type, startDate, endDate } = filters;
 
     const stabilizedThis = inputData.map((el, index) => [el, index] as const);
+    console.log(inputData, "inputData");
 
     stabilizedThis.sort((a, b) => {
         const order = comparator(a[0], b[0]);

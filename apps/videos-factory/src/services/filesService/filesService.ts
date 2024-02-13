@@ -20,6 +20,8 @@ export const getFiles = async (
         url += `&path=${path}`;
     }
 
+    url += `&all=true`;
+
     const response = await axios.get<IFile[]>(url, {
         headers: {
             Accept: "application/json",

@@ -17,7 +17,7 @@ import { useSnackbar } from "@/components/snackbar";
 import { useBoolean } from "@/hooks/use-boolean";
 import { useCopyToClipboard } from "@/hooks/use-copy-to-clipboard";
 import { useDoubleClick } from "@/hooks/use-double-click";
-import { IFile } from "@/types/file";
+import { IFile, IFolderManager } from "@/types/file";
 import { fData } from "@/utils/format-number";
 
 import FileManagerFileDetails from "./file-manager-file-details";
@@ -27,7 +27,7 @@ import { useFolderNavigation } from "./hooks/use-folder-navigation";
 // ----------------------------------------------------------------------
 
 interface Props extends CardProps {
-    folder: IFile;
+    folder: IFolderManager;
     selected?: boolean;
     onSelect?: VoidFunction;
     onDelete: VoidFunction;
@@ -114,7 +114,22 @@ export default function FileManagerFolderItem({
         <ListItemText
             onClick={details.onTrue}
             primary={folder.name}
-            secondary={fData(folder.size)}
+            secondary={
+                <>
+                    {fData(folder.size)}
+                    <Box
+                        component="span"
+                        sx={{
+                            mx: 0.75,
+                            width: 2,
+                            height: 2,
+                            borderRadius: "50%",
+                            bgcolor: "currentColor",
+                        }}
+                    />
+                    {folder.totalFiles} files
+                </>
+            }
             primaryTypographyProps={{
                 noWrap: true,
                 typography: "subtitle1",

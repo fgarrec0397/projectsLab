@@ -6,10 +6,16 @@ import { InjectStorageConfig, StorageConfig } from "src/config/storage-config.mo
 export class FilesService {
     constructor(@InjectStorageConfig() private readonly storageConfig: StorageConfig) {}
 
-    getUserFiles = async (userId: string, filesPath?: string) => {
-        const userFilesPath = filesPath ? path.join(userId, filesPath) : userId;
+    getUserFiles = async (userId: string, filesPath?: string, shouldFetchAll?: boolean) => {
+        let userFilesPath = filesPath ? path.join(userId, filesPath) : userId;
 
-        return this.storageConfig.getFiles(userFilesPath);
+        if (shouldFetchAll) {
+            userFilesPath = path.join(userId, "**_no_delimiter_!**");
+        }
+
+        const files = await this.storageConfig.getFiles(userFilesPath);
+
+        return files;
     };
 
     uploadUserFiles = async (

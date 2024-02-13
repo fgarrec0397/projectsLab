@@ -25,7 +25,8 @@ export type IFolderManager = {
     id: string;
     name: string;
     path: string;
-    size: 0;
+    size: number;
+    totalFiles?: number;
     type: "folder";
     url: string;
     modifiedAt: Date | number | string;

@@ -3,17 +3,22 @@ import {
     Get,
     HttpException,
     HttpStatus,
+    ParseBoolPipe,
     Post,
     Query,
     UploadedFiles,
     UseInterceptors,
 } from "@nestjs/common";
 import { AnyFilesInterceptor } from "@nestjs/platform-express";
-import { UseCache } from "src/common/cache/cache.interceptor";
+import { UseCache } from "src/common/cache/decorators/use-cache.decorator";
+import { UseInvalidateCache } from "src/common/cache/decorators/use-invalidate-cache.decorator";
+import { WEEK_IN_SECONDS } from "src/common/constants";
 
 import { UseAuthGuard } from "../auth/auth.guard";
 import { FilesMapper } from "./files.mapper";
 import { FilesService } from "./files.service";
+
+const filesCacheKey = "files-list";
 
 @Controller("files")
 export class FilesController {
@@ -23,20 +28,34 @@ export class FilesController {
     ) {}
 
     @Get()
-    @UseCache()
+    @UseCache(filesCacheKey, WEEK_IN_SECONDS)
     @UseAuthGuard()
-    async getFiles(@Query("userId") userId: string, @Query("path") path: string | undefined) {
+    async getFiles(
+        @Query("userId") userId: string,
+        @Query("path") path: string | undefined,
+        @Query("all", ParseBoolPipe) all: boolean | undefined
+    ) {
         if (!userId) {
             throw new HttpException("No user id received.", HttpStatus.BAD_REQUEST);
         }
 
-        const result = await this.filesMapper.map({ userId, path }, this.filesService.getUserFiles);
+        const result = await this.filesMapper.map(
+            { userId, path, all },
+            this.filesService.getUserFiles
+        );
 
-        return result;
+        let sanitizedResult = result;
+
+        if (Array.isArray(result)) {
+            sanitizedResult = result.filter((x) => x !== null && x !== undefined);
+        }
+
+        return sanitizedResult;
     }
 
     @Post()
     @UseAuthGuard()
+    @UseInvalidateCache(filesCacheKey)
     @UseInterceptors(AnyFilesInterceptor())
     async uploadMultiple(
         @Query("userId") userId: string,
@@ -48,6 +67,7 @@ export class FilesController {
     }
 
     @Post("createFolder")
+    @UseInvalidateCache(filesCacheKey)
     @UseAuthGuard()
     async createFolder(@Query("userId") userId: string, @Query("folderName") folderName: string) {
         console.log(folderName, "folderName in backend");

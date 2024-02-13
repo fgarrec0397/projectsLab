@@ -11,6 +11,7 @@ type S3StorageManagerTypes = {
     getFile: AWS.S3.GetObjectOutput;
     getFiles: AWS.S3.ObjectList;
     uploadFile: AWS.S3.ManagedUpload.SendData;
+    createFolder: AWS.S3.PutObjectOutput;
     downloadFile: void;
 };
 
@@ -93,22 +94,43 @@ export class S3StorageManager implements StorageStrategy<S3StorageManagerTypes> 
     }
 
     async getFiles(folderPath?: string): Promise<AWS.S3.ObjectList> {
-        const regex = /\\\\?/gm;
+        const hasFolderPath = !!folderPath;
+        const backSlashSelector = /\\\\?/gm;
+        const normalizedFolderPath = folderPath.replaceAll(backSlashSelector, "/");
+        const folderPathArray = normalizedFolderPath.split("/");
+        const hasNoDelimiterTag =
+            folderPathArray[folderPathArray.length - 1] === "**_no_delimiter_!**";
+
+        const params: AWS.S3.ListObjectsV2Request = {
+            Bucket: this.bucketName,
+        };
+
+        if (hasFolderPath) {
+            if (hasNoDelimiterTag) {
+                folderPathArray.pop();
+            }
+
+            const prefix = folderPathArray.join("/");
+
+            params.Prefix = prefix;
+            params.Delimiter = hasNoDelimiterTag ? undefined : "/";
+        }
+
         try {
-            const params: AWS.S3.ListObjectsV2Request = {
-                Bucket: this.bucketName,
-                Prefix: folderPath ? `${folderPath.replaceAll(regex, "/")}/` : undefined,
-                Delimiter: "/",
-            };
-
             const response = await this.s3.listObjectsV2(params).promise();
-            const files = response.Contents?.filter((item) => !item.Key.endsWith("/")) ?? [];
-            const folders = response.CommonPrefixes ?? [];
 
-            const objectFolders = folders.map(this.commonPrefixToObject);
-            const objects = [...objectFolders, ...files];
+            let files = response.Contents;
 
-            return objects || [];
+            if (!hasNoDelimiterTag) {
+                const noneFolderItems =
+                    response.Contents?.filter((item) => !item.Key.endsWith("/")) ?? [];
+                const folders = response.CommonPrefixes ?? [];
+                const folderItems = folders.map(this.commonPrefixToObject);
+
+                files = [...folderItems, ...noneFolderItems];
+            }
+
+            return files || [];
         } catch (error) {
             throw new Error("Error listing files: " + error);
         }

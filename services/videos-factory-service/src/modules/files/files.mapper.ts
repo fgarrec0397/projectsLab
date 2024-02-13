@@ -7,6 +7,7 @@ import { FilesService } from "./files.service";
 type FilesMapperData = {
     userId: string;
     path?: string;
+    all?: boolean;
 };
 
 @Injectable()
@@ -16,7 +17,7 @@ export class FilesMapper {
     constructor(@InjectStorageConfig() private readonly storageConfig: StorageConfig) {}
 
     async map(data: FilesMapperData, callback: FilesService["getUserFiles"]) {
-        const serviceData = await callback(data.userId, data.path);
+        const serviceData = await callback(data.userId, data.path, data.all);
 
         this.data = data;
 

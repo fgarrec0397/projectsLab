@@ -1,3 +1,5 @@
+export const WEEK_IN_SECONDS = 604800;
+
 export const countries: string[] = [
     "Afghanistan",
     "Albania",

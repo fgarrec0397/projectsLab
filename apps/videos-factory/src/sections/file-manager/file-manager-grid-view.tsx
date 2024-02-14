@@ -9,13 +9,14 @@ import Iconify from "@/components/iconify";
 import { TableProps } from "@/components/table";
 import { useBoolean } from "@/hooks/use-boolean";
 import { createFolder } from "@/services/filesService/filesService";
-import { IFile } from "@/types/file";
+import { IFile, IFolderManager } from "@/types/file";
 
 import FileManagerActionSelected from "./file-manager-action-selected";
 import FileManagerFileItem from "./file-manager-file-item";
 import FileManagerFolderItem from "./file-manager-folder-item";
 import FileManagerNewFolderDialog from "./file-manager-new-folder-dialog";
 import FileManagerPanel from "./file-manager-panel";
+import { useFolderNavigation } from "./hooks/use-folder-navigation";
 
 // ----------------------------------------------------------------------
 
@@ -32,6 +33,8 @@ export default function FileManagerGridView({
     onDeleteItem,
     onOpenConfirm,
 }: Props) {
+    const { currentPath } = useFolderNavigation();
+
     const { user } = useAuthContext();
 
     const { selected, onSelectRow: onSelectItem, onSelectAllRows: onSelectAllItems } = table;
@@ -56,9 +59,8 @@ export default function FileManagerGridView({
 
     const onCreateFolder = async () => {
         newFolder.onFalse();
-        console.info("CREATE NEW FOLDER", folderName);
+        await createFolder(user?.accessToken, user?.id as string, folderName, currentPath);
         setFolderName("");
-        await createFolder(user?.accessToken, user?.id as string, folderName);
     };
 
     return (
@@ -90,7 +92,7 @@ export default function FileManagerGridView({
                             .map((folder) => (
                                 <FileManagerFolderItem
                                     key={folder.id}
-                                    folder={folder}
+                                    folder={folder as IFolderManager}
                                     selected={selected.includes(folder.id)}
                                     onSelect={() => onSelectItem(folder.id)}
                                     onDelete={() => onDeleteItem(folder.id)}

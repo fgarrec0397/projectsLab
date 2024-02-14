@@ -1,9 +1,11 @@
 import {
+    Body,
     Controller,
     Get,
     HttpException,
     HttpStatus,
     ParseBoolPipe,
+    Patch,
     Post,
     Query,
     UploadedFiles,
@@ -14,7 +16,6 @@ import { UseCache } from "src/common/cache/decorators/use-cache.decorator";
 import { UseInvalidateCache } from "src/common/cache/decorators/use-invalidate-cache.decorator";
 import { WEEK_IN_SECONDS } from "src/common/constants";
 
-import { UseAuthGuard } from "../auth/auth.guard";
 import { FilesMapper } from "./files.mapper";
 import { FilesService } from "./files.service";
 
@@ -29,7 +30,6 @@ export class FilesController {
 
     @Get()
     @UseCache(filesCacheKey, WEEK_IN_SECONDS)
-    @UseAuthGuard()
     async getFiles(
         @Query("userId") userId: string,
         @Query("path") path: string | undefined,
@@ -54,10 +54,9 @@ export class FilesController {
     }
 
     @Post()
-    @UseAuthGuard()
     @UseInvalidateCache(filesCacheKey)
     @UseInterceptors(AnyFilesInterceptor())
-    async uploadMultiple(
+    async uploadFiles(
         @Query("userId") userId: string,
         @UploadedFiles() files: Array<Express.Multer.File> | Express.Multer.File
     ) {
@@ -66,12 +65,23 @@ export class FilesController {
         return { message: `files uploaded successfully!` };
     }
 
+    @Patch()
+    @UseInvalidateCache(filesCacheKey)
+    async editFile(
+        @Body("userId") userId: string,
+        @Body("filePath") filePath: string,
+        @Body("newFilePath") newFilePath: string
+    ) {
+        console.log({ filePath, newFilePath });
+
+        // await this.filesService.createFolder(userId, folderName);
+
+        return { message: `files uploaded successfully!` };
+    }
+
     @Post("createFolder")
     @UseInvalidateCache(filesCacheKey)
-    @UseAuthGuard()
     async createFolder(@Query("userId") userId: string, @Query("folderName") folderName: string) {
-        console.log(folderName, "folderName in backend");
-
         await this.filesService.createFolder(userId, folderName);
 
         return { message: `files uploaded successfully!` };

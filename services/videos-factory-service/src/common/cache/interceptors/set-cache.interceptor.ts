@@ -31,12 +31,9 @@ export class SetCacheInterceptor implements NestInterceptor {
         const method = context.getHandler();
         const { key, ttl } =
             this.reflector.get<{ key: string; ttl?: number }>("setCache", method) || {};
-        const request = context.switchToHttp().getRequest();
-        const url = request.originalUrl || request.url;
-        const params = JSON.stringify(request.params);
 
         return {
-            key: `${key}:${url}:${params}`,
+            key,
             ttl,
         };
     }

@@ -1,6 +1,6 @@
 import { Controller, Get, HttpException, HttpStatus, Post } from "@nestjs/common";
 
-import { UseAuthGuard } from "../auth/auth.guard";
+import { Public } from "../auth/decorators/use-public.guard";
 import { Script } from "./components/ScriptManager/ScriptManager";
 import { ScriptService } from "./services/script.service";
 import { TemplateService } from "./services/template.service";
@@ -20,9 +20,9 @@ export class VideoController {
     ) {}
 
     @Get()
-    @UseAuthGuard()
+    @Public()
     async getVideo() {
-        return "authenticated route";
+        return "not authenticated route";
     }
 
     @Post()

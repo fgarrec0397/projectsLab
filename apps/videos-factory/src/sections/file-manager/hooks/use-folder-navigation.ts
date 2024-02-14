@@ -5,7 +5,7 @@ export const useFolderNavigation = () => {
     const router = useRouter();
     const pathname = usePathname();
     const searchParams = useSearchParams();
-    const currentPath = searchParams.get("path");
+    const currentPath = searchParams.get("path") || undefined;
 
     const goTo = useCallback(
         (path: string) => {

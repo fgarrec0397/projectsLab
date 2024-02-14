@@ -11,6 +11,7 @@ type S3StorageManagerTypes = {
     getFile: AWS.S3.GetObjectOutput;
     getFiles: AWS.S3.ObjectList;
     uploadFile: AWS.S3.ManagedUpload.SendData;
+    renameFile: void;
     createFolder: AWS.S3.PutObjectOutput;
     downloadFile: void;
 };
@@ -147,6 +148,27 @@ export class S3StorageManager implements StorageStrategy<S3StorageManagerTypes> 
                 .promise();
         } catch (error) {
             throw new Error("Error uploading file: " + error);
+        }
+    }
+
+    async renameFile(fileName: string, newFileName: string): Promise<void> {
+        try {
+            await this.s3
+                .copyObject({
+                    Bucket: this.bucketName,
+                    CopySource: `${this.bucketName}/${fileName}`,
+                    Key: newFileName,
+                })
+                .promise();
+
+            await this.s3
+                .deleteObject({
+                    Bucket: this.bucketName,
+                    Key: fileName,
+                })
+                .promise();
+        } catch (error) {
+            throw error;
         }
     }
 

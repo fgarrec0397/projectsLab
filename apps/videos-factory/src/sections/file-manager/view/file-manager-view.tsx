@@ -72,8 +72,6 @@ export default function FileManagerView() {
 
     const dateError = isAfter(filters.startDate, filters.endDate);
 
-    console.log(table, "table");
-
     const dataFiltered = applyFilter({
         inputData: tableData,
         comparator: getComparator(table.order, table.orderBy),
@@ -302,7 +300,6 @@ function applyFilter({
     const { name, type, startDate, endDate } = filters;
 
     const stabilizedThis = inputData.map((el, index) => [el, index] as const);
-    console.log(inputData, "inputData");
 
     stabilizedThis.sort((a, b) => {
         const order = comparator(a[0], b[0]);

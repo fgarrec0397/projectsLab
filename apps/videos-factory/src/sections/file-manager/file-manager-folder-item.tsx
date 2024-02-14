@@ -17,8 +17,7 @@ import { useSnackbar } from "@/components/snackbar";
 import { useBoolean } from "@/hooks/use-boolean";
 import { useCopyToClipboard } from "@/hooks/use-copy-to-clipboard";
 import { useDoubleClick } from "@/hooks/use-double-click";
-import { IFile, IFolderManager } from "@/types/file";
-import { fData } from "@/utils/format-number";
+import { IFolderManager } from "@/types/file";
 
 import FileManagerFileDetails from "./file-manager-file-details";
 import FileManagerNewFolderDialog from "./file-manager-new-folder-dialog";
@@ -114,22 +113,7 @@ export default function FileManagerFolderItem({
         <ListItemText
             onClick={details.onTrue}
             primary={folder.name}
-            secondary={
-                <>
-                    {fData(folder.size)}
-                    <Box
-                        component="span"
-                        sx={{
-                            mx: 0.75,
-                            width: 2,
-                            height: 2,
-                            borderRadius: "50%",
-                            bgcolor: "currentColor",
-                        }}
-                    />
-                    {folder.totalFiles} files
-                </>
-            }
+            secondary={folder.totalFiles !== undefined && <>{folder.totalFiles} files</>}
             primaryTypographyProps={{
                 noWrap: true,
                 typography: "subtitle1",

@@ -1,4 +1,5 @@
 import axios from "axios";
+import { mutate } from "swr";
 
 import { endpoints } from "@/routes/endpoints";
 import { IFile } from "@/types/file";
@@ -41,6 +42,8 @@ export const uploadFiles = async (
     const formData = new FormData();
     const url = `${endpoints.files.post}?userId=${userId}`;
 
+    const swrKey = [accessToken, userId, undefined];
+
     files.forEach((file, index) => {
         formData.append(`files[${index}]`, file);
     });
@@ -52,6 +55,9 @@ export const uploadFiles = async (
                 Authorization: `Bearer ${accessToken}`,
             },
         });
+
+        mutate(swrKey);
+
         return response.data;
     } catch (error) {
         throw error;
@@ -61,9 +67,11 @@ export const uploadFiles = async (
 export const createFolder = async (
     accessToken: string | undefined,
     userId: string | undefined,
-    folderName: string | undefined
+    folderName: string | undefined,
+    path: string | undefined // TODO - implement createFolder in a specific folder later
 ) => {
     const url = `${endpoints.files.createFolder}?userId=${userId}&folderName=${folderName}`;
+    const swrKey = [accessToken, userId, undefined];
 
     try {
         const response = await axios.post(url, undefined, {
@@ -72,6 +80,9 @@ export const createFolder = async (
                 Authorization: `Bearer ${accessToken}`,
             },
         });
+
+        mutate(swrKey);
+
         return response.data;
     } catch (error) {
         throw error;

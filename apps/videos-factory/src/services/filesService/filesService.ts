@@ -4,24 +4,18 @@ import { mutate } from "swr";
 import { endpoints } from "@/routes/endpoints";
 import { IFile } from "@/types/file";
 
-export type GetFilesParams = [string | undefined, string | undefined, string | undefined];
+export type GetFilesParams = [string | undefined, string | undefined];
 
-export const getFiles = async (
-    accessToken: string | undefined,
-    userId: string | undefined,
-    path: string | undefined
-) => {
-    if (!accessToken || !userId) {
+export const getFiles = async (accessToken: string | undefined, path: string | undefined) => {
+    if (!accessToken) {
         return new Promise<IFile[]>((_, reject) => reject({ data: [] }));
     }
 
-    let url = `${endpoints.files.get}?userId=${userId}`;
+    let url = `${endpoints.files.get}?all=true`;
 
     if (path) {
         url += `&path=${path}`;
     }
-
-    url += `&all=true`;
 
     const response = await axios.get<IFile[]>(url, {
         headers: {
@@ -35,14 +29,13 @@ export const getFiles = async (
 
 export const uploadFiles = async (
     accessToken: string | undefined,
-    userId: string | undefined,
     path: string | undefined, // TODO - implement upload file in a specific folder later
     files: File[]
 ) => {
     const formData = new FormData();
-    const url = `${endpoints.files.post}?userId=${userId}`;
+    const url = `${endpoints.files.post}`;
 
-    const swrKey = [accessToken, userId, undefined];
+    const swrKey = [accessToken, undefined];
 
     files.forEach((file, index) => {
         formData.append(`files[${index}]`, file);
@@ -66,12 +59,11 @@ export const uploadFiles = async (
 
 export const createFolder = async (
     accessToken: string | undefined,
-    userId: string | undefined,
     folderName: string | undefined,
     path: string | undefined // TODO - implement createFolder in a specific folder later
 ) => {
-    const url = `${endpoints.files.createFolder}?userId=${userId}&folderName=${folderName}`;
-    const swrKey = [accessToken, userId, undefined];
+    const url = `${endpoints.files.createFolder}?folderName=${folderName}`;
+    const swrKey = [accessToken, undefined];
 
     try {
         const response = await axios.post(url, undefined, {
@@ -89,20 +81,20 @@ export const createFolder = async (
     }
 };
 
+// TODO add a loader when fetching
+
 export const renameFile = async (
     accessToken: string | undefined,
-    userId: string | undefined,
     filePath: string | undefined,
     newFileName: string | undefined
 ) => {
     const url = `${endpoints.files.rename}`;
-    const swrKey = [accessToken, userId, undefined];
+    const swrKey = [accessToken, undefined];
 
     try {
         const response = await axios.patch(
             url,
             {
-                userId,
                 filePath,
                 newFileName,
             },
@@ -124,18 +116,16 @@ export const renameFile = async (
 
 export const renameFolder = async (
     accessToken: string | undefined,
-    userId: string | undefined,
     folderName: string | undefined,
     newFolderName: string | undefined
 ) => {
     const url = `${endpoints.files.createFolder}`;
-    const swrKey = [accessToken, userId, undefined];
+    const swrKey = [accessToken, undefined];
 
     try {
         const response = await axios.post(
             url,
             {
-                userId,
                 folderName,
                 newFolderName,
             },

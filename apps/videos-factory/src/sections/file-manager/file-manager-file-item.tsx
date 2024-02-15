@@ -88,7 +88,7 @@ export default function FileManagerFileItem({
         editFile.onFalse();
         setFileName(fileName);
 
-        await renameFile(user?.accessToken, user?.id, file.path, fileName);
+        await renameFile(user?.accessToken, file.path, fileName);
     };
 
     const renderIcon =

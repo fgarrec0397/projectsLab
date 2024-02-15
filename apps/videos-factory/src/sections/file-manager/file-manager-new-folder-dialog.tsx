@@ -64,7 +64,7 @@ export default function FileManagerNewFolderDialog({
     const handleUpload = async () => {
         onClose();
 
-        await uploadFiles(user?.accessToken, user?.id as string, undefined, files);
+        await uploadFiles(user?.accessToken, undefined, files);
     };
 
     const handleRemoveFile = (inputFile: File | string) => {

@@ -25,6 +25,7 @@ export class FirebaseAuthGuard extends AuthGuard("firebase-auth") {
                 err || new UnauthorizedException("You are not authorized to access this resource")
             );
         }
+
         return user;
     }
 }

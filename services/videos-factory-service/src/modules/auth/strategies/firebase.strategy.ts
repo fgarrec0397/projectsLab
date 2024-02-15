@@ -18,7 +18,10 @@ export class FirebaseStrategy extends PassportStrategy(Strategy, "firebase-auth"
 
         try {
             const decodedToken = await this.authService.verifyIdToken(idToken);
-            const user = { uid: decodedToken.uid };
+
+            const user = { id: decodedToken.uid };
+
+            request.userId = user.id;
 
             return user;
         } catch (error) {

@@ -59,7 +59,7 @@ export default function FileManagerGridView({
 
     const onCreateFolder = async () => {
         newFolder.onFalse();
-        await createFolder(user?.accessToken, user?.id as string, folderName, currentPath);
+        await createFolder(user?.accessToken, folderName, currentPath);
         setFolderName("");
     };
 

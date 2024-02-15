@@ -3,6 +3,7 @@ import { Reflector } from "@nestjs/core";
 import { tap } from "rxjs/operators";
 
 import { CacheService } from "../cache.service";
+import { CacheKey } from "./set-cache.interceptor";
 
 @Injectable()
 export class InvalidateCacheInterceptor implements NestInterceptor {
@@ -13,10 +14,13 @@ export class InvalidateCacheInterceptor implements NestInterceptor {
 
     intercept(context: ExecutionContext, next: CallHandler) {
         const method = context.getHandler();
-        const key = this.reflector.get<string>("invalidateCache", method);
+        const request = context.switchToHttp().getRequest();
+        const key = this.reflector.get<CacheKey>("invalidateCache", method);
 
-        if (!key) return next.handle();
+        const resolvedKey = typeof key === "function" ? key(request) : key;
 
-        return next.handle().pipe(tap(async () => this.cacheService.invalidate(key)));
+        if (!resolvedKey) return next.handle();
+
+        return next.handle().pipe(tap(async () => this.cacheService.invalidate(resolvedKey)));
     }
 }

@@ -81,7 +81,7 @@ export default function FileManagerFolderItem({
         editFolder.onFalse();
         setFolderName(folderName);
 
-        await renameFolder(user?.accessToken, user?.userId, folder.name, folderName);
+        await renameFolder(user?.accessToken, folder.name, folderName);
     };
 
     const renderAction = (

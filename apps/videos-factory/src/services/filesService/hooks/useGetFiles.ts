@@ -23,8 +23,8 @@ export const useGetFiles = () => {
     );
 
     const swrKey: GetFilesParams = useMemo(
-        () => [auth.user?.accessToken, auth.user?.id, memoizedpathParam],
-        [auth.user?.accessToken, auth.user?.id, memoizedpathParam]
+        () => [auth.user?.accessToken, memoizedpathParam],
+        [auth.user?.accessToken, memoizedpathParam]
     );
 
     const { data, isLoading, error, isValidating } = useSWR(swrKey, getFilesFetcher, {

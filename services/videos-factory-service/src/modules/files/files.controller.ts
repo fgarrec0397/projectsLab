@@ -2,12 +2,11 @@ import {
     Body,
     Controller,
     Get,
-    HttpException,
-    HttpStatus,
     ParseBoolPipe,
     Patch,
     Post,
     Query,
+    Req,
     UploadedFiles,
     UseInterceptors,
 } from "@nestjs/common";
@@ -32,13 +31,13 @@ export class FilesController {
     @Get()
     @UseCache(filesCacheKey, WEEK_IN_SECONDS)
     async getFiles(
-        @Query("userId") userId: string,
+        @Req() request: Request,
         @Query("path") path: string | undefined,
         @Query("all", ParseBoolPipe) all: boolean | undefined
     ) {
-        if (!userId) {
-            throw new HttpException("No user id received.", HttpStatus.BAD_REQUEST);
-        }
+        const { userId } = request;
+
+        console.log(userId, "userId");
 
         const result = await this.filesMapper.map(
             { userId, path, all },
@@ -58,10 +57,10 @@ export class FilesController {
     @UseInvalidateCache(filesCacheKey)
     @UseInterceptors(AnyFilesInterceptor())
     async uploadFiles(
-        @Query("userId") userId: string,
+        @Req() request: Request,
         @UploadedFiles() files: Array<Express.Multer.File> | Express.Multer.File
     ) {
-        await this.filesService.uploadUserFiles(userId, files);
+        await this.filesService.uploadUserFiles(request.userId, files);
 
         return { message: `files uploaded successfully!` };
     }
@@ -69,10 +68,12 @@ export class FilesController {
     @Patch()
     @UseInvalidateCache(filesCacheKey)
     async renameFile(
-        @Body("userId") userId: string,
+        @Req() request: Request,
         @Body("filePath") filePath: string,
         @Body("newFileName") newFileName: string
     ) {
+        const { userId } = request;
+
         await this.filesService.renameFile(userId, filePath, newFileName);
 
         return { message: `files uploaded successfully!` };
@@ -80,7 +81,9 @@ export class FilesController {
 
     @Post("createFolder")
     @UseInvalidateCache(filesCacheKey)
-    async createFolder(@Query("userId") userId: string, @Query("folderName") folderName: string) {
+    async createFolder(@Req() request: Request, @Query("folderName") folderName: string) {
+        const { userId } = request;
+
         await this.filesService.createFolder(userId, folderName);
 
         return { message: `files uploaded successfully!` };

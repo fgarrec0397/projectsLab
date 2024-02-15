@@ -1,9 +1,12 @@
 import { CallHandler, ExecutionContext, Injectable, NestInterceptor } from "@nestjs/common";
 import { Reflector } from "@nestjs/core";
+import { Request } from "express";
 import { Observable, of } from "rxjs";
 import { tap } from "rxjs/operators";
 
 import { CacheService } from "../cache.service";
+
+export type CacheKey = string | ((context: Request) => string);
 
 @Injectable()
 export class SetCacheInterceptor implements NestInterceptor {
@@ -29,11 +32,15 @@ export class SetCacheInterceptor implements NestInterceptor {
         ttl?: number;
     } {
         const method = context.getHandler();
+        const request = context.switchToHttp().getRequest();
+
         const { key, ttl } =
-            this.reflector.get<{ key: string; ttl?: number }>("setCache", method) || {};
+            this.reflector.get<{ key: CacheKey; ttl?: number }>("setCache", method) || {};
+
+        const resolvedKey = typeof key === "function" ? key(request) : key;
 
         return {
-            key,
+            key: resolvedKey,
             ttl,
         };
     }

@@ -1,3 +1,5 @@
 import { SetMetadata } from "@nestjs/common";
 
-export const InvalidateCache = (key: string) => SetMetadata("invalidateCache", key);
+import { CacheKey } from "../interceptors/set-cache.interceptor";
+
+export const InvalidateCache = (key: CacheKey) => SetMetadata("invalidateCache", key);

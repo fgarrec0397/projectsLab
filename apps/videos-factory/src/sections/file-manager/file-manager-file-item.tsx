@@ -8,8 +8,9 @@ import MenuItem from "@mui/material/MenuItem";
 import Paper from "@mui/material/Paper";
 import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
-import { useCallback } from "react";
+import { useCallback, useState } from "react";
 
+import { useAuthContext } from "@/auth/hooks";
 import { ConfirmDialog } from "@/components/custom-dialog";
 import CustomPopover, { usePopover } from "@/components/custom-popover";
 import FileThumbnail from "@/components/file-thumbnail";
@@ -19,11 +20,13 @@ import TextMaxLine from "@/components/text-max-line";
 import { useBoolean } from "@/hooks/use-boolean";
 import { useCopyToClipboard } from "@/hooks/use-copy-to-clipboard";
 import { useDoubleClick } from "@/hooks/use-double-click";
+import { renameFile } from "@/services/filesService/filesService";
 import { IFileManager } from "@/types/file";
 import { fData } from "@/utils/format-number";
 import { fDateTime } from "@/utils/format-time";
 
 import FileManagerFileDetails from "./file-manager-file-details";
+import FileManagerNewFolderDialog from "./file-manager-new-folder-dialog";
 import { useFolderNavigation } from "./hooks/use-folder-navigation";
 
 // ----------------------------------------------------------------------
@@ -43,15 +46,19 @@ export default function FileManagerFileItem({
     sx,
     ...other
 }: Props) {
+    const { user } = useAuthContext();
+
     const { goTo } = useFolderNavigation();
 
     const { enqueueSnackbar } = useSnackbar();
 
     const { copy } = useCopyToClipboard();
 
-    const checkbox = useBoolean();
+    const [fileName, setFileName] = useState(file.name);
 
-    const share = useBoolean();
+    const editFile = useBoolean();
+
+    const checkbox = useBoolean();
 
     const confirm = useBoolean();
 
@@ -68,10 +75,21 @@ export default function FileManagerFileItem({
         },
     });
 
+    const handleChangeFileName = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
+        setFileName(event.target.value);
+    }, []);
+
     const handleCopy = useCallback(() => {
         enqueueSnackbar("Copied!");
         copy(file.url);
     }, [copy, enqueueSnackbar, file.url]);
+
+    const handleRenameFile = async () => {
+        editFile.onFalse();
+        setFileName(fileName);
+
+        await renameFile(user?.accessToken, user?.id, file.path, fileName);
+    };
 
     const renderIcon =
         (checkbox.value || selected) && onSelect ? (
@@ -175,21 +193,11 @@ export default function FileManagerFileItem({
                 <MenuItem
                     onClick={() => {
                         popover.onClose();
-                        handleCopy();
+                        editFile.onTrue();
                     }}
                 >
-                    <Iconify icon="eva:link-2-fill" />
-                    Copy Link
-                </MenuItem>
-
-                <MenuItem
-                    onClick={() => {
-                        popover.onClose();
-                        share.onTrue();
-                    }}
-                >
-                    <Iconify icon="solar:share-bold" />
-                    Share
+                    <Iconify icon="solar:pen-bold" />
+                    Edit
                 </MenuItem>
 
                 <Divider sx={{ borderStyle: "dashed" }} />
@@ -215,6 +223,15 @@ export default function FileManagerFileItem({
                     details.onFalse();
                     onDelete();
                 }}
+            />
+
+            <FileManagerNewFolderDialog
+                open={editFile.value}
+                onClose={editFile.onFalse}
+                title="Edit Folder"
+                onUpdate={handleRenameFile}
+                folderName={fileName}
+                onChangeFolderName={handleChangeFileName}
             />
 
             <ConfirmDialog

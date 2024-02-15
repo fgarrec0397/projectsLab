@@ -144,6 +144,7 @@ export class S3StorageManager implements StorageStrategy<S3StorageManagerTypes> 
                     Bucket: this.bucketName,
                     Key: fileName,
                     Body: file.buffer,
+                    ContentType: file.mimetype,
                 })
                 .promise();
         } catch (error) {
@@ -152,6 +153,8 @@ export class S3StorageManager implements StorageStrategy<S3StorageManagerTypes> 
     }
 
     async renameFile(fileName: string, newFileName: string): Promise<void> {
+        console.log({ fileName, newFileName });
+
         try {
             await this.s3
                 .copyObject({

@@ -36,11 +36,14 @@ export class FilesService {
         return this.storageConfig.uploadFile(files, fileName);
     };
 
-    renameFile = async (userId: string, fileName: string, newFileName: string) => {
-        const userFileName = `${userId}/${fileName}`;
-        const newUserFileName = `${userId}/${newFileName}`;
+    renameFile = async (userId: string, filePath: string, newFileName: string) => {
+        const userFilePath = `${userId}/${filePath}`;
+        const userFilePathArray = userFilePath.split("/");
+        userFilePathArray.pop();
+        userFilePathArray.push(newFileName);
+        const newUserFileName = userFilePathArray.join("/");
 
-        return this.storageConfig.renameFile(userFileName, newUserFileName);
+        return this.storageConfig.renameFile(userFilePath, newUserFileName);
     };
 
     createFolder = async (userId: string, folderName: string) => {

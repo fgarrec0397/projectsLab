@@ -88,3 +88,69 @@ export const createFolder = async (
         throw error;
     }
 };
+
+export const renameFile = async (
+    accessToken: string | undefined,
+    userId: string | undefined,
+    filePath: string | undefined,
+    newFileName: string | undefined
+) => {
+    const url = `${endpoints.files.rename}`;
+    const swrKey = [accessToken, userId, undefined];
+
+    try {
+        const response = await axios.patch(
+            url,
+            {
+                userId,
+                filePath,
+                newFileName,
+            },
+            {
+                headers: {
+                    Accept: "application/json",
+                    Authorization: `Bearer ${accessToken}`,
+                },
+            }
+        );
+
+        mutate(swrKey);
+
+        return response.data;
+    } catch (error) {
+        throw error;
+    }
+};
+
+export const renameFolder = async (
+    accessToken: string | undefined,
+    userId: string | undefined,
+    folderName: string | undefined,
+    newFolderName: string | undefined
+) => {
+    const url = `${endpoints.files.createFolder}`;
+    const swrKey = [accessToken, userId, undefined];
+
+    try {
+        const response = await axios.post(
+            url,
+            {
+                userId,
+                folderName,
+                newFolderName,
+            },
+            {
+                headers: {
+                    Accept: "application/json",
+                    Authorization: `Bearer ${accessToken}`,
+                },
+            }
+        );
+
+        mutate(swrKey);
+
+        return response.data;
+    } catch (error) {
+        throw error;
+    }
+};

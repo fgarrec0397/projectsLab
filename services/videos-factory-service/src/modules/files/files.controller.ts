@@ -12,6 +12,7 @@ import {
     UseInterceptors,
 } from "@nestjs/common";
 import { AnyFilesInterceptor } from "@nestjs/platform-express";
+import { Request } from "express";
 import { UseCache } from "src/common/cache/decorators/use-cache.decorator";
 import { UseInvalidateCache } from "src/common/cache/decorators/use-invalidate-cache.decorator";
 import { WEEK_IN_SECONDS } from "src/common/constants";
@@ -19,7 +20,7 @@ import { WEEK_IN_SECONDS } from "src/common/constants";
 import { FilesMapper } from "./files.mapper";
 import { FilesService } from "./files.service";
 
-const filesCacheKey = "files-list";
+const filesCacheKey = (request: Request) => `files-list-${request.query.userId}`;
 
 @Controller("files")
 export class FilesController {
@@ -67,14 +68,12 @@ export class FilesController {
 
     @Patch()
     @UseInvalidateCache(filesCacheKey)
-    async editFile(
+    async renameFile(
         @Body("userId") userId: string,
         @Body("filePath") filePath: string,
-        @Body("newFilePath") newFilePath: string
+        @Body("newFileName") newFileName: string
     ) {
-        console.log({ filePath, newFilePath });
-
-        // await this.filesService.createFolder(userId, folderName);
+        await this.filesService.renameFile(userId, filePath, newFileName);
 
         return { message: `files uploaded successfully!` };
     }

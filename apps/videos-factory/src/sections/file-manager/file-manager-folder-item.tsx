@@ -10,6 +10,7 @@ import Paper from "@mui/material/Paper";
 import Stack from "@mui/material/Stack";
 import { useCallback, useState } from "react";
 
+import { useAuthContext } from "@/auth/hooks";
 import { ConfirmDialog } from "@/components/custom-dialog";
 import CustomPopover, { usePopover } from "@/components/custom-popover";
 import Iconify from "@/components/iconify";
@@ -17,6 +18,7 @@ import { useSnackbar } from "@/components/snackbar";
 import { useBoolean } from "@/hooks/use-boolean";
 import { useCopyToClipboard } from "@/hooks/use-copy-to-clipboard";
 import { useDoubleClick } from "@/hooks/use-double-click";
+import { renameFile, renameFolder } from "@/services/filesService/filesService";
 import { IFolderManager } from "@/types/file";
 
 import FileManagerFileDetails from "./file-manager-file-details";
@@ -40,6 +42,8 @@ export default function FileManagerFolderItem({
     sx,
     ...other
 }: Props) {
+    const { user } = useAuthContext();
+
     const { goTo } = useFolderNavigation();
 
     const { enqueueSnackbar } = useSnackbar();
@@ -51,8 +55,6 @@ export default function FileManagerFolderItem({
     const editFolder = useBoolean();
 
     const checkbox = useBoolean();
-
-    const share = useBoolean();
 
     const popover = usePopover();
 
@@ -74,6 +76,13 @@ export default function FileManagerFolderItem({
         enqueueSnackbar("Copied!");
         copy(folder.url);
     }, [copy, enqueueSnackbar, folder.url]);
+
+    const handleRenameFolder = async () => {
+        editFolder.onFalse();
+        setFolderName(folderName);
+
+        await renameFolder(user?.accessToken, user?.userId, folder.name, folderName);
+    };
 
     const renderAction = (
         <Stack
@@ -170,26 +179,6 @@ export default function FileManagerFolderItem({
                 <MenuItem
                     onClick={() => {
                         popover.onClose();
-                        handleCopy();
-                    }}
-                >
-                    <Iconify icon="eva:link-2-fill" />
-                    Copy Link
-                </MenuItem>
-
-                <MenuItem
-                    onClick={() => {
-                        popover.onClose();
-                        share.onTrue();
-                    }}
-                >
-                    <Iconify icon="solar:share-bold" />
-                    Share
-                </MenuItem>
-
-                <MenuItem
-                    onClick={() => {
-                        popover.onClose();
                         editFolder.onTrue();
                     }}
                 >
@@ -226,11 +215,7 @@ export default function FileManagerFolderItem({
                 open={editFolder.value}
                 onClose={editFolder.onFalse}
                 title="Edit Folder"
-                onUpdate={() => {
-                    editFolder.onFalse();
-                    setFolderName(folderName);
-                    console.info("UPDATE FOLDER", folderName);
-                }}
+                onUpdate={handleRenameFolder}
                 folderName={folderName}
                 onChangeFolderName={handleChangeFolderName}
             />

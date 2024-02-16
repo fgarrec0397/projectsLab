@@ -1,4 +1,3 @@
-import Button from "@mui/material/Button";
 import Dialog, { DialogProps } from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
@@ -8,6 +7,8 @@ import TextField from "@mui/material/TextField";
 import { useCallback, useEffect, useState } from "react";
 
 import { useAuthContext } from "@/auth/hooks";
+import { PrimaryButton } from "@/components/button";
+import { TertiaryButton } from "@/components/button/tertiary-button";
 import Iconify from "@/components/iconify";
 import { Upload } from "@/components/upload";
 import { uploadFiles } from "@/services/filesService/filesService";
@@ -16,6 +17,7 @@ import { uploadFiles } from "@/services/filesService/filesService";
 
 interface Props extends DialogProps {
     title?: string;
+    showUpload?: boolean;
     //
     onCreate?: VoidFunction;
     onUpdate?: VoidFunction;
@@ -29,6 +31,7 @@ interface Props extends DialogProps {
 
 export default function FileManagerNewFolderDialog({
     title = "Upload Files",
+    showUpload = true,
     open,
     onClose,
     //
@@ -39,6 +42,8 @@ export default function FileManagerNewFolderDialog({
     onChangeFolderName,
     ...other
 }: Props) {
+    const isUploading = showUpload && !(onCreate || onUpdate);
+
     const { user } = useAuthContext();
     const [files, setFiles] = useState<File[]>([]);
 
@@ -91,29 +96,37 @@ export default function FileManagerNewFolderDialog({
                     />
                 )}
 
-                <Upload multiple files={files} onDrop={handleDrop} onRemove={handleRemoveFile} />
+                {isUploading && (
+                    <Upload
+                        multiple
+                        files={files}
+                        onDrop={handleDrop}
+                        onRemove={handleRemoveFile}
+                    />
+                )}
             </DialogContent>
 
             <DialogActions>
-                <Button
-                    variant="contained"
-                    startIcon={<Iconify icon="eva:cloud-upload-fill" />}
-                    onClick={handleUpload}
-                >
-                    Upload
-                </Button>
-
+                <TertiaryButton onClick={handleRemoveAllFiles}>Cancel</TertiaryButton>
                 {!!files.length && (
-                    <Button variant="outlined" color="inherit" onClick={handleRemoveAllFiles}>
-                        Remove all
-                    </Button>
+                    <TertiaryButton onClick={handleRemoveAllFiles}>Remove all</TertiaryButton>
+                )}
+
+                {isUploading && (
+                    <PrimaryButton
+                        variant="contained"
+                        startIcon={<Iconify icon="eva:cloud-upload-fill" />}
+                        onClick={handleUpload}
+                    >
+                        Upload
+                    </PrimaryButton>
                 )}
 
                 {(onCreate || onUpdate) && (
                     <Stack direction="row" justifyContent="flex-end" flexGrow={1}>
-                        <Button variant="soft" onClick={onCreate || onUpdate}>
+                        <PrimaryButton onClick={onCreate || onUpdate}>
                             {onUpdate ? "Save" : "Create"}
-                        </Button>
+                        </PrimaryButton>
                     </Stack>
                 )}
             </DialogActions>

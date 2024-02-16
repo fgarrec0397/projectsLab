@@ -31,12 +31,12 @@ import { useFolderNavigation } from "./hooks/use-folder-navigation";
 
 // ----------------------------------------------------------------------
 
-interface Props extends CardProps {
+type Props = CardProps & {
     file: IFileManager;
     selected?: boolean;
-    onSelect?: VoidFunction;
+    onSelect?: (event: React.MouseEvent<HTMLElement>) => void;
     onDelete: VoidFunction;
-}
+};
 
 export default function FileManagerFileItem({
     file,
@@ -91,6 +91,11 @@ export default function FileManagerFileItem({
         await renameFile(user?.accessToken, file.path, fileName);
     };
 
+    const handleOnClickActions = (event: React.MouseEvent<HTMLElement>) => {
+        event.stopPropagation();
+        popover.onOpen(event);
+    };
+
     const renderIcon =
         (checkbox.value || selected) && onSelect ? (
             <Checkbox
@@ -102,12 +107,12 @@ export default function FileManagerFileItem({
                 sx={{ p: 0.75 }}
             />
         ) : (
-            <FileThumbnail file={file.type} sx={{ width: 36, height: 36 }} />
+            <FileThumbnail file={file.type} sx={{ width: 32, height: 32 }} />
         );
 
     const renderAction = (
         <Stack direction="row" alignItems="center" sx={{ top: 8, right: 8, position: "absolute" }}>
-            <IconButton color={popover.open ? "inherit" : "default"} onClick={popover.onOpen}>
+            <IconButton color={popover.open ? "inherit" : "default"} onClick={handleOnClickActions}>
                 <Iconify icon="eva:more-vertical-fill" />
             </IconButton>
         </Stack>
@@ -197,7 +202,7 @@ export default function FileManagerFileItem({
                     }}
                 >
                     <Iconify icon="solar:pen-bold" />
-                    Edit
+                    Rename
                 </MenuItem>
 
                 <Divider sx={{ borderStyle: "dashed" }} />
@@ -228,10 +233,11 @@ export default function FileManagerFileItem({
             <FileManagerNewFolderDialog
                 open={editFile.value}
                 onClose={editFile.onFalse}
-                title="Edit Folder"
+                title="Rename File"
                 onUpdate={handleRenameFile}
                 folderName={fileName}
                 onChangeFolderName={handleChangeFileName}
+                showUpload={false}
             />
 
             <ConfirmDialog

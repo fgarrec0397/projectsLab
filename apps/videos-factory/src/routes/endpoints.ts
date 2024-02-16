@@ -9,6 +9,7 @@ export const endpoints = {
         get: `${baseURL}/files`,
         post: `${baseURL}/files`,
         rename: `${baseURL}/files`,
+        delete: `${baseURL}/files`,
         createFolder: `${baseURL}/files/createFolder`,
     },
 };

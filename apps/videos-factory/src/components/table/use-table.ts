@@ -39,8 +39,10 @@ export default function useTable(props?: UseTableProps): ReturnType {
         [order, orderBy]
     );
 
-    const onSelectRow = useCallback(
-        (inputValue: string) => {
+    const onSelectRow: ReturnType["onSelectRow"] = useCallback(
+        (event, inputValue: string) => {
+            event.stopPropagation();
+
             const newSelected = selected.includes(inputValue)
                 ? selected.filter((value) => value !== inputValue)
                 : [...selected, inputValue];

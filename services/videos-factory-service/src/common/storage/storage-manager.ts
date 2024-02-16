@@ -5,8 +5,10 @@ export type StorageManagerTypes = {
     getFiles: unknown[];
     uploadFile: unknown;
     renameFile: unknown;
+    renameFolder: unknown;
     createFolder: unknown;
     downloadFile: unknown;
+    deleteFiles: unknown;
 };
 
 export interface StorageStrategy<T extends StorageManagerTypes> {
@@ -19,8 +21,10 @@ export interface StorageStrategy<T extends StorageManagerTypes> {
     getFiles(path: string): Promise<T["getFiles"]>;
     uploadFile(file: Express.Multer.File, name: string): Promise<T["uploadFile"]>;
     renameFile(fileName: string, newFileName: string): Promise<T["renameFile"]>;
+    renameFolder(folderName: string, newFolderName: string): Promise<T["renameFolder"]>;
     createFolder(folderName: string): Promise<T["createFolder"]>;
     downloadFile(fileName: string, destinationPath: string): Promise<T["downloadFile"]>;
+    deleteFiles(fileIds: string[]): Promise<T["deleteFiles"]>;
 }
 
 export const STORAGE_MANAGER_TOKEN = "StorageManagerToken";
@@ -69,12 +73,20 @@ export class StorageManager<T extends StorageManagerTypes> {
         return this.storageStrategy.renameFile(fileName, newFileName);
     }
 
+    async renameFolder(folderName: string, newFolderName: string) {
+        return this.storageStrategy.renameFile(folderName, newFolderName);
+    }
+
     async createFolder(folderName: string) {
         return this.storageStrategy.createFolder(folderName);
     }
 
     async downloadFile(fileName: string, destinationPath: string) {
         return this.storageStrategy.downloadFile(fileName, destinationPath);
+    }
+
+    async deleteFiles(fileIds: string[]) {
+        return this.storageStrategy.deleteFiles(fileIds);
     }
 }
 

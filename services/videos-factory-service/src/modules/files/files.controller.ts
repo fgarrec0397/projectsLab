@@ -1,7 +1,10 @@
 import {
     Body,
     Controller,
+    Delete,
     Get,
+    HttpException,
+    HttpStatus,
     ParseBoolPipe,
     Patch,
     Post,
@@ -36,8 +39,6 @@ export class FilesController {
         @Query("all", ParseBoolPipe) all: boolean | undefined
     ) {
         const { userId } = request;
-
-        console.log(userId, "userId");
 
         const result = await this.filesMapper.map(
             { userId, path, all },
@@ -85,6 +86,19 @@ export class FilesController {
         const { userId } = request;
 
         await this.filesService.createFolder(userId, folderName);
+
+        return { message: `files uploaded successfully!` };
+    }
+
+    @Delete()
+    @UseInvalidateCache(filesCacheKey)
+    async delete(@Query("fileIds") fileIds: string | undefined) {
+        if (!fileIds) {
+            throw new HttpException("fileIds parameter missing", HttpStatus.BAD_REQUEST);
+        }
+
+        const idsArray = fileIds.split(",");
+        await this.filesService.delete(idsArray);
 
         return { message: `files uploaded successfully!` };
     }

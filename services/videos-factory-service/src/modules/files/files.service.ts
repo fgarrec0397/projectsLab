@@ -39,9 +39,20 @@ export class FilesService {
     renameFile = async (userId: string, filePath: string, newFileName: string) => {
         const userFilePath = `${userId}/${filePath}`;
         const userFilePathArray = userFilePath.split("/");
-        userFilePathArray.pop();
-        userFilePathArray.push(newFileName);
+
+        const isFolder = userFilePathArray.pop() === "";
+
+        if (isFolder) {
+            userFilePathArray.pop();
+        }
+
+        userFilePathArray.push(isFolder ? `${newFileName}/` : newFileName);
+
         const newUserFileName = userFilePathArray.join("/");
+
+        if (isFolder) {
+            return this.storageConfig.renameFolder(userFilePath, newUserFileName);
+        }
 
         return this.storageConfig.renameFile(userFilePath, newUserFileName);
     };
@@ -49,5 +60,9 @@ export class FilesService {
     createFolder = async (userId: string, folderName: string) => {
         const userFolderName = `${userId}/${folderName}`;
         return this.storageConfig.createFolder(userFolderName);
+    };
+
+    delete = async (fileIds: string[]) => {
+        return this.storageConfig.deleteFiles(fileIds);
     };
 }

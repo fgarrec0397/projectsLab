@@ -8,7 +8,7 @@ export type TableProps = {
     orderBy: string;
     //
     selected: string[];
-    onSelectRow: (id: string) => void;
+    onSelectRow: (event: React.MouseEvent<HTMLElement>, id: string) => void;
     onSelectAllRows: (checked: boolean, newSelecteds: string[]) => void;
     //
     onResetPage: VoidFunction;

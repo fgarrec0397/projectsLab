@@ -18,7 +18,7 @@ import { useSnackbar } from "@/components/snackbar";
 import { useBoolean } from "@/hooks/use-boolean";
 import { useCopyToClipboard } from "@/hooks/use-copy-to-clipboard";
 import { useDoubleClick } from "@/hooks/use-double-click";
-import { renameFile, renameFolder } from "@/services/filesService/filesService";
+import { renameFile } from "@/services/filesService/filesService";
 import { IFolderManager } from "@/types/file";
 
 import FileManagerFileDetails from "./file-manager-file-details";
@@ -27,12 +27,12 @@ import { useFolderNavigation } from "./hooks/use-folder-navigation";
 
 // ----------------------------------------------------------------------
 
-interface Props extends CardProps {
+type Props = CardProps & {
     folder: IFolderManager;
     selected?: boolean;
-    onSelect?: VoidFunction;
+    onSelect?: (event: React.MouseEvent<HTMLElement>) => void;
     onDelete: VoidFunction;
-}
+};
 
 export default function FileManagerFolderItem({
     folder,
@@ -81,7 +81,12 @@ export default function FileManagerFolderItem({
         editFolder.onFalse();
         setFolderName(folderName);
 
-        await renameFolder(user?.accessToken, folder.name, folderName);
+        await renameFile(user?.accessToken, folder.path, folderName);
+    };
+
+    const handleOnClickActions = (event: React.MouseEvent<HTMLElement>) => {
+        event.stopPropagation();
+        popover.onOpen(event);
     };
 
     const renderAction = (
@@ -94,7 +99,7 @@ export default function FileManagerFolderItem({
                 position: "absolute",
             }}
         >
-            <IconButton color={popover.open ? "inherit" : "default"} onClick={popover.onOpen}>
+            <IconButton color={popover.open ? "inherit" : "default"} onClick={handleOnClickActions}>
                 <Iconify icon="eva:more-vertical-fill" />
             </IconButton>
         </Stack>
@@ -114,7 +119,7 @@ export default function FileManagerFolderItem({
             <Box
                 component="img"
                 src="/assets/icons/files/ic_folder.svg"
-                sx={{ width: 36, height: 36 }}
+                sx={{ width: 32, height: 32 }}
             />
         );
 
@@ -183,7 +188,7 @@ export default function FileManagerFolderItem({
                     }}
                 >
                     <Iconify icon="solar:pen-bold" />
-                    Edit
+                    Rename
                 </MenuItem>
 
                 <Divider sx={{ borderStyle: "dashed" }} />
@@ -218,6 +223,7 @@ export default function FileManagerFolderItem({
                 onUpdate={handleRenameFolder}
                 folderName={folderName}
                 onChangeFolderName={handleChangeFolderName}
+                showUpload={false}
             />
 
             <ConfirmDialog

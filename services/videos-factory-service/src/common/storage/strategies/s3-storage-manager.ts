@@ -12,8 +12,10 @@ type S3StorageManagerTypes = {
     getFiles: AWS.S3.ObjectList;
     uploadFile: AWS.S3.ManagedUpload.SendData;
     renameFile: void;
+    renameFolder: void;
     createFolder: AWS.S3.PutObjectOutput;
     downloadFile: void;
+    deleteFiles: void;
 };
 
 @Injectable()
@@ -153,8 +155,6 @@ export class S3StorageManager implements StorageStrategy<S3StorageManagerTypes> 
     }
 
     async renameFile(fileName: string, newFileName: string): Promise<void> {
-        console.log({ fileName, newFileName });
-
         try {
             await this.s3
                 .copyObject({
@@ -171,6 +171,46 @@ export class S3StorageManager implements StorageStrategy<S3StorageManagerTypes> 
                 })
                 .promise();
         } catch (error) {
+            throw error;
+        }
+    }
+
+    async renameFolder(folderName: string, newFolderName: string): Promise<void> {
+        try {
+            const listObjectsResponse = await this.s3
+                .listObjectsV2({
+                    Bucket: this.bucketName,
+                    Prefix: folderName,
+                })
+                .promise();
+
+            console.log(listObjectsResponse.Contents, "listObjectsResponse.Contents");
+
+            for (const object of listObjectsResponse.Contents || []) {
+                const oldKey = object.Key!;
+                const newKey = oldKey.replace(folderName, newFolderName);
+
+                console.log(object.Key, "object.Key");
+
+                await this.s3
+                    .copyObject({
+                        Bucket: this.bucketName,
+                        CopySource: `${this.bucketName}/${oldKey}`,
+                        Key: newKey,
+                    })
+                    .promise();
+
+                await this.s3
+                    .deleteObject({
+                        Bucket: this.bucketName,
+                        Key: oldKey,
+                    })
+                    .promise();
+            }
+
+            console.log(`Folder renamed from ${folderName} to ${newFolderName}`);
+        } catch (error) {
+            console.error("Error renaming folder:", error);
             throw error;
         }
     }
@@ -195,6 +235,20 @@ export class S3StorageManager implements StorageStrategy<S3StorageManagerTypes> 
             fs.writeFileSync(path.join(destinationPath, fileName), data.Body as Buffer);
         } catch (error) {
             throw new Error("Error downloading file: " + error);
+        }
+    }
+
+    async deleteFiles(fileIds: string[]): Promise<void> {
+        try {
+            for (const fileId of fileIds)
+                await this.s3
+                    .deleteObject({
+                        Bucket: this.bucketName,
+                        Key: fileId,
+                    })
+                    .promise();
+        } catch (error) {
+            throw error;
         }
     }
 

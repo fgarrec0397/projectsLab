@@ -35,7 +35,7 @@ export const uploadFiles = async (
     const formData = new FormData();
     const url = `${endpoints.files.post}`;
 
-    const swrKey = [accessToken, undefined];
+    const swrKey: GetFilesParams = [accessToken, undefined];
 
     files.forEach((file, index) => {
         formData.append(`files[${index}]`, file);
@@ -63,7 +63,7 @@ export const createFolder = async (
     path: string | undefined // TODO - implement createFolder in a specific folder later
 ) => {
     const url = `${endpoints.files.createFolder}?folderName=${folderName}`;
-    const swrKey = [accessToken, undefined];
+    const swrKey: GetFilesParams = [accessToken, undefined];
 
     try {
         const response = await axios.post(url, undefined, {
@@ -89,7 +89,7 @@ export const renameFile = async (
     newFileName: string | undefined
 ) => {
     const url = `${endpoints.files.rename}`;
-    const swrKey = [accessToken, undefined];
+    const swrKey: GetFilesParams = [accessToken, undefined];
 
     try {
         const response = await axios.patch(
@@ -119,15 +119,15 @@ export const renameFolder = async (
     folderName: string | undefined,
     newFolderName: string | undefined
 ) => {
-    const url = `${endpoints.files.createFolder}`;
-    const swrKey = [accessToken, undefined];
+    const url = `${endpoints.files.rename}`;
+    const swrKey: GetFilesParams = [accessToken, undefined];
 
     try {
-        const response = await axios.post(
+        const response = await axios.patch(
             url,
             {
-                folderName,
-                newFolderName,
+                filePath: folderName,
+                newFileName: newFolderName,
             },
             {
                 headers: {
@@ -136,6 +136,32 @@ export const renameFolder = async (
                 },
             }
         );
+
+        mutate(swrKey);
+
+        return response.data;
+    } catch (error) {
+        throw error;
+    }
+};
+
+export const deleteFiles = async (accessToken: string | undefined, fileId: string | string[]) => {
+    let fileIdParam = fileId;
+
+    if (Array.isArray(fileIdParam)) {
+        fileIdParam = fileIdParam.join(",");
+    }
+
+    const url = `${endpoints.files.delete}?fileIds=${fileIdParam}`;
+    const swrKey: GetFilesParams = [accessToken, undefined];
+
+    try {
+        const response = await axios.delete(url, {
+            headers: {
+                Accept: "application/json",
+                Authorization: `Bearer ${accessToken}`,
+            },
+        });
 
         mutate(swrKey);
 

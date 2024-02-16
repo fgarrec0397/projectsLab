@@ -43,8 +43,6 @@ export default function FileManagerGridView({
 
     const [folderName, setFolderName] = useState("");
 
-    const share = useBoolean();
-
     const newFolder = useBoolean();
 
     const upload = useBoolean();
@@ -94,7 +92,12 @@ export default function FileManagerGridView({
                                     key={folder.id}
                                     folder={folder as IFolderManager}
                                     selected={selected.includes(folder.id)}
-                                    onSelect={() => onSelectItem(folder.id)}
+                                    onSelect={(event) =>
+                                        onSelectItem(
+                                            event as React.MouseEvent<HTMLElement>,
+                                            folder.id
+                                        )
+                                    }
                                     onDelete={() => onDeleteItem(folder.id)}
                                     sx={{ maxWidth: "auto" }}
                                 />
@@ -132,7 +135,12 @@ export default function FileManagerGridView({
                                     key={file.id}
                                     file={file}
                                     selected={selected.includes(file.id)}
-                                    onSelect={() => onSelectItem(file.id)}
+                                    onSelect={(event) =>
+                                        onSelectItem(
+                                            event as React.MouseEvent<HTMLElement>,
+                                            file.id
+                                        )
+                                    }
                                     onDelete={() => onDeleteItem(file.id)}
                                     sx={{ maxWidth: "auto" }}
                                 />
@@ -162,16 +170,6 @@ export default function FileManagerGridView({
                                     sx={{ mr: 1 }}
                                 >
                                     Delete
-                                </Button>
-
-                                <Button
-                                    color="primary"
-                                    size="small"
-                                    variant="contained"
-                                    startIcon={<Iconify icon="solar:share-bold" />}
-                                    onClick={share.onTrue}
-                                >
-                                    Share
                                 </Button>
                             </>
                         }

@@ -10,6 +10,7 @@ import { usePrevious } from "@projectslab/helpers-client";
 import { useCallback, useEffect, useState } from "react";
 
 import { FILE_TYPE_OPTIONS } from "@/_mock";
+import { useAuthContext } from "@/auth/hooks";
 import CustomBreadcrumbs from "@/components/custom-breadcrumbs";
 import { ConfirmDialog } from "@/components/custom-dialog";
 import EmptyContent from "@/components/empty-content";
@@ -20,6 +21,7 @@ import { useSettingsContext } from "@/components/settings";
 import { useSnackbar } from "@/components/snackbar";
 import { getComparator, useTable } from "@/components/table";
 import { useBoolean } from "@/hooks/use-boolean";
+import { deleteFiles } from "@/services/filesService/filesService";
 import { useGetFiles } from "@/services/filesService/hooks/useGetFiles";
 import { pxToRem } from "@/theme/typography";
 import { IFile, IFileFilters, IFileFilterValue } from "@/types/file";
@@ -46,6 +48,8 @@ const defaultFilters: IFileFilters = {
 const showDisplayToggles = false;
 
 export default function FileManagerView() {
+    const auth = useAuthContext();
+
     const breadcrumbsLinks = useFolderBreadcrumbs();
 
     const previousBreadcrumbsLinks = usePrevious(breadcrumbsLinks);
@@ -78,11 +82,6 @@ export default function FileManagerView() {
         filters,
         dateError,
     });
-
-    const dataInPage = dataFiltered.slice(
-        table.page * table.rowsPerPage,
-        table.page * table.rowsPerPage + table.rowsPerPage
-    );
 
     const canReset =
         !!filters.name || !!filters.type.length || (!!filters.startDate && !!filters.endDate);
@@ -124,30 +123,28 @@ export default function FileManagerView() {
     }, []);
 
     const handleDeleteItem = useCallback(
-        (id: string) => {
-            const deleteRow = tableData.filter((row) => row.id !== id);
+        async (id: string) => {
+            enqueueSnackbar(`Deleting item...`, {
+                variant: "warning",
+            });
 
-            enqueueSnackbar("Delete success!");
+            await deleteFiles(auth.user?.accessToken, id);
 
-            setTableData(deleteRow);
-
-            table.onUpdatePageDeleteRow(dataInPage.length);
+            enqueueSnackbar("Item deleted with success!");
         },
-        [dataInPage.length, enqueueSnackbar, table, tableData]
+        [auth.user?.accessToken, enqueueSnackbar]
     );
 
-    const handleDeleteItems = useCallback(() => {
-        const deleteRows = tableData.filter((row) => !table.selected.includes(row.id));
-
-        enqueueSnackbar("Delete success!");
-
-        setTableData(deleteRows);
-
-        table.onUpdatePageDeleteRows({
-            totalRowsInPage: dataInPage.length,
-            totalRowsFiltered: dataFiltered.length,
+    const handleDeleteItems = useCallback(async () => {
+        enqueueSnackbar(`Deleting ${table.selected.length} items...`, {
+            variant: "warning",
         });
-    }, [dataFiltered.length, dataInPage.length, enqueueSnackbar, table, tableData]);
+        await deleteFiles(auth.user?.accessToken, table.selected);
+
+        enqueueSnackbar(`${table.selected.length} items were delected with success!`);
+
+        table.setSelected([]);
+    }, [auth.user?.accessToken, enqueueSnackbar, table]);
 
     const renderFilters = (
         <Stack

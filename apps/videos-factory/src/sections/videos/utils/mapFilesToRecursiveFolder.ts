@@ -1,33 +1,28 @@
 import { IFile } from "@/types/file";
 
-type Folder = {
-    [key: string]: Folder | IFile[];
+export type RecuriveFilesTree = {
+    [key: string]: RecuriveFilesTree | IFile;
 };
 
-export const mapFilesToRecursiveFolder = (assets: IFile[]): Folder => {
-    const root: Folder = {};
+export const mapFilesToRecursiveFolder = (files: IFile[]): RecuriveFilesTree => {
+    const root: RecuriveFilesTree = {};
 
-    assets.forEach((asset) => {
-        const pathParts = asset.id.split("/");
+    files.forEach((file) => {
+        const parts = file.id.split("/");
         let currentLevel = root;
 
-        for (let i = 0; i < pathParts.length; i++) {
-            const part = pathParts[i];
+        parts.shift();
 
-            if (i === pathParts.length - 1) {
-                // It's a file
-                if (!Array.isArray(currentLevel[part])) {
-                    currentLevel[part] = [];
-                }
-                (currentLevel[part] as IFile[]).push(asset);
+        parts.forEach((part, index) => {
+            if (index === parts.length - 1) {
+                currentLevel[part] = file;
             } else {
-                // It's a folder
                 if (!currentLevel[part]) {
                     currentLevel[part] = {};
                 }
-                currentLevel = currentLevel[part] as Folder;
+                currentLevel = currentLevel[part] as RecuriveFilesTree;
             }
-        }
+        });
     });
 
     return root;

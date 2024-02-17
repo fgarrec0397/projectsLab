@@ -4,13 +4,14 @@ import { SyntheticEvent, useMemo } from "react";
 import { useGetFiles } from "@/services/filesService/hooks/useGetFiles";
 
 import { mapFilesToRecursiveFolder } from "../utils/mapFilesToRecursiveFolder";
+import RecursiveFilesTree from "./recursive-files-tree";
 
 export default function FilesSelector() {
-    const { files } = useGetFiles();
+    const { allFiles } = useGetFiles();
 
-    const mappedFiles = useMemo(() => mapFilesToRecursiveFolder(files), [files]);
+    const mappedFiles = useMemo(() => mapFilesToRecursiveFolder(allFiles), [allFiles]);
 
-    console.log(files, "files");
+    console.log(allFiles, "allFiles");
     console.log(mappedFiles, "mappedFiles");
 
     const handleSelect = (event: SyntheticEvent<Element, Event>, nodeIds: string[]) => {
@@ -19,15 +20,7 @@ export default function FilesSelector() {
 
     return (
         <TreeView aria-label="file system navigator" onNodeSelect={handleSelect} multiSelect>
-            <TreeItem nodeId="1" label="Applications">
-                <TreeItem nodeId="2" label="Calendar" />
-            </TreeItem>
-            <TreeItem nodeId="5" label="Documents">
-                <TreeItem nodeId="10" label="OSS" />
-                <TreeItem nodeId="6" label="MUI">
-                    <TreeItem nodeId="8" label="index.js" />
-                </TreeItem>
-            </TreeItem>
+            <RecursiveFilesTree files={mappedFiles} />
         </TreeView>
     );
 }

@@ -1,14 +1,9 @@
 import { IFile } from "@/types/file";
 
 export const rootFileFilter = (file: IFile) => {
-    const pathWithTrailingSlash = file.path.substring(0, file.path.length - 1);
+    const isFileAtRoot = file.path.split("/").length <= 2;
 
-    const isPathContainsSlash = pathWithTrailingSlash.includes("/");
-    console.log({ file, pathWithTrailingSlash, isPathContainsSlash });
-
-    const isFileDeeper = file.path.split("/").length > 2;
-
-    return !isFileDeeper;
+    return !isFileAtRoot;
 };
 
 export const noneRootFileFilter = (file: IFile, currentPath: string) => {

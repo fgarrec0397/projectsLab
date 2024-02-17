@@ -34,7 +34,6 @@ export const useGetFiles = () => {
 
     const files = useMemo(() => {
         const isRoot = !pathParam;
-        console.log({ isRoot, data });
 
         if (isRoot) {
             return data?.filter(rootFileFilter);
@@ -46,11 +45,12 @@ export const useGetFiles = () => {
     const memoizedResponse = useMemo(
         () => ({
             files: files || [],
+            allFiles: data || [],
             isFilesLoading: isLoading,
             filesError: error,
             isFilesValidating: isValidating,
         }),
-        [files, isLoading, error, isValidating]
+        [files, data, isLoading, error, isValidating]
     );
     return memoizedResponse;
 };

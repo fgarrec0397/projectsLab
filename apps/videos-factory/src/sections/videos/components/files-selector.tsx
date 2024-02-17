@@ -11,7 +11,7 @@ export default function FilesSelector() {
 
     const mappedFiles = useMemo(() => mapFilesToRecursiveFolder(allFiles), [allFiles]);
 
-    console.log(allFiles, "allFiles");
+    // console.log(allFiles, "allFiles");
     console.log(mappedFiles, "mappedFiles");
 
     const handleSelect = (event: SyntheticEvent<Element, Event>, nodeIds: string[]) => {

@@ -14,10 +14,17 @@ export const mapFilesToRecursiveFolder = (files: IFile[]): RecuriveFilesTree => 
         parts.shift();
 
         parts.forEach((part, index) => {
+            if (part === "") {
+                return;
+            }
+
             if (index === parts.length - 1) {
                 currentLevel[part] = file;
             } else {
                 if (!currentLevel[part]) {
+                    console.log(currentLevel[part], "currentLevel[part]");
+                    console.log(file, "file");
+
                     currentLevel[part] = {};
                 }
                 currentLevel = currentLevel[part] as RecuriveFilesTree;

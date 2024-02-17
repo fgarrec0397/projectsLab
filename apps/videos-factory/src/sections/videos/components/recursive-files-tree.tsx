@@ -17,7 +17,7 @@ export default function RecursiveFilesTree({ files }: Props) {
                 }
 
                 return (
-                    <TreeItem key={file.id} nodeId={file.id} label={file.name}>
+                    <TreeItem key={fileKey} nodeId={fileKey} label={fileKey}>
                         <RecursiveFilesTree files={files[fileKey] as RecuriveFilesTree} />
                     </TreeItem>
                 );

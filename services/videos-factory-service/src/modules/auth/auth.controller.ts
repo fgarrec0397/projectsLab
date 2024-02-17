@@ -16,7 +16,7 @@ export class AuthController {
     async createSession(@Body("idToken") idToken: string, @Req() req: Request) {
         try {
             const firebaseUser = await this.authService.verifyIdToken(idToken);
-            req.session.uid = firebaseUser.uid;
+            (req.session as any).uid = firebaseUser.uid;
 
             return { success: true };
         } catch (error) {
@@ -27,7 +27,7 @@ export class AuthController {
     @Post("logout")
     async logout(@Req() req: Request, @Res() res: Response) {
         try {
-            const uid = req.session.uid;
+            const uid = (req.session as any).uid;
 
             await this.authService.revokeRefreshTokens(uid);
 

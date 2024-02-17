@@ -1,4 +1,4 @@
-import VideosView from "@/sections/videos/view";
+import VideosListView from "@/sections/videos/view/videos-list-view";
 
 // ----------------------------------------------------------------------
 
@@ -7,5 +7,5 @@ export const metadata = {
 };
 
 export default function Page() {
-    return <VideosView />;
+    return <VideosListView />;
 }

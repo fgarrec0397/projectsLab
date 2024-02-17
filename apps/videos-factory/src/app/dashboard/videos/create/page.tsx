@@ -1,4 +1,4 @@
-import VideosCreateView from "@/sections/videos/videos-create-view";
+import VideosCreateView from "@/sections/videos/view/videos-create-view";
 
 // ----------------------------------------------------------------------
 

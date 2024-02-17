@@ -11,13 +11,6 @@
   },
   "prettier": "@projectslab/prettier-config",
   "dependencies": {
-    "@projectslab/eslint-config": "*",
-    "@projectslab/helpers": "*",
-    "@projectslab/helpers-client": "*",
-    "@projectslab/prettier-config": "*",
-    "@projectslab/next-pwa": "*",
-    "@projectslab/typescript-config": "*",
-    "@projectslab/ui": "*",
     "@auth0/auth0-react": "^2.2.3",
     "@emotion/cache": "^11.10.5",
     "@emotion/react": "^11.11.1",
@@ -32,11 +25,19 @@
     "@hello-pangea/dnd": "^16.5.0",
     "@hookform/resolvers": "^3.3.2",
     "@iconify/react": "^4.1.1",
-    "@mui/lab": "^5.0.0-alpha.155",
+    "@mui/lab": "^5.0.0-alpha.165",
     "@mui/material": "^5.14.20",
     "@mui/system": "^5.14.20",
     "@mui/x-data-grid": "^6.18.4",
     "@mui/x-date-pickers": "^6.18.4",
+    "@mui/x-tree-view": "^6.17.0",
+    "@projectslab/eslint-config": "*",
+    "@projectslab/helpers": "*",
+    "@projectslab/helpers-client": "*",
+    "@projectslab/next-pwa": "*",
+    "@projectslab/prettier-config": "*",
+    "@projectslab/typescript-config": "*",
+    "@projectslab/ui": "*",
     "@react-pdf/renderer": "^3.1.14",
     "@supabase/supabase-js": "^2.39.0",
     "apexcharts": "^3.44.2",
@@ -95,6 +96,5 @@
     "@typescript-eslint/eslint-plugin": "^6.13.2",
     "@typescript-eslint/parser": "^6.13.2",
     "typescript": "^5.3.3"
-
   }
 }

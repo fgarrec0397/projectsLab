@@ -4,8 +4,11 @@ export const rootFileFilter = (file: IFile) => {
     const pathWithTrailingSlash = file.path.substring(0, file.path.length - 1);
 
     const isPathContainsSlash = pathWithTrailingSlash.includes("/");
+    console.log({ file, pathWithTrailingSlash, isPathContainsSlash });
 
-    return !isPathContainsSlash;
+    const isFileDeeper = file.path.split("/").length > 2;
+
+    return !isFileDeeper;
 };
 
 export const noneRootFileFilter = (file: IFile, currentPath: string) => {

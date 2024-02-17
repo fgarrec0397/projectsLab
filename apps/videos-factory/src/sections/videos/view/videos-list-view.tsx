@@ -9,7 +9,7 @@ import { useSettingsContext } from "@/components/settings";
 
 // ----------------------------------------------------------------------
 
-export default function VideosView() {
+export default function VideosListView() {
     const settings = useSettingsContext();
 
     return (

@@ -34,6 +34,7 @@ export const useGetFiles = () => {
 
     const files = useMemo(() => {
         const isRoot = !pathParam;
+        console.log({ isRoot, data });
 
         if (isRoot) {
             return data?.filter(rootFileFilter);

@@ -12,4 +12,8 @@ export const endpoints = {
         delete: `${baseURL}/files`,
         createFolder: `${baseURL}/files/createFolder`,
     },
+    videos: {
+        get: `${baseURL}/video`,
+        post: `${baseURL}/video`,
+    },
 };

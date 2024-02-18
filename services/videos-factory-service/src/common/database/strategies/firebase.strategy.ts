@@ -10,7 +10,7 @@ type FirebaseTypes = {
 };
 
 @Injectable()
-export class Firebase implements DatabaseStrategy<FirebaseTypes> {
+export class FirebaseDatabase implements DatabaseStrategy<FirebaseTypes> {
     private defaultApp: admin.app.App;
 
     init() {

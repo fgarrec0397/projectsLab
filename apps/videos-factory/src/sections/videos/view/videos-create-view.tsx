@@ -21,10 +21,11 @@ import Typography from "@mui/material/Typography";
 import Grid from "@mui/system/Unstable_Grid";
 import { m } from "framer-motion";
 import { useRouter } from "next/navigation";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 import * as Yup from "yup";
 
+import { useAuthContext } from "@/auth/hooks";
 import { varHover } from "@/components/animate";
 import { PrimaryButton, SecondaryButton } from "@/components/button";
 import { TertiaryButton } from "@/components/button/tertiary-button";
@@ -41,6 +42,7 @@ import { useSettingsContext } from "@/components/settings";
 import { useSnackbar } from "@/components/snackbar";
 import { useBoolean } from "@/hooks/use-boolean";
 import { FileManagerView } from "@/sections/file-manager/view";
+import { getOrCreateVideoDraft } from "@/services/videosService/videosService";
 import { icon } from "@/theme/icons";
 import { pxToRem } from "@/theme/typography";
 
@@ -49,12 +51,21 @@ import FilesSelector from "../components/files-selector";
 // ----------------------------------------------------------------------
 
 export default function VideosCreateView() {
+    const auth = useAuthContext();
     const router = useRouter();
     const { enqueueSnackbar } = useSnackbar();
     const settings = useSettingsContext();
     const [isEditingVideoName, setIsEditingVideoName] = useState(false);
     const isFilesModalOpen = useBoolean();
     const [videoName, setVideoName] = useState("Your awesome video");
+
+    useEffect(() => {
+        const fetchFunction = async () => {
+            await getOrCreateVideoDraft(auth.user?.accessToken); // TODO use useSWR to fetch this
+        };
+
+        fetchFunction();
+    }, [auth.user?.accessToken]);
 
     const NewVideoSchema = Yup.object().shape({
         name: Yup.string().required("Name is required"),

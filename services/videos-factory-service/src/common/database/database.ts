@@ -1,14 +1,12 @@
 import { Inject, Injectable } from "@nestjs/common";
 
 export type DatabaseTypes = {
-    getDB: unknown;
     get: unknown;
     set: unknown;
 };
 
 export interface DatabaseStrategy<T extends DatabaseTypes> {
     init(): void;
-    getDB(): T["getDB"];
     get(collectionPath: string, documentId: string): T["get"];
     set<TData>(collectionPath: string, documentId: string, data: TData): T["set"];
 }
@@ -23,10 +21,6 @@ export class Database<T extends DatabaseTypes> {
 
     init() {
         this.databaseStrategy.init();
-    }
-
-    getDB() {
-        return this.databaseStrategy.getDB();
     }
 
     get(collectionPath: string, documentId: string) {

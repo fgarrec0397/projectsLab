@@ -10,6 +10,7 @@ export type TableProps = {
     selected: string[];
     onSelectRow: (event: React.MouseEvent<HTMLElement>, id: string) => void;
     onSelectAllRows: (checked: boolean, newSelecteds: string[]) => void;
+    resetSelected: VoidFunction;
     //
     onResetPage: VoidFunction;
     onSort: (id: string) => void;

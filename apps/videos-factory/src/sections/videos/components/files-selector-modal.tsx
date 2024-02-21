@@ -52,6 +52,7 @@ export default function FilesSelectorModal({
         const selectedFiles = allFiles.filter((x) => selected.findIndex((s) => s === x.id) !== -1);
 
         onSelectFiles(selectedFiles);
+        setSelected([]);
     };
 
     return (

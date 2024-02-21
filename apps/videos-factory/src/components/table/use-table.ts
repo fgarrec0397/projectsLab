@@ -28,6 +28,10 @@ export default function useTable(props?: UseTableProps): ReturnType {
 
     const [selected, setSelected] = useState<string[]>(props?.defaultSelected || []);
 
+    const resetSelected = useCallback(() => {
+        setSelected([]);
+    }, []);
+
     const onSort = useCallback(
         (id: string) => {
             const isAsc = orderBy === id && order === "asc";
@@ -127,6 +131,7 @@ export default function useTable(props?: UseTableProps): ReturnType {
         selected,
         onSelectRow,
         onSelectAllRows,
+        resetSelected,
         //
         onSort,
         onChangePage,

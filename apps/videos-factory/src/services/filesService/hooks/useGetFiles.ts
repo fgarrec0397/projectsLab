@@ -52,5 +52,6 @@ export const useGetFiles = () => {
         }),
         [files, data, isLoading, error, isValidating]
     );
+
     return memoizedResponse;
 };

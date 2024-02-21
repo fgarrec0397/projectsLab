@@ -5,7 +5,7 @@ import { CacheModule } from "./common/cache/cache.module";
 import { ConfigModule } from "./config.module";
 import { AuthModule } from "./modules/auth/auth.module";
 import { FilesModule } from "./modules/files/files.module";
-import { VideoModule } from "./modules/video/video.module";
+import { VideosModule } from "./modules/videos/videos.module";
 
 @Module({
     imports: [
@@ -13,7 +13,7 @@ import { VideoModule } from "./modules/video/video.module";
         ConfigModule,
         CacheModule,
         AuthModule,
-        VideoModule,
+        VideosModule,
         FilesModule,
     ],
 })

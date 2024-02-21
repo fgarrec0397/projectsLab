@@ -30,7 +30,7 @@ import { useFolderNavigation } from "./hooks/use-folder-navigation";
 type Props = {
     row: IFileManager;
     selected: boolean;
-    onSelectRow: VoidFunction;
+    onSelectRow: (event: React.MouseEvent<HTMLElement>) => void;
     onDeleteRow: VoidFunction;
 };
 

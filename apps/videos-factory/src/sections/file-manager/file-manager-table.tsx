@@ -158,7 +158,7 @@ export default function FileManagerTable({
                                         key={row.id}
                                         row={row}
                                         selected={selected.includes(row.id)}
-                                        onSelectRow={() => onSelectRow(row.id)}
+                                        onSelectRow={(event) => onSelectRow(event, row.id)}
                                         onDeleteRow={() => onDeleteRow(row.id)}
                                     />
                                 ))}

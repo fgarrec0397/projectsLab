@@ -30,9 +30,9 @@ export const getVideoById = async (accessToken: string | undefined, videoId: str
 };
 
 export const getOrCreateVideoDraft = async (accessToken: string | undefined) => {
-    const url = `${endpoints.videos.post}`;
+    const url = `${endpoints.videos.getOrCreateDraft}`;
 
-    const response = await axios.post<IVideo>(url, undefined, {
+    const response = await axios.get<IVideo>(url, {
         headers: {
             Accept: "application/json",
             Authorization: `Bearer ${accessToken}`,

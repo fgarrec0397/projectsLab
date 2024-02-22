@@ -4,7 +4,6 @@ import { SyntheticEvent, useMemo, useState } from "react";
 
 import { PrimaryButton } from "@/components/button";
 import { TertiaryButton } from "@/components/button/tertiary-button";
-import { useGetFiles } from "@/services/filesService/hooks/useGetFiles";
 import { icon } from "@/theme/icons";
 import { IFile } from "@/types/file";
 
@@ -13,20 +12,21 @@ import RecursiveFilesTree from "./recursive-files-tree";
 
 type Props = {
     isFilesModalOpen: boolean;
+    files: IFile[];
     onCloseFilesModal: () => void;
     onSelectFiles: (files: IFile[]) => void;
 };
 
 export default function FilesSelectorModal({
     isFilesModalOpen,
+    files,
     onCloseFilesModal,
     onSelectFiles,
 }: Props) {
-    const { allFiles } = useGetFiles();
     const [selected, setSelected] = useState<string[]>([]);
     const [expanded, setExpanded] = useState<string[]>([]);
 
-    const mappedFiles = useMemo(() => mapFilesToRecursiveFolder(allFiles), [allFiles]);
+    const mappedFiles = useMemo(() => mapFilesToRecursiveFolder(files), [files]);
 
     const handleSelect = (event: SyntheticEvent, nodeIds: string[]) => {
         const newSelected = [...selected];
@@ -49,14 +49,14 @@ export default function FilesSelectorModal({
     };
 
     const handleSelectFilesClick = () => {
-        const selectedFiles = allFiles.filter((x) => selected.findIndex((s) => s === x.id) !== -1);
+        const selectedFiles = files.filter((x) => selected.findIndex((s) => s === x.id) !== -1);
 
         onSelectFiles(selectedFiles);
         setSelected([]);
     };
 
     return (
-        <Dialog open={isFilesModalOpen} fullWidth>
+        <Dialog open={isFilesModalOpen} fullWidth onClose={onCloseFilesModal}>
             <DialogTitle>Select the files</DialogTitle>
             <DialogContent>
                 <TreeView

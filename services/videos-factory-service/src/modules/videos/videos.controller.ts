@@ -38,8 +38,6 @@ export class VideoController {
             .then((docRef) => console.log("Video added with ID: ", docRef.id))
             .catch((error) => console.error("Error adding video: ", error));
 
-        // this.database.set();
-
         return { result: "video created" };
     }
 
@@ -55,8 +53,6 @@ export class VideoController {
 
     @Patch("draft/save")
     async saveDraft(@Req() request: Request, @Body() videoDraft: IVideoDraft) {
-        console.log(videoDraft, "saveDraft in controller");
-
         return this.videosService.saveLastVideoDraft(request.userId, videoDraft);
     }
 }

@@ -11,7 +11,6 @@ export class VideosService {
     async getOrCreateLastVideoDraft(userId: string) {
         const videoCollectionPath = `users/${userId}/videos`;
         const lastVideoDraft = await this.getLastVideoDraft(userId);
-        console.log(lastVideoDraft, "lastVideoDraft get");
 
         if (lastVideoDraft) {
             return lastVideoDraft;
@@ -35,7 +34,6 @@ export class VideosService {
         };
 
         const createdDocument = await this.database.create(videoCollectionPath, defaultVideoDraft);
-        console.log(createdDocument, "createdDocument");
 
         return createdDocument;
     }
@@ -45,8 +43,6 @@ export class VideosService {
         const lastVideoDraft = await this.database.findWithQuery<IVideoDraft>(videoCollectionPath, [
             { field: "isDraft", operator: "==", value: true },
         ]);
-
-        console.log(lastVideoDraft[0], "lastVideoDraft[0]");
 
         return lastVideoDraft[0];
     }

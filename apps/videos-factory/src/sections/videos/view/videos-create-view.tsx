@@ -24,27 +24,21 @@ import { useAuthContext } from "@/auth/hooks";
 import { varHover } from "@/components/animate";
 import { SecondaryButton } from "@/components/button";
 import { TertiaryButton } from "@/components/button/tertiary-button";
-import { ConfirmDialog } from "@/components/custom-dialog";
-import EmptyContent from "@/components/empty-content";
 import FormProvider, {
     RHFRadioGroup,
     RHFSelect,
     RHFSlider,
     RHFTextField,
 } from "@/components/hook-form";
+import RHFFilesSelector from "@/components/hook-form/rhf-files-selector";
 import { useSettingsContext } from "@/components/settings";
 import { useSnackbar } from "@/components/snackbar";
-import { useTable } from "@/components/table";
-import { useBoolean } from "@/hooks/use-boolean";
+import { useGetFiles } from "@/services/filesService/hooks/useGetFiles";
 import { useGetOrCreateVideoDraft } from "@/services/videosService/hooks/useGetOrCreateVideoDraft";
 import { saveDraft } from "@/services/videosService/videosService";
 import { icon } from "@/theme/icons";
 import { pxToRem } from "@/theme/typography";
-import { IFile } from "@/types/file";
-import { IFormVideo, IVideo } from "@/types/video";
-
-import FilesSelectorModal from "../components/files-selector-modal";
-import FilesTable from "../components/files-table";
+import { IFormVideo } from "@/types/video";
 
 // ----------------------------------------------------------------------
 
@@ -64,15 +58,10 @@ export default function VideosCreateView() {
     const auth = useAuthContext();
     const { enqueueSnackbar } = useSnackbar();
     const settings = useSettingsContext();
+    const { allFiles } = useGetFiles();
     const [isEditingVideoName, setIsEditingVideoName] = useState(false);
-    const [files, setFiles] = useState<IFile[]>([]);
-    const isFilesModalOpen = useBoolean();
-    const isConfirmRemoveModalOpen = useBoolean();
     const [videoName, setVideoName] = useState("Your awesome video");
     const { videoDraft } = useGetOrCreateVideoDraft();
-    const table = useTable();
-
-    console.log(videoDraft, "videoDraft");
 
     const NewVideoSchema = Yup.object().shape({
         name: Yup.string().required("Name is required"),
@@ -89,7 +78,8 @@ export default function VideosCreateView() {
         moreSpecificities: Yup.string(),
         files: Yup.array()
             .of(Yup.string().required())
-            .required("You must add some files to your video"),
+            .min(1, "You must have at least one file for you video")
+            .required("Files are required"),
     });
 
     const defaultValues = useMemo<IFormVideo>(() => {
@@ -115,14 +105,7 @@ export default function VideosCreateView() {
         defaultValues,
     });
 
-    const { reset, handleSubmit, control, setValue } = methods;
-
-    useEffect(() => {
-        setValue(
-            "files",
-            files.map((x) => x.id)
-        );
-    }, [files, files.length, setValue]);
+    const { reset, handleSubmit, control } = methods;
 
     useEffect(() => {
         if (videoDraft) {
@@ -153,31 +136,6 @@ export default function VideosCreateView() {
             console.error(error);
         }
     });
-
-    const onSelectFiles = (selectedFiles: IFile[]) => {
-        isFilesModalOpen.onFalse();
-        setFiles(selectedFiles);
-    };
-
-    const removeSelectedFromTable = () => {
-        setFiles((prev) => {
-            const filtered = prev.filter((x) => {
-                const isSelected = table.selected.findIndex((item) => item === x.id) !== -1;
-
-                return !isSelected;
-            });
-            return filtered;
-        });
-
-        table.resetSelected();
-        isConfirmRemoveModalOpen.onFalse();
-    };
-
-    const onTableRemoveFile = (fileId: string) => {
-        setFiles((prev) => {
-            return prev.filter((x) => x.id !== fileId);
-        });
-    };
 
     return (
         <>
@@ -320,39 +278,7 @@ export default function VideosCreateView() {
                             </Card>
                         </Grid>
                         <Grid xs={12} md={6}>
-                            <Card sx={{ height: "100%" }}>
-                                <CardHeader
-                                    title="Assets"
-                                    sx={{ mb: 2 }}
-                                    action={
-                                        <>
-                                            {table.selected.length > 0 && (
-                                                <Button onClick={isConfirmRemoveModalOpen.onTrue}>
-                                                    Remove
-                                                </Button>
-                                            )}
-                                            <Button onClick={isFilesModalOpen.onTrue}>Add</Button>
-                                        </>
-                                    }
-                                />
-                                <CardContent>
-                                    {files.length ? (
-                                        <FilesTable
-                                            table={table}
-                                            files={files}
-                                            onRemoveFile={onTableRemoveFile}
-                                        />
-                                    ) : (
-                                        <EmptyContent
-                                            filled
-                                            title="No Data"
-                                            sx={{
-                                                py: 10,
-                                            }}
-                                        />
-                                    )}
-                                </CardContent>
-                            </Card>
+                            <RHFFilesSelector name="files" label="Assets" files={allFiles} />
                         </Grid>
                         <Grid xs={12} md={6}>
                             <Card>
@@ -420,24 +346,6 @@ export default function VideosCreateView() {
                     </Grid>
                 </Container>
             </FormProvider>
-            <FilesSelectorModal
-                isFilesModalOpen={isFilesModalOpen.value}
-                onCloseFilesModal={isFilesModalOpen.onFalse}
-                onSelectFiles={onSelectFiles}
-            />
-            <ConfirmDialog
-                open={isConfirmRemoveModalOpen.value}
-                onClose={isConfirmRemoveModalOpen.onFalse}
-                title="Remove"
-                content={`Are you sure want to remove ${table.selected.length} file${
-                    table.selected.length > 1 ? "s" : ""
-                } from the list?`}
-                action={
-                    <Button variant="contained" color="error" onClick={removeSelectedFromTable}>
-                        Remove
-                    </Button>
-                }
-            />
         </>
     );
 }

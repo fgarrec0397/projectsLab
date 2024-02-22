@@ -45,6 +45,8 @@ export class FirebaseDatabase {
             [x: string]: any;
         },
     >(collection: string, id: string, data: TData) {
+        console.log({ collection, id });
+
         return this.getDB().collection(collection).doc(id).update(data);
     }
 
@@ -52,7 +54,7 @@ export class FirebaseDatabase {
         return this.getDB().collection(collection).doc(id).delete();
     }
 
-    async findWithQuery(
+    async findWithQuery<TData>(
         collection: string,
         conditions: { field: string; operator: WhereFilterOp; value: any }[],
         orderByField?: string,
@@ -75,7 +77,12 @@ export class FirebaseDatabase {
 
         const snapshot = await query.get();
 
-        return snapshot.docs.map((doc) => doc.data());
+        const data = snapshot.docs.map((doc) => ({
+            ...doc.data(),
+            documentId: doc.id,
+        }));
+
+        return data as TData[];
     }
 
     private removeUndefinedProperties(obj: Record<string, any>): Record<string, any> {

@@ -1,12 +1,13 @@
-import { Controller, Get, Post, Req } from "@nestjs/common";
+import { Body, Controller, Get, Patch, Post, Req } from "@nestjs/common";
 import { Request } from "express";
 import { DatabaseConfig, InjectDatabase } from "src/config/database-config.module";
 
 import { Public } from "../auth/decorators/use-public.guard";
 import { VideoGeneratorService } from "./services/generateVideo.service";
 import { VideosService } from "./services/videos.service";
+import { IVideoDraft } from "./videosTypes";
 
-@Controller("video")
+@Controller("videos")
 export class VideoController {
     constructor(
         @InjectDatabase() private readonly database: DatabaseConfig,
@@ -18,11 +19,6 @@ export class VideoController {
     @Public()
     async getVideo() {
         return "not authenticated route";
-    }
-
-    @Get("getOrCreateDraft")
-    async getOrCreateVideoDraft(@Req() request: Request) {
-        return this.videosService.getLastVideoDraft(request.userId);
     }
 
     @Post()
@@ -50,5 +46,17 @@ export class VideoController {
     @Post("render/:id")
     async renderVideo() {
         this.videoGeneratorService.renderVideo();
+    }
+
+    @Get("draft/getOrCreate")
+    async getOrCreateVideoDraft(@Req() request: Request) {
+        return this.videosService.getOrCreateLastVideoDraft(request.userId);
+    }
+
+    @Patch("draft/save")
+    async saveDraft(@Req() request: Request, @Body() videoDraft: IVideoDraft) {
+        console.log(videoDraft, "saveDraft in controller");
+
+        return this.videosService.saveLastVideoDraft(request.userId, videoDraft);
     }
 }

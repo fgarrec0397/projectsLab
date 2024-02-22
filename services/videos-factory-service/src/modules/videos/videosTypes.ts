@@ -1,3 +1,5 @@
+import { BaseResult } from "src/common/database/databaseTypes";
+
 import { BaseElement } from "./components/VideoRenderer/Entities/BaseElement";
 
 export type TimedText = {
@@ -21,7 +23,7 @@ export type Template = {
     elements: BaseElement[];
 };
 
-export type IVideo = {
+export type IVideo = BaseResult & {
     id: string;
     name: string;
     location: string;
@@ -36,3 +38,4 @@ export type IVideo = {
     pace: string;
     moreSpecificities?: string;
 };
+export type IVideoDraft = Partial<IVideo>;

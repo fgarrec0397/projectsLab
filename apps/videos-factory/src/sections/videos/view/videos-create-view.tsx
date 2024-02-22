@@ -20,6 +20,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 import * as Yup from "yup";
 
+import { useAuthContext } from "@/auth/hooks";
 import { varHover } from "@/components/animate";
 import { SecondaryButton } from "@/components/button";
 import { TertiaryButton } from "@/components/button/tertiary-button";
@@ -36,9 +37,11 @@ import { useSnackbar } from "@/components/snackbar";
 import { useTable } from "@/components/table";
 import { useBoolean } from "@/hooks/use-boolean";
 import { useGetOrCreateVideoDraft } from "@/services/videosService/hooks/useGetOrCreateVideoDraft";
+import { saveDraft } from "@/services/videosService/videosService";
 import { icon } from "@/theme/icons";
 import { pxToRem } from "@/theme/typography";
 import { IFile } from "@/types/file";
+import { IFormVideo, IVideo } from "@/types/video";
 
 import FilesSelectorModal from "../components/files-selector-modal";
 import FilesTable from "../components/files-table";
@@ -58,6 +61,7 @@ const STRUCTURE_TYPE_OPTIONS = [
 ];
 
 export default function VideosCreateView() {
+    const auth = useAuthContext();
     const { enqueueSnackbar } = useSnackbar();
     const settings = useSettingsContext();
     const [isEditingVideoName, setIsEditingVideoName] = useState(false);
@@ -68,12 +72,14 @@ export default function VideosCreateView() {
     const { videoDraft } = useGetOrCreateVideoDraft();
     const table = useTable();
 
+    console.log(videoDraft, "videoDraft");
+
     const NewVideoSchema = Yup.object().shape({
         name: Yup.string().required("Name is required"),
         location: Yup.string().required("Location is required"),
-        age: Yup.array().of(Yup.number()),
-        gender: Yup.string().default("all"),
-        language: Yup.string().default("en-US"),
+        age: Yup.array().of(Yup.number().required()).required("Age is required"),
+        gender: Yup.string().required("Gender is required").default("all"),
+        language: Yup.string().required("Language is required").default("en-US"),
         interests: Yup.string(),
         chanllenges: Yup.string(),
         contentType: Yup.string().required(),
@@ -81,11 +87,13 @@ export default function VideosCreateView() {
         structureType: Yup.string().required(),
         pace: Yup.string().required(),
         moreSpecificities: Yup.string(),
-        files: Yup.array().of(Yup.string()),
+        files: Yup.array()
+            .of(Yup.string().required())
+            .required("You must add some files to your video"),
     });
 
-    const defaultValues = useMemo(
-        () => ({
+    const defaultValues = useMemo<IFormVideo>(() => {
+        return {
             name: "Your new awesome video",
             location: "",
             age: [18, 36],
@@ -99,11 +107,10 @@ export default function VideosCreateView() {
             pace: "mix",
             moreSpecificities: undefined,
             files: [],
-        }),
-        []
-    );
+        };
+    }, []);
 
-    const methods = useForm({
+    const methods = useForm<IFormVideo>({
         resolver: yupResolver(NewVideoSchema),
         defaultValues,
     });
@@ -117,14 +124,29 @@ export default function VideosCreateView() {
         );
     }, [files, files.length, setValue]);
 
-    const onSaveDraft = () => {
-        console.log({ formValues: control._formValues }, "control save draft");
+    useEffect(() => {
+        if (videoDraft) {
+            reset({
+                ...defaultValues,
+                ...videoDraft,
+            });
+        }
+    }, [videoDraft, reset, defaultValues]);
+
+    const onSaveDraft = async () => {
+        try {
+            await saveDraft(auth.user?.accessToken, {
+                ...control._formValues,
+                documentId: videoDraft?.documentId,
+            });
+            enqueueSnackbar("Video draft saved with success!");
+        } catch (error) {
+            enqueueSnackbar("The video draft was not saved correctly", { variant: "error" });
+        }
     };
 
     const onSubmit = handleSubmit(async (data) => {
         try {
-            console.log(data, "data");
-
             reset();
             enqueueSnackbar("Video created with success!");
         } catch (error) {

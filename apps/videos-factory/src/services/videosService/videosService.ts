@@ -1,7 +1,7 @@
 import axios from "axios";
 
 import { endpoints } from "@/routes/endpoints";
-import { IVideo } from "@/types/video";
+import { IVideo, IVideoDraft } from "@/types/video";
 
 export const getVideos = async (accessToken: string | undefined) => {
     const url = `${endpoints.videos.get}`;
@@ -30,9 +30,22 @@ export const getVideoById = async (accessToken: string | undefined, videoId: str
 };
 
 export const getOrCreateVideoDraft = async (accessToken: string | undefined) => {
-    const url = `${endpoints.videos.getOrCreateDraft}`;
+    const url = `${endpoints.videos.draft.getOrCreate}`;
 
-    const response = await axios.get<IVideo>(url, {
+    const response = await axios.get<IVideoDraft>(url, {
+        headers: {
+            Accept: "application/json",
+            Authorization: `Bearer ${accessToken}`,
+        },
+    });
+
+    return response.data;
+};
+
+export const saveDraft = async (accessToken: string | undefined, videoDraft: IVideoDraft) => {
+    const url = `${endpoints.videos.draft.save}`;
+
+    const response = await axios.patch<IVideoDraft>(url, videoDraft, {
         headers: {
             Accept: "application/json",
             Authorization: `Bearer ${accessToken}`,

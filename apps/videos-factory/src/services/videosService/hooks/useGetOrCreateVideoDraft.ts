@@ -4,13 +4,14 @@ import { useMemo } from "react";
 import useSWR from "swr";
 
 import { useAuthContext } from "@/auth/hooks";
+import { IVideoDraft } from "@/types/video";
 
 import { getOrCreateVideoDraft } from "../videosService";
 
 export const useGetOrCreateVideoDraft = () => {
     const auth = useAuthContext();
 
-    const { data, isLoading, error, isValidating } = useSWR(
+    const { data, isLoading, error, isValidating } = useSWR<IVideoDraft>(
         auth.user?.accessToken,
         getOrCreateVideoDraft,
         {

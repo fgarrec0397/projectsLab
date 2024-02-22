@@ -13,8 +13,11 @@ export const endpoints = {
         createFolder: `${baseURL}/files/createFolder`,
     },
     videos: {
-        get: `${baseURL}/video`,
-        post: `${baseURL}/video`,
-        getOrCreateDraft: `${baseURL}/video/getOrCreateDraft`,
+        get: `${baseURL}/videos`,
+        post: `${baseURL}/videos`,
+        draft: {
+            getOrCreate: `${baseURL}/videos/draft/getOrCreate`,
+            save: `${baseURL}/videos/draft/save`,
+        },
     },
 };

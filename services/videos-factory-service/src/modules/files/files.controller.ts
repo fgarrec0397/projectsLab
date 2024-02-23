@@ -15,14 +15,15 @@ import {
 } from "@nestjs/common";
 import { AnyFilesInterceptor } from "@nestjs/platform-express";
 import { Request } from "express";
+import { getAuthCacheKey } from "src/common/cache/cache.utils";
 import { UseCache } from "src/common/cache/decorators/use-cache.decorator";
 import { UseInvalidateCache } from "src/common/cache/decorators/use-invalidate-cache.decorator";
-import { WEEK_IN_SECONDS } from "src/common/constants";
+import { MONTH_IN_SECONDS } from "src/common/constants";
 
 import { FilesMapper } from "./files.mapper";
 import { FilesService } from "./files.service";
 
-const filesCacheKey = (request: Request) => `files-list-${request.query.userId}`;
+const filesCacheKey = getAuthCacheKey("files-list");
 
 @Controller("files")
 export class FilesController {
@@ -32,7 +33,7 @@ export class FilesController {
     ) {}
 
     @Get()
-    @UseCache(filesCacheKey, WEEK_IN_SECONDS)
+    @UseCache(filesCacheKey, MONTH_IN_SECONDS)
     async getFiles(
         @Req() request: Request,
         @Query("path") path: string | undefined,

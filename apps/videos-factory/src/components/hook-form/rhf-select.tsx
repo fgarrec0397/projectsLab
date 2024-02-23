@@ -5,16 +5,17 @@ import FormControl, { FormControlProps } from "@mui/material/FormControl";
 import FormHelperText from "@mui/material/FormHelperText";
 import InputLabel from "@mui/material/InputLabel";
 import MenuItem from "@mui/material/MenuItem";
-import Select from "@mui/material/Select";
+import Select, { SelectProps } from "@mui/material/Select";
 import { SxProps, Theme } from "@mui/material/styles";
-import TextField, { TextFieldProps } from "@mui/material/TextField";
 import { Controller, useFormContext } from "react-hook-form";
 
 // ----------------------------------------------------------------------
 
-type RHFSelectProps = TextFieldProps & {
+type RHFSelectProps = SelectProps & {
     name: string;
+    label?: string;
     native?: boolean;
+    helperText?: string;
     maxHeight?: boolean | number;
     children: React.ReactNode;
     PaperPropsSx?: SxProps<Theme>;
@@ -22,9 +23,10 @@ type RHFSelectProps = TextFieldProps & {
 
 export function RHFSelect({
     name,
+    label,
     native,
-    maxHeight = 220,
     helperText,
+    maxHeight = 220,
     children,
     PaperPropsSx,
     ...other
@@ -36,13 +38,12 @@ export function RHFSelect({
             name={name}
             control={control}
             render={({ field, fieldState: { error } }) => (
-                <TextField
-                    {...field}
-                    select
-                    fullWidth
-                    SelectProps={{
-                        native,
-                        MenuProps: {
+                <>
+                    <Select
+                        {...field}
+                        fullWidth
+                        native={native}
+                        MenuProps={{
                             PaperProps: {
                                 sx: {
                                     ...(!native && {
@@ -52,15 +53,19 @@ export function RHFSelect({
                                     ...PaperPropsSx,
                                 },
                             },
-                        },
-                        sx: { textTransform: "capitalize" },
-                    }}
-                    error={!!error}
-                    helperText={error ? error?.message : helperText}
-                    {...other}
-                >
-                    {children}
-                </TextField>
+                        }}
+                        sx={{ textTransform: "capitalize" }}
+                        error={!!error}
+                        {...other}
+                    >
+                        {children}
+                    </Select>
+                    {!!error && (
+                        <FormHelperText error sx={{ px: 2, textAlign: "center" }}>
+                            {error.message}
+                        </FormHelperText>
+                    )}
+                </>
             )}
         />
     );

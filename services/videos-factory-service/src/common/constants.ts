@@ -1,4 +1,14 @@
-export const WEEK_IN_SECONDS = 604800;
+export const ONE_SECOND = 1;
+
+export const MINUTE_IN_SECONDS = ONE_SECOND * 60;
+
+export const HOUR_IN_SECONDS = MINUTE_IN_SECONDS * 60;
+
+export const DAY_IN_SECONDS = HOUR_IN_SECONDS * 24;
+
+export const WEEK_IN_SECONDS = DAY_IN_SECONDS * 7;
+
+export const MONTH_IN_SECONDS = WEEK_IN_SECONDS * 4;
 
 export const countries: string[] = [
     "Afghanistan",

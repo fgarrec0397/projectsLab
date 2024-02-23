@@ -1,4 +1,5 @@
 import axios from "axios";
+import { mutate } from "swr";
 
 import { endpoints } from "@/routes/endpoints";
 import { IVideo, IVideoDraft } from "@/types/video";
@@ -51,6 +52,8 @@ export const saveDraft = async (accessToken: string | undefined, videoDraft: IVi
             Authorization: `Bearer ${accessToken}`,
         },
     });
+
+    mutate(accessToken);
 
     return response.data;
 };

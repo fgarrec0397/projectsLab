@@ -33,6 +33,10 @@ export default function RHFFilesSelector({ name, label, helperText, files }: Pro
             (x) => (control._formValues[name] as string[]).findIndex((y) => y === x.id) !== -1
         );
 
+        if (!filesToInit.length) {
+            return;
+        }
+
         setSelectedFiles(filesToInit);
     }, [files, control._formValues, name]);
 

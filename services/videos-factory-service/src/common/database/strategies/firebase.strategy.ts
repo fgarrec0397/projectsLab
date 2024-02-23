@@ -6,13 +6,27 @@ import { DatabaseStrategy } from "../database";
 
 type FirebaseTypes = {
     getDB: admin.firestore.Firestore;
-    get: Promise<admin.firestore.DocumentData>;
-    set: Promise<admin.firestore.WriteResult>;
+    create: Promise<
+        admin.firestore.DocumentReference<
+            admin.firestore.DocumentData,
+            admin.firestore.DocumentData
+        >
+    >;
+    findAll: Promise<
+        admin.firestore.QuerySnapshot<admin.firestore.DocumentData, admin.firestore.DocumentData>
+    >;
+    findOne: Promise<
+        admin.firestore.DocumentSnapshot<admin.firestore.DocumentData, admin.firestore.DocumentData>
+    >;
+    update: Promise<admin.firestore.WriteResult>;
+    delete: Promise<admin.firestore.WriteResult>;
+    findWithQuery: unknown;
+    operator: WhereFilterOp;
 };
 
 @Injectable()
-// export class FirebaseDatabase implements DatabaseStrategy<FirebaseTypes> { // TODO - bring changes to the database core class
-export class FirebaseDatabase {
+export class FirebaseDatabase implements DatabaseStrategy<FirebaseTypes> {
+    // TODO - bring changes to the database core class
     private defaultApp: admin.app.App;
 
     init() {
@@ -45,8 +59,6 @@ export class FirebaseDatabase {
             [x: string]: any;
         },
     >(collection: string, id: string, data: TData) {
-        console.log({ collection, id });
-
         return this.getDB().collection(collection).doc(id).update(data);
     }
 

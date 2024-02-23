@@ -1,11 +1,17 @@
 import { Body, Controller, Get, Patch, Post, Req } from "@nestjs/common";
 import { Request } from "express";
+import { getAuthCacheKey } from "src/common/cache/cache.utils";
+import { UseCache } from "src/common/cache/decorators/use-cache.decorator";
+import { UseInvalidateCache } from "src/common/cache/decorators/use-invalidate-cache.decorator";
+import { MONTH_IN_SECONDS } from "src/common/constants";
 import { DatabaseConfig, InjectDatabase } from "src/config/database-config.module";
 
 import { Public } from "../auth/decorators/use-public.guard";
 import { VideoGeneratorService } from "./services/generateVideo.service";
 import { VideosService } from "./services/videos.service";
 import { IVideoDraft } from "./videosTypes";
+
+const videosCacheKey = getAuthCacheKey("videos");
 
 @Controller("videos")
 export class VideoController {
@@ -47,11 +53,13 @@ export class VideoController {
     }
 
     @Get("draft/getOrCreate")
+    @UseCache(videosCacheKey, MONTH_IN_SECONDS)
     async getOrCreateVideoDraft(@Req() request: Request) {
         return this.videosService.getOrCreateLastVideoDraft(request.userId);
     }
 
     @Patch("draft/save")
+    @UseInvalidateCache(videosCacheKey)
     async saveDraft(@Req() request: Request, @Body() videoDraft: IVideoDraft) {
         return this.videosService.saveLastVideoDraft(request.userId, videoDraft);
     }

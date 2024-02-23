@@ -5,12 +5,10 @@ import {
     Card,
     CardContent,
     CardHeader,
-    Divider,
     IconButton,
     inputBaseClasses,
     MenuItem,
     Stack,
-    TextField,
 } from "@mui/material";
 import Container from "@mui/material/Container";
 import Typography from "@mui/material/Typography";
@@ -31,6 +29,7 @@ import FormProvider, {
     RHFTextField,
 } from "@/components/hook-form";
 import RHFFilesSelector from "@/components/hook-form/rhf-files-selector";
+import { LoadingScreen } from "@/components/loading-screen";
 import { useSettingsContext } from "@/components/settings";
 import { useSnackbar } from "@/components/snackbar";
 import { useGetFiles } from "@/services/filesService/hooks/useGetFiles";
@@ -60,8 +59,7 @@ export default function VideosCreateView() {
     const settings = useSettingsContext();
     const { allFiles } = useGetFiles();
     const [isEditingVideoName, setIsEditingVideoName] = useState(false);
-    const [videoName, setVideoName] = useState("Your awesome video");
-    const { videoDraft } = useGetOrCreateVideoDraft();
+    const { videoDraft, isVideoDraftLoading } = useGetOrCreateVideoDraft();
 
     const NewVideoSchema = Yup.object().shape({
         name: Yup.string().required("Name is required"),
@@ -70,7 +68,7 @@ export default function VideosCreateView() {
         gender: Yup.string().required("Gender is required").default("all"),
         language: Yup.string().required("Language is required").default("en-US"),
         interests: Yup.string(),
-        chanllenges: Yup.string(),
+        challenges: Yup.string(),
         contentType: Yup.string().required(),
         specificityLevel: Yup.string().required(),
         structureType: Yup.string().required(),
@@ -90,10 +88,10 @@ export default function VideosCreateView() {
             gender: "all",
             language: "en-US",
             interests: undefined,
-            chanllenges: undefined,
+            challenges: undefined,
             contentType: "",
-            specificityLevel: "broader audience",
-            structureType: "quick tips",
+            specificityLevel: SPECIFICITY_OPTIONS[0].value,
+            structureType: STRUCTURE_TYPE_OPTIONS[0].value,
             pace: "mix",
             moreSpecificities: undefined,
             files: [],
@@ -130,12 +128,18 @@ export default function VideosCreateView() {
 
     const onSubmit = handleSubmit(async (data) => {
         try {
+            console.log(data, "data");
+
             reset();
             enqueueSnackbar("Video created with success!");
         } catch (error) {
             console.error(error);
         }
     });
+
+    if (isVideoDraftLoading) {
+        return <LoadingScreen />;
+    }
 
     return (
         <>
@@ -151,16 +155,14 @@ export default function VideosCreateView() {
                     >
                         {isEditingVideoName ? (
                             <Stack direction="row" alignItems="center">
-                                <TextField
-                                    value={videoName}
-                                    onChange={(event) => setVideoName(event.target.value)}
+                                <RHFTextField
+                                    name="name"
                                     fullWidth
                                     sx={{
                                         marginTop: pxToRem(-10),
                                         paddingTop: pxToRem(2),
                                         paddingBottom: pxToRem(2),
                                         [`&.${inputBaseClasses.root}`]: {
-                                            // py: 0.75,
                                             borderRadius: 1,
                                             typography: "h4",
                                             borderWidth: 2,
@@ -193,7 +195,7 @@ export default function VideosCreateView() {
                             </Stack>
                         ) : (
                             <Stack direction="row" alignItems="center">
-                                <Typography variant="h4"> {videoName} </Typography>
+                                <Typography variant="h4"> {control._formValues.name} </Typography>
                                 <IconButton
                                     component={m.button}
                                     whileTap="tap"
@@ -216,7 +218,7 @@ export default function VideosCreateView() {
                             <TertiaryButton onClick={onSaveDraft} sx={{ mr: 1 }}>
                                 Save Draft
                             </TertiaryButton>
-                            <SecondaryButton type="submit">Publish</SecondaryButton>
+                            <SecondaryButton type="submit">Start rendering</SecondaryButton>
                         </Stack>
                     </Stack>
 
@@ -266,11 +268,12 @@ export default function VideosCreateView() {
                                         </Grid>
                                         <Grid xs={12}>
                                             <RHFTextField
-                                                name="chanllenges"
+                                                name="challenges"
                                                 label="What challenges are they facing?"
                                                 fullWidth
                                                 multiline
                                                 minRows={3}
+                                                value={videoDraft?.challenges}
                                             />
                                         </Grid>
                                     </Grid>
@@ -293,13 +296,15 @@ export default function VideosCreateView() {
                                             />
                                         </Grid>
                                         <Grid xs={12} md={6}>
-                                            <RHFSelect name="specificityLevel" label="Specificity">
-                                                <MenuItem value="">None</MenuItem>
-                                                <Divider sx={{ borderStyle: "dashed" }} />
+                                            <RHFSelect
+                                                name="specificityLevel"
+                                                label="Specificity"
+                                                defaultValue={SPECIFICITY_OPTIONS[0].value}
+                                            >
                                                 {SPECIFICITY_OPTIONS.map((option) => (
                                                     <MenuItem
                                                         key={option.value}
-                                                        value={option.label}
+                                                        value={option.value}
                                                     >
                                                         {option.label}
                                                     </MenuItem>
@@ -307,11 +312,15 @@ export default function VideosCreateView() {
                                             </RHFSelect>
                                         </Grid>
                                         <Grid xs={12} md={6}>
-                                            <RHFSelect name="structureType" label="Structure type">
+                                            <RHFSelect
+                                                name="structureType"
+                                                label="Structure type"
+                                                defaultValue={STRUCTURE_TYPE_OPTIONS[0].value}
+                                            >
                                                 {STRUCTURE_TYPE_OPTIONS.map((option) => (
                                                     <MenuItem
                                                         key={option.value}
-                                                        value={option.label}
+                                                        value={option.value}
                                                     >
                                                         {option.label}
                                                     </MenuItem>
@@ -337,6 +346,7 @@ export default function VideosCreateView() {
                                                 fullWidth
                                                 multiline
                                                 minRows={3}
+                                                value={videoDraft?.moreSpecificities}
                                             />
                                         </Grid>
                                     </Grid>

@@ -57,3 +57,18 @@ export const saveDraft = async (accessToken: string | undefined, videoDraft: IVi
 
     return response.data;
 };
+
+export const startRendering = async (accessToken: string | undefined, videoDraft: IVideoDraft) => {
+    const url = `${endpoints.videos.startRendering}`;
+
+    const response = await axios.post<IVideoDraft>(url, videoDraft, {
+        headers: {
+            Accept: "application/json",
+            Authorization: `Bearer ${accessToken}`,
+        },
+    });
+
+    mutate(accessToken);
+
+    return response.data;
+};

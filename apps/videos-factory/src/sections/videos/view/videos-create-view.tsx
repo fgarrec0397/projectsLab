@@ -34,7 +34,7 @@ import { useSettingsContext } from "@/components/settings";
 import { useSnackbar } from "@/components/snackbar";
 import { useGetFiles } from "@/services/filesService/hooks/useGetFiles";
 import { useGetOrCreateVideoDraft } from "@/services/videosService/hooks/useGetOrCreateVideoDraft";
-import { saveDraft } from "@/services/videosService/videosService";
+import { saveDraft, startRendering } from "@/services/videosService/videosService";
 import { icon } from "@/theme/icons";
 import { pxToRem } from "@/theme/typography";
 import { IFormVideo } from "@/types/video";
@@ -127,13 +127,14 @@ export default function VideosCreateView() {
     };
 
     const onSubmit = handleSubmit(async (data) => {
+        console.log(data, "data");
         try {
-            console.log(data, "data");
+            await startRendering(auth.user?.accessToken, data);
 
             reset();
             enqueueSnackbar("Video created with success!");
         } catch (error) {
-            console.error(error);
+            enqueueSnackbar("Something went wrong", { variant: "error" });
         }
     });
 

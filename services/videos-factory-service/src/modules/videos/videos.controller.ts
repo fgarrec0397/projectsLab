@@ -7,17 +7,15 @@ import { MONTH_IN_SECONDS } from "src/common/constants";
 import { DatabaseConfig, InjectDatabase } from "src/config/database-config.module";
 
 import { Public } from "../auth/decorators/use-public.guard";
-import { VideoGeneratorService } from "./services/generateVideo.service";
 import { VideosService } from "./services/videos.service";
-import { IVideoDraft } from "./videosTypes";
+import { IVideo, IVideoDraft } from "./videosTypes";
 
 const videosCacheKey = getAuthCacheKey("videos");
 
 @Controller("videos")
-export class VideoController {
+export class VideosController {
     constructor(
         @InjectDatabase() private readonly database: DatabaseConfig,
-        private readonly videoGeneratorService: VideoGeneratorService,
         private readonly videosService: VideosService
     ) {}
 
@@ -29,8 +27,6 @@ export class VideoController {
 
     @Post()
     async createVideo(@Req() request: Request) {
-        console.log("createVideo");
-
         const userRef = this.database.getDB().collection("users").doc(request.userId);
         const videosRef = userRef.collection("videos");
         const videoData = {
@@ -47,9 +43,11 @@ export class VideoController {
         return { result: "video created" };
     }
 
-    @Post("render/:id")
-    async renderVideo() {
-        this.videoGeneratorService.renderVideo();
+    @Post("startRendering")
+    async renderVideo(@Req() request: Request, @Body() video: IVideo) {
+        console.log("startRendering");
+
+        this.videosService.startRendering(request.userId, video);
     }
 
     @Get("draft/getOrCreate")

@@ -14,7 +14,7 @@ export const endpoints = {
     },
     videos: {
         get: `${baseURL}/videos`,
-        post: `${baseURL}/videos`,
+        startRendering: `${baseURL}/videos/startRendering`,
         draft: {
             getOrCreate: `${baseURL}/videos/draft/getOrCreate`,
             save: `${baseURL}/videos/draft/save`,

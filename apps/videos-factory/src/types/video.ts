@@ -14,8 +14,9 @@ export type IVideo = {
     pace: string;
     moreSpecificities?: string;
     files: string[];
+    status: "draft" | "pending" | "rendering" | "rendered" | "publishing" | "published";
 };
 
 export type IVideoDraft = Partial<IVideo>;
 
-export type IFormVideo = Omit<IVideo, "id" | "documentId">;
+export type IFormVideo = Omit<IVideo, "id" | "documentId" | "status">;

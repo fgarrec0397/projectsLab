@@ -10,8 +10,8 @@ import { VideoRendererService } from "./submodules/video-renderer/video-renderer
 import { Template } from "./submodules/video-renderer/video-renderer.types";
 
 const canGenerateScript = true;
-const canGenerateTemplate = true;
-const canRenderVideo = true;
+const canGenerateTemplate = false;
+const canRenderVideo = false;
 
 @Injectable()
 export class VideoProcessingService {

@@ -28,7 +28,7 @@ export class VideosService {
             gender: "all",
             language: "en-US",
             interests: undefined,
-            chanllenges: undefined,
+            challenges: undefined,
             contentType: "",
             specificityLevel: "broader audience",
             structureType: "quick tips",

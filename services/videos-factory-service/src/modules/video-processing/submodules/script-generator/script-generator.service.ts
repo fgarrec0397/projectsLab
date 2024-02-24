@@ -5,7 +5,6 @@ import {
     VOICE_GENERATOR_STRATEGY_TOKEN,
 } from "src/common/dependencies_tokens";
 import { FileSystem } from "src/common/FileSystem";
-import { IVideo } from "src/modules/videos/videosTypes";
 
 import { TimedSentence, TimedText } from "../video-renderer/video-renderer.types";
 import { TextGeneratorStrategy } from "./strategies/TextGeneratorStrategy/TextGeneratorStrategy";
@@ -39,16 +38,16 @@ export class ScriptGeneratorService {
         private timestampsGeneratorStrategy: TimestampsGeneratorStrategy
     ) {}
 
-    async generateScript(video: IVideo) {
-        await this.generateText(video);
+    async generateScript() {
+        await this.generateText();
         await this.generateVoice();
         await this.generateTimestampsBasedOnAudio();
 
         return this.script;
     }
 
-    private async generateText(video: IVideo) {
-        this.text = await this.textGeneratorStrategy.generateText(video);
+    private async generateText() {
+        this.text = await this.textGeneratorStrategy.generateText();
     }
 
     private async generateVoice() {

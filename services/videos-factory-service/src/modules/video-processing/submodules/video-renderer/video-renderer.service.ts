@@ -1,8 +1,8 @@
 import { Injectable } from "@nestjs/common";
 import ffmpeg, { FfmpegCommand } from "fluent-ffmpeg";
 import { FileSystem } from "src/common/FileSystem";
+import { CanvasRendererService } from "src/modules/canvas-renderer/canvas-renderer.service";
 
-import { CanvasRendererService } from "../canvas-renderer/canvas-renderer.service";
 import { IElementComponent } from "./components/BaseComponent";
 import { IFragmentableComponent } from "./components/FragmentableComponent";
 import { SourceableElement } from "./entities/SourceableElement";

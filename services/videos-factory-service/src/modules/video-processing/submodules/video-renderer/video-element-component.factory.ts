@@ -1,4 +1,5 @@
-import { CanvasRendererService } from "../canvas-renderer/canvas-renderer.service";
+import { CanvasRendererService } from "src/modules/canvas-renderer/canvas-renderer.service";
+
 import { AudioComponent } from "./components/AudioComponent";
 import { IElementComponent } from "./components/BaseComponent";
 import { CompositionComponent } from "./components/CompositionComponent";

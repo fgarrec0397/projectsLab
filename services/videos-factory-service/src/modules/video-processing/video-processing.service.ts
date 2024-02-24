@@ -1,10 +1,13 @@
 import { HttpException, HttpStatus, Injectable } from "@nestjs/common";
 
-import { Script, ScriptGeneratorService } from "../script-generator/script-generator.service";
-import { TemplateGeneratorService } from "../template-generator/template-generator.service";
-import { VideoRendererService } from "../video-renderer/video-renderer.service";
-import { Template } from "../video-renderer/video-renderer.types";
 import { IVideo } from "../videos/videosTypes";
+import {
+    Script,
+    ScriptGeneratorService,
+} from "./submodules/script-generator/script-generator.service";
+import { TemplateGeneratorService } from "./submodules/template-generator/template-generator.service";
+import { VideoRendererService } from "./submodules/video-renderer/video-renderer.service";
+import { Template } from "./submodules/video-renderer/video-renderer.types";
 
 const canGenerateScript = true;
 const canGenerateTemplate = true;

@@ -5,9 +5,9 @@ import {
     VOICE_GENERATOR_STRATEGY_TOKEN,
 } from "src/common/dependencies_tokens";
 import { FileSystem } from "src/common/FileSystem";
+import { IVideo } from "src/modules/videos/videosTypes";
 
 import { TimedSentence, TimedText } from "../video-renderer/video-renderer.types";
-import { IVideo } from "../videos/videosTypes";
 import { TextGeneratorStrategy } from "./strategies/TextGeneratorStrategy/TextGeneratorStrategy";
 import { TimestampsGeneratorStrategy } from "./strategies/TimestampsGeneratorStrategy/TimestampsGeneratorStrategy";
 import { VoiceGeneratorStrategy } from "./strategies/VoiceGeneratorStrategy/VoiceGeneratorStrategy";

@@ -2,8 +2,8 @@ import { Injectable } from "@nestjs/common";
 import OpenAI from "openai";
 import { FileSystem } from "src/common/FileSystem";
 import { OpenAIModule } from "src/common/OpenAI";
-import { VideoUtils } from "src/modules/video-renderer/video.utils";
 
+import { VideoUtils } from "../../../video-renderer/video.utils";
 import { VoiceGeneratorStrategy } from "./VoiceGeneratorStrategy";
 
 @Injectable()

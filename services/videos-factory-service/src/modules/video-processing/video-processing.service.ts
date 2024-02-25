@@ -1,6 +1,5 @@
 import { HttpException, HttpStatus, Injectable } from "@nestjs/common";
 
-import { IVideo } from "../videos/videosTypes";
 import {
     Script,
     ScriptGeneratorService,
@@ -21,12 +20,12 @@ export class VideoProcessingService {
         private readonly videoService: VideoRendererService
     ) {}
 
-    async renderVideo(video: IVideo) {
+    async renderVideo() {
         let script: Script = {};
         let template: Template | undefined = undefined;
 
         if (canGenerateScript) {
-            script = await this.scriptService.generateScript(video);
+            script = await this.scriptService.generateScript();
         }
 
         if (canGenerateTemplate) {

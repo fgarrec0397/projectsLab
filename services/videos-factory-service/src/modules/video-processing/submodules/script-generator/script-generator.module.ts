@@ -1,5 +1,5 @@
 import { Module, Scope } from "@nestjs/common";
-import { ContextIdFactory, REQUEST } from "@nestjs/core";
+import { REQUEST } from "@nestjs/core";
 import { Request } from "express";
 import {
     TEXT_GENERATOR_STRATEGY_TOKEN,
@@ -17,8 +17,8 @@ import { OpenAIVoiceGeneratorStrategy } from "./strategies/VoiceGeneratorStrateg
         ScriptGeneratorService,
         {
             provide: TEXT_GENERATOR_STRATEGY_TOKEN,
-            useClass: OpenAITextGeneratorStrategy,
             useFactory: async (request: Request) => {
+                console.log(request.videoData, "request.videoData in useFactory");
                 return new OpenAITextGeneratorStrategy(request.videoData);
             },
             inject: [REQUEST],
@@ -26,21 +26,19 @@ import { OpenAIVoiceGeneratorStrategy } from "./strategies/VoiceGeneratorStrateg
         },
         {
             provide: VOICE_GENERATOR_STRATEGY_TOKEN,
-            useClass: OpenAIVoiceGeneratorStrategy,
-            // useFactory: async (request: Request) => {
-            //     return new OpenAIVoiceGeneratorStrategy(request.videoData);
-            // },
-            // inject: [REQUEST],
-            // scope: Scope.REQUEST,
+            useFactory: async (request: Request) => {
+                return new OpenAIVoiceGeneratorStrategy(request.videoData);
+            },
+            inject: [REQUEST],
+            scope: Scope.REQUEST,
         },
         {
             provide: TIMESTAMPS_GENERATOR_STRATEGY_TOKEN,
-            useClass: DeepgramTimestampsGeneratorStrategy,
-            // useFactory: async (request: Request) => {
-            //     return new DeepgramTimestampsGeneratorStrategy(request.videoData);
-            // },
-            // inject: [REQUEST],
-            // scope: Scope.REQUEST,
+            useFactory: async (request: Request) => {
+                return new DeepgramTimestampsGeneratorStrategy(request.videoData);
+            },
+            inject: [REQUEST],
+            scope: Scope.REQUEST,
         },
     ],
     exports: [ScriptGeneratorService],

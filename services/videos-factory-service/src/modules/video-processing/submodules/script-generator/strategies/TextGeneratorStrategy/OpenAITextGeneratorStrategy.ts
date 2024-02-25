@@ -21,6 +21,7 @@ export class OpenAITextGeneratorStrategy implements TextGeneratorStrategy {
     countries: string[] = allCountries;
 
     constructor(private readonly video: IVideo) {
+        console.log(this.video, "this.video in OpenAITextGeneratorStrategy");
         this.openAi = OpenAIModule.getModule();
     }
 
@@ -61,7 +62,7 @@ export class OpenAITextGeneratorStrategy implements TextGeneratorStrategy {
 
     private generatePrePrompt(options: PromptOptions): string[] {
         const { ageRange, locations, date, subjectsCount } = options;
-        const countryList = locations.join(", ");
+        const locationsList = locations.join(", ");
         const gender = this.getGender();
 
         return [
@@ -69,8 +70,10 @@ export class OpenAITextGeneratorStrategy implements TextGeneratorStrategy {
             You need to create your next video and search for some ideas. We are ${date} and you are about to summarize briefly your next video of “${this.video.contentType}”.
             `,
             `
-            Write me a ${this.video.structureType} text that would interest a [tiktok viewer] of age between ${ageRange} that happened in ${countryList}. Just write a simple and concise statement for 
-            each fact. This is a preprompt that will be used for another prompt`,
+            Write me a script where the structure of the script is ${this.video.structureType} of ${subjectsCount} subjects that would interest a ${gender} that likes ${this.video.interests} of age between ${ageRange}
+            that happens or is related to ${locationsList}. The audience faces ${this.video.challenges} as challenges and the script should appeal to a ${this.video.specificityLevel} audience;
+            ${this.video.moreSpecificities}. The script should be written in ${this.video.language} with a ${this.video.pace} pace.
+            This is a preprompt that will be used for another prompt`,
         ];
     }
 
@@ -135,8 +138,16 @@ export class OpenAITextGeneratorStrategy implements TextGeneratorStrategy {
     private getGender() {
         let gender = this.video.gender as string;
 
+        if (gender === "male") {
+            gender = "man";
+        }
+
+        if (gender === "female") {
+            gender = "girl";
+        }
+
         if (gender === "all") {
-            gender = "male and/or female";
+            gender = "man and/or girl";
         }
 
         return gender;

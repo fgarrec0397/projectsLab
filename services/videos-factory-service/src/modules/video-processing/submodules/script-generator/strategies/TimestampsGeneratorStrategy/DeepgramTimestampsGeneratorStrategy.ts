@@ -1,6 +1,7 @@
 import { DeepgramClient, SyncPrerecordedResponse } from "@deepgram/sdk";
 import { Injectable } from "@nestjs/common";
 import { DeepgramModule } from "src/common/Deepgram";
+import { IVideo } from "src/modules/videos/videosTypes";
 
 import { TimedSentence, TimedText } from "../../../video-renderer/video-renderer.types";
 import { TimestampsGeneratorStrategy } from "./TimestampsGeneratorStrategy";
@@ -9,7 +10,7 @@ import { TimestampsGeneratorStrategy } from "./TimestampsGeneratorStrategy";
 export class DeepgramTimestampsGeneratorStrategy implements TimestampsGeneratorStrategy {
     deepgramModule: DeepgramClient;
 
-    constructor() {
+    constructor(private readonly video: IVideo) {
         this.deepgramModule = DeepgramModule.getModule();
     }
 

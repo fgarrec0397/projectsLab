@@ -45,9 +45,11 @@ export class VideosController {
     }
 
     @Post("startRendering")
-    @UseInterceptors(VideoDataInterceptor)
+    // @UseInterceptors(VideoDataInterceptor)
     async renderVideo(@Req() request: Request, @Body() video: IVideo) {
-        this.videosService.startRendering(request.userId, video);
+        console.log(video, "video in renderVideo controller");
+
+        this.videosService.startRendering();
     }
 
     @Get("draft/getOrCreate")

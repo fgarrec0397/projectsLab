@@ -3,7 +3,7 @@ import { uidGenerator } from "@projectslab/helpers";
 import { DatabaseConfig, InjectDatabase } from "src/config/database-config.module";
 import { VideoProcessingService } from "src/modules/video-processing/video-processing.service";
 
-import { IVideo, IVideoDraft } from "../videosTypes";
+import { IVideoDraft } from "../videosTypes";
 
 @Injectable()
 export class VideosService {
@@ -63,7 +63,7 @@ export class VideosService {
         return updatedDocument;
     }
 
-    async startRendering(userId: string, video: IVideo) {
-        this.videoProcessingService.renderVideo(video);
+    async startRendering() {
+        this.videoProcessingService.renderVideo();
     }
 }

@@ -2,6 +2,7 @@ import { Injectable } from "@nestjs/common";
 import OpenAI from "openai";
 import { FileSystem } from "src/common/FileSystem";
 import { OpenAIModule } from "src/common/OpenAI";
+import { IVideo } from "src/modules/videos/videosTypes";
 
 import { VideoUtils } from "../../../video-renderer/video.utils";
 import { VoiceGeneratorStrategy } from "./VoiceGeneratorStrategy";
@@ -14,7 +15,7 @@ export class OpenAIVoiceGeneratorStrategy implements VoiceGeneratorStrategy {
 
     audio: Buffer | undefined;
 
-    constructor() {
+    constructor(private readonly video: IVideo) {
         this.openai = OpenAIModule.getModule();
     }
 

@@ -274,7 +274,6 @@ export default function VideosCreateView() {
                                                 fullWidth
                                                 multiline
                                                 minRows={3}
-                                                value={videoDraft?.challenges}
                                             />
                                         </Grid>
                                     </Grid>
@@ -347,7 +346,6 @@ export default function VideosCreateView() {
                                                 fullWidth
                                                 multiline
                                                 minRows={3}
-                                                value={videoDraft?.moreSpecificities}
                                             />
                                         </Grid>
                                     </Grid>

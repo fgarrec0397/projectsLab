@@ -1,6 +1,7 @@
-import { Module } from "@nestjs/common";
+import { MiddlewareConsumer, Module, RequestMethod } from "@nestjs/common";
 
 import { VideoProcessingModule } from "../video-processing/video-processing.module";
+import { VideoDataMiddleware } from "./middlewares/video-data.middleware";
 import { VideosService } from "./services/videos.service";
 import { VideosController } from "./videos.controller";
 
@@ -9,4 +10,10 @@ import { VideosController } from "./videos.controller";
     imports: [VideoProcessingModule],
     providers: [VideosService],
 })
-export class VideosModule {}
+export class VideosModule {
+    configure(consumer: MiddlewareConsumer) {
+        consumer
+            .apply(VideoDataMiddleware)
+            .forRoutes({ path: "videos/startRendering", method: RequestMethod.POST });
+    }
+}

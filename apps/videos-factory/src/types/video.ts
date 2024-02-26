@@ -8,7 +8,7 @@ export type IVideo = {
     language: string;
     interests?: string;
     challenges?: string;
-    contentType: string;
+    topic: string;
     specificityLevel: string;
     structureType: string;
     pace: string;

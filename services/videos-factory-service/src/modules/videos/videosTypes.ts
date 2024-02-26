@@ -17,7 +17,7 @@ export type IVideo = BaseResult & {
     language: string;
     interests?: string;
     challenges?: undefined;
-    contentType: string;
+    topic: string;
     specificityLevel: SpecificityLevel;
     structureType: StructureType;
     pace: Pace;

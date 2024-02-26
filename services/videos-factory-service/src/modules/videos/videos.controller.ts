@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Patch, Post, Req, UseInterceptors } from "@nestjs/common";
+import { Body, Controller, Get, Patch, Post, Req } from "@nestjs/common";
 import { Request } from "express";
 import { getAuthCacheKey } from "src/common/cache/cache.utils";
 import { UseCache } from "src/common/cache/decorators/use-cache.decorator";
@@ -7,7 +7,6 @@ import { MONTH_IN_SECONDS } from "src/common/constants";
 import { DatabaseConfig, InjectDatabase } from "src/config/database-config.module";
 
 import { Public } from "../auth/decorators/use-public.guard";
-import { VideoDataInterceptor } from "./interceptors/video-data.interceptor";
 import { VideosService } from "./services/videos.service";
 import { IVideo, IVideoDraft } from "./videosTypes";
 

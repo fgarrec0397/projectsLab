@@ -69,7 +69,7 @@ export default function VideosCreateView() {
         language: Yup.string().required("Language is required").default("en-US"),
         interests: Yup.string(),
         challenges: Yup.string(),
-        contentType: Yup.string().required(),
+        topic: Yup.string().required(),
         specificityLevel: Yup.string().required(),
         structureType: Yup.string().required(),
         pace: Yup.string().required(),
@@ -89,7 +89,7 @@ export default function VideosCreateView() {
             language: "en-US",
             interests: undefined,
             challenges: undefined,
-            contentType: "",
+            topic: "",
             specificityLevel: SPECIFICITY_OPTIONS[0].value,
             structureType: STRUCTURE_TYPE_OPTIONS[0].value,
             pace: "mix",
@@ -289,11 +289,7 @@ export default function VideosCreateView() {
                                 <CardContent>
                                     <Grid container spacing={3}>
                                         <Grid xs={12} md={6}>
-                                            <RHFTextField
-                                                name="contentType"
-                                                label="Type of content"
-                                                fullWidth
-                                            />
+                                            <RHFTextField name="topic" label="Topic" fullWidth />
                                         </Grid>
                                         <Grid xs={12} md={6}>
                                             <RHFSelect

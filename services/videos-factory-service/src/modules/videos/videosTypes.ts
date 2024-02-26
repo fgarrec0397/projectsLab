@@ -22,6 +22,7 @@ export type IVideo = BaseResult & {
     structureType: StructureType;
     pace: Pace;
     moreSpecificities?: string;
+    files: string[];
     status: "draft" | "pending" | "rendering" | "rendered" | "publishing" | "published";
 };
 

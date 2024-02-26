@@ -4,19 +4,22 @@ import {
     Script,
     ScriptGeneratorService,
 } from "./submodules/script-generator/script-generator.service";
-import { TemplateGeneratorService } from "./submodules/template-generator/template-generator.service";
+import {
+    InjectTemplateGenerator,
+    TemplateGeneratorService,
+} from "./submodules/template-generator/template-generator.service";
 import { VideoRendererService } from "./submodules/video-renderer/video-renderer.service";
 import { Template } from "./submodules/video-renderer/video-renderer.types";
 
 const canGenerateScript = true;
-const canGenerateTemplate = false;
-const canRenderVideo = false;
+const canGenerateTemplate = true;
+const canRenderVideo = true;
 
 @Injectable()
 export class VideoProcessingService {
     constructor(
         private readonly scriptService: ScriptGeneratorService,
-        private readonly templateService: TemplateGeneratorService,
+        @InjectTemplateGenerator() private readonly templateService: TemplateGeneratorService,
         private readonly videoService: VideoRendererService
     ) {}
 

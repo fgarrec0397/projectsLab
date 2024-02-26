@@ -1,7 +1,6 @@
 import { Injectable, Scope } from "@nestjs/common";
 import { format, getRandomNumber } from "@projectslab/helpers";
 import OpenAI from "openai";
-import { countries as allCountries } from "src/common/constants";
 import { OpenAIModule } from "src/common/OpenAI";
 import { IVideo } from "src/modules/videos/videosTypes";
 
@@ -11,10 +10,7 @@ import { TextGeneratorStrategy } from "./TextGeneratorStrategy";
 export class OpenAITextGeneratorStrategy implements TextGeneratorStrategy {
     openAi: OpenAI;
 
-    countries: string[] = allCountries;
-
     constructor(private readonly video: IVideo) {
-        console.log(this.video, "this.video in OpenAITextGeneratorStrategy");
         this.openAi = OpenAIModule.getModule();
     }
 

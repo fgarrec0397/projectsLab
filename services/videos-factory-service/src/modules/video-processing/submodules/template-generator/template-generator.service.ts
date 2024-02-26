@@ -1,8 +1,9 @@
-import { Injectable } from "@nestjs/common";
+import { Inject, Injectable, Scope } from "@nestjs/common";
 import OpenAI from "openai";
 import { FileSystem } from "src/common/FileSystem";
 import { OpenAIModule } from "src/common/OpenAI";
 import { InjectStorageConfig, StorageConfig } from "src/config/storage-config.module";
+import { IVideo } from "src/modules/videos/videosTypes";
 
 import { Script } from "../script-generator/script-generator.service";
 import { BaseElement } from "../video-renderer/entities/BaseElement";
@@ -24,7 +25,11 @@ export type MappedFetchedAsset = {
 
 export type TemplateAIElement = SourceableElementConfig;
 
-@Injectable()
+export const TEMPLATE_GENERATOR_SERVICE_TOKEN = "TemplateGeneratorService";
+
+export const InjectTemplateGenerator = () => Inject(TEMPLATE_GENERATOR_SERVICE_TOKEN);
+
+@Injectable({ scope: Scope.REQUEST })
 export class TemplateGeneratorService<T extends BaseTemplateData = BaseTemplateData> {
     templateElements: TemplateAIElement[] | undefined;
 
@@ -36,12 +41,16 @@ export class TemplateGeneratorService<T extends BaseTemplateData = BaseTemplateD
 
     data?: T;
 
-    constructor(@InjectStorageConfig() private storageConfig: StorageConfig) {
+    constructor(
+        @InjectStorageConfig() private storageConfig: StorageConfig,
+        private readonly video: IVideo
+    ) {
         this.openAi = OpenAIModule.getModule();
         this.templatePromptBuilder = new TemplatePromptBuilder();
     }
 
     async createTemplate() {
+        console.log(this.video, "this.video in template generator");
         await this.fetchAvailableAssets();
         await this.generateTemplateByAI();
 
@@ -57,16 +66,14 @@ export class TemplateGeneratorService<T extends BaseTemplateData = BaseTemplateD
     }
 
     private async fetchAvailableAssets() {
-        const filesList = await this.storageConfig.getFiles("assets");
-
-        this.mappedFetchedAssets = filesList?.map((x) => ({
-            id: x.Key,
-            name: this.storageConfig.getFileName(x.Key),
-            type: this.storageConfig.getFileExtension(x.Key),
-            url: this.storageConfig.getFileUrl(x.Key),
+        this.mappedFetchedAssets = this.video.files?.map((x) => ({
+            id: x,
+            name: this.storageConfig.getFileName(x),
+            type: this.storageConfig.getFileExtension(x),
+            url: this.storageConfig.getFileUrl(x),
         }));
 
-        console.log(JSON.stringify(filesList), "TemplateGenerator filesList");
+        console.log(JSON.stringify(this.video.files), "TemplateGenerator filesList");
         console.log(this.mappedFetchedAssets, "this.mappedFetchedAssets");
     }
 

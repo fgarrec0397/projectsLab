@@ -96,6 +96,17 @@ export class S3StorageManager implements StorageStrategy<S3StorageManagerTypes> 
         }
     }
 
+    async getFilesByIds(ids: string[]): Promise<AWS.S3.GetObjectOutput[]> {
+        const filesArray: AWS.S3.GetObjectOutput[] = [];
+
+        for (const id of ids) {
+            const result = await this.getFile(id);
+            filesArray.push(result);
+        }
+
+        return filesArray;
+    }
+
     async getFiles(folderPath?: string): Promise<AWS.S3.ObjectList> {
         const hasFolderPath = !!folderPath;
         const backSlashSelector = /\\\\?/gm;
@@ -184,13 +195,9 @@ export class S3StorageManager implements StorageStrategy<S3StorageManagerTypes> 
                 })
                 .promise();
 
-            console.log(listObjectsResponse.Contents, "listObjectsResponse.Contents");
-
             for (const object of listObjectsResponse.Contents || []) {
                 const oldKey = object.Key!;
                 const newKey = oldKey.replace(folderName, newFolderName);
-
-                console.log(object.Key, "object.Key");
 
                 await this.s3
                     .copyObject({

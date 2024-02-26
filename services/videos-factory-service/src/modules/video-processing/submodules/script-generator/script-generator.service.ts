@@ -40,8 +40,8 @@ export class ScriptGeneratorService {
 
     async generateScript() {
         await this.generateText();
-        // await this.generateVoice();
-        // await this.generateTimestampsBasedOnAudio();
+        await this.generateVoice();
+        await this.generateTimestampsBasedOnAudio();
 
         return this.script;
     }

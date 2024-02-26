@@ -6,7 +6,11 @@ import { Template } from "../video-renderer.types";
 import { BaseComponent, IElementComponent } from "./BaseComponent";
 
 export class VideoComponent extends BaseComponent<Video> implements IElementComponent {
-    process(ffmpegCommand: ffmpeg.FfmpegCommand, _: Template, durationPerVideo?: number): void {
+    async process(
+        ffmpegCommand: ffmpeg.FfmpegCommand,
+        _: Template,
+        durationPerVideo?: number
+    ): Promise<void> {
         const video = this.element;
 
         if (!video) {
@@ -33,6 +37,14 @@ export class VideoComponent extends BaseComponent<Video> implements IElementComp
 
         // Init input options
         const inputOptions = [...getVideoDurationCommand()];
+
+        const videoHasAudio = await VideoUtils.hasAudioStream(video.sourcePath);
+
+        console.log(videoHasAudio, "videoHasAudio");
+
+        if (videoHasAudio) {
+            await VideoUtils.addSilentAudioToVideo(video.sourcePath, video.sourcePath);
+        }
 
         // Process as video concatenation
         ffmpegCommand.input(video.sourcePath);

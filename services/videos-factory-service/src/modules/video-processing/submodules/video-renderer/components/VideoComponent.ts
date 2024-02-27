@@ -38,14 +38,6 @@ export class VideoComponent extends BaseComponent<Video> implements IElementComp
         // Init input options
         const inputOptions = [...getVideoDurationCommand()];
 
-        const videoHasAudio = await VideoUtils.hasAudioStream(video.sourcePath);
-
-        console.log(videoHasAudio, "videoHasAudio");
-
-        if (videoHasAudio) {
-            await VideoUtils.addSilentAudioToVideo(video.sourcePath, video.sourcePath);
-        }
-
         // Process as video concatenation
         ffmpegCommand.input(video.sourcePath);
         this.complexFilterBuilder.addVideoWithAudio();

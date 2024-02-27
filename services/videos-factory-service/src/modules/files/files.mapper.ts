@@ -47,7 +47,6 @@ export class FilesMapper {
             type: this.storageConfig.getFileExtension(file.Key) || "folder",
             path,
             url: this.storageConfig.getFileUrl(file.Key),
-            // url: `${this.storageConfig.getBaseUrl()}/${encodeURIComponent(file.Key)}`,
             createdAt: file.LastModified?.toISOString() ?? new Date().toISOString(),
             modifiedAt: file.LastModified?.toISOString() ?? new Date().toISOString(),
         };

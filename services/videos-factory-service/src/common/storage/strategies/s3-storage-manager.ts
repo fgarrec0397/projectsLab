@@ -68,7 +68,7 @@ export class S3StorageManager implements StorageStrategy<S3StorageManagerTypes> 
         return extensionMatch ? extensionMatch[0] : null;
     }
 
-    getFileUrl(key: string | undefined) {
+    getFileUrl(key: string | undefined, method = "getObject") {
         const expirySeconds: number = 3600;
 
         if (!key) {
@@ -80,7 +80,7 @@ export class S3StorageManager implements StorageStrategy<S3StorageManagerTypes> 
             Key: key,
             Expires: expirySeconds,
         };
-        return this.s3.getSignedUrl("getObject", params);
+        return this.s3.getSignedUrl(method, params);
     }
 
     async getFile(key: string): Promise<AWS.S3.GetObjectOutput> {

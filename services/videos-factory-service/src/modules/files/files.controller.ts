@@ -20,8 +20,10 @@ import { UseCache } from "src/common/cache/decorators/use-cache.decorator";
 import { UseInvalidateCache } from "src/common/cache/decorators/use-invalidate-cache.decorator";
 import { MONTH_IN_SECONDS } from "src/common/constants";
 
+import { AfterFilesUploadInterceptor } from "./after-files-upload.interceptor";
 import { FilesMapper } from "./files.mapper";
 import { FilesService } from "./files.service";
+import { FilesValidationPipe } from "./files-validation.pipe";
 
 const filesCacheKey = getAuthCacheKey("files-list");
 
@@ -58,13 +60,22 @@ export class FilesController {
     @Post()
     @UseInvalidateCache(filesCacheKey)
     @UseInterceptors(AnyFilesInterceptor())
+    @UseInterceptors(AfterFilesUploadInterceptor)
     async uploadFiles(
         @Req() request: Request,
-        @UploadedFiles() files: Array<Express.Multer.File> | Express.Multer.File
+        @UploadedFiles(new FilesValidationPipe())
+        files: Array<Express.Multer.File> | Express.Multer.File
     ) {
-        await this.filesService.uploadUserFiles(request.userId, files);
+        const uploadedFiles = await this.filesService.uploadUserFiles(request.userId, files);
 
-        return { message: `files uploaded successfully!` };
+        const uploadedFilesIds = Array.isArray(uploadedFiles)
+            ? uploadedFiles.map((x) => x.Key)
+            : [uploadedFiles.Key];
+
+        return {
+            message: `files uploaded successfully!`,
+            uploadedFilesIds,
+        };
     }
 
     @Patch()

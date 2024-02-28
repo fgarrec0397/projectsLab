@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable, PipeTransform } from "@nestjs/common";
+import { HttpException, HttpStatus, Injectable, PipeTransform } from "@nestjs/common";
 
 @Injectable()
 export class FilesValidationPipe implements PipeTransform {
@@ -9,14 +9,16 @@ export class FilesValidationPipe implements PipeTransform {
 
         for (const file of files) {
             if (file.size > MAX_FILE_SIZE) {
-                throw new BadRequestException(
-                    `File size is too large. The files should be under ${maxMgb}mb`
+                throw new HttpException(
+                    `File size is too large. The files should be under ${maxMgb}mb`,
+                    HttpStatus.BAD_REQUEST
                 );
             }
 
             if (!ALLOWED_FILE_TYPES.includes(file.mimetype)) {
-                throw new BadRequestException(
-                    `Invalid file type. Only ${ALLOWED_FILE_TYPES.join(", ")} are valid types`
+                throw new HttpException(
+                    `Invalid file type. Only ${ALLOWED_FILE_TYPES.join(", ")} are valid types`,
+                    HttpStatus.BAD_REQUEST
                 );
             }
         }

@@ -4,6 +4,7 @@ import AWS, { config } from "aws-sdk";
 import { CommonPrefix } from "aws-sdk/clients/s3";
 import fs from "fs";
 import path from "path";
+import { FileSystem } from "src/common/FileSystem";
 
 import { StorageStrategy } from "../storage-manager";
 
@@ -14,7 +15,7 @@ type S3StorageManagerTypes = {
     renameFile: void;
     renameFolder: void;
     createFolder: AWS.S3.PutObjectOutput;
-    downloadFile: void;
+    downloadFile: string;
     deleteFiles: void;
 };
 
@@ -150,14 +151,29 @@ export class S3StorageManager implements StorageStrategy<S3StorageManagerTypes> 
         }
     }
 
-    async uploadFile(file: Express.Multer.File, fileName: string) {
+    async uploadFile(file: Express.Multer.File | string, fileName: string) {
+        let fileToUpload: { buffer: Buffer; mimetype: string };
+
+        if (typeof file === "string") {
+            const buffer = await FileSystem.convertFileToBuffer(file);
+            fileToUpload = {
+                buffer,
+                mimetype: "",
+            };
+        } else {
+            fileToUpload = {
+                buffer: file.buffer,
+                mimetype: file.mimetype,
+            };
+        }
+
         try {
             return await this.s3
                 .upload({
                     Bucket: this.bucketName,
                     Key: fileName,
-                    Body: file.buffer,
-                    ContentType: file.mimetype,
+                    Body: fileToUpload.buffer,
+                    ContentType: fileToUpload.mimetype,
                 })
                 .promise();
         } catch (error) {
@@ -232,14 +248,19 @@ export class S3StorageManager implements StorageStrategy<S3StorageManagerTypes> 
         }
     }
 
-    async downloadFile(fileName: string, destinationPath: string) {
+    async downloadFile(fileId: string, destinationPath: string) {
         try {
             const params = {
                 Bucket: this.bucketName,
-                Key: fileName,
+                Key: fileId,
             };
+
+            const filePath = path.join(destinationPath, this.getFileName(fileId));
             const data = await this.s3.getObject(params).promise();
-            fs.writeFileSync(path.join(destinationPath, fileName), data.Body as Buffer);
+
+            fs.writeFileSync(filePath, data.Body as Buffer);
+
+            return filePath;
         } catch (error) {
             throw new Error("Error downloading file: " + error);
         }

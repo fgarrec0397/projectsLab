@@ -127,7 +127,6 @@ export default function VideosCreateView() {
     };
 
     const onSubmit = handleSubmit(async (data) => {
-        console.log(data, "data");
         try {
             await startRendering(auth.user?.accessToken, data);
 

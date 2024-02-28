@@ -22,3 +22,9 @@ export const fetcher = async (args: string | [string, AxiosRequestConfig]) => {
 
     return res.data;
 };
+
+// ----------------------------------------------------------------------
+
+export const getErrorMessage = (error: any): any | undefined => {
+    return error.response?.data?.message;
+};

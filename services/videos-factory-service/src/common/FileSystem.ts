@@ -15,6 +15,18 @@ export class FileSystem {
         return FileSystem.getPath("./assets/poc", assetPath || ""); // TODO - config - "./assets/poc"
     }
 
+    static getTempFolderPath(id?: string) {
+        let folderPath = "temp";
+
+        if (id) {
+            folderPath += `/${id}`;
+        }
+
+        const tempPath = FileSystem.getAssetsPath(folderPath);
+
+        return tempPath;
+    }
+
     static getPath(...filePath: string[]) {
         return path.resolve(...filePath);
     }
@@ -72,6 +84,8 @@ export class FileSystem {
                     reject(err);
                     return;
                 }
+
+                console.log(data, "data");
 
                 resolve(data);
             });

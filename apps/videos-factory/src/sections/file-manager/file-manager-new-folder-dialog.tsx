@@ -4,14 +4,18 @@ import DialogContent from "@mui/material/DialogContent";
 import DialogTitle from "@mui/material/DialogTitle";
 import Stack from "@mui/material/Stack";
 import TextField from "@mui/material/TextField";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { useAuthContext } from "@/auth/hooks";
 import { PrimaryButton } from "@/components/button";
 import { TertiaryButton } from "@/components/button/tertiary-button";
 import Iconify from "@/components/iconify";
+import { LoadingScreen } from "@/components/loading-screen";
+import { useSnackbar } from "@/components/snackbar";
 import { Upload } from "@/components/upload";
+import { useBoolean } from "@/hooks/use-boolean";
 import { uploadFiles } from "@/services/filesService/filesService";
+import { getErrorMessage } from "@/utils/axios";
 
 // ----------------------------------------------------------------------
 
@@ -42,10 +46,13 @@ export default function FileManagerNewFolderDialog({
     onChangeFolderName,
     ...other
 }: Props) {
-    const isUploading = showUpload && !(onCreate || onUpdate);
+    const isUpload = showUpload && !(onCreate || onUpdate);
 
     const { user } = useAuthContext();
     const [files, setFiles] = useState<File[]>([]);
+    const hasFiles = useMemo(() => files.length > 0, [files]);
+    const { enqueueSnackbar } = useSnackbar();
+    const isFilesUploading = useBoolean();
 
     useEffect(() => {
         if (!open) {
@@ -67,9 +74,35 @@ export default function FileManagerNewFolderDialog({
     );
 
     const handleUpload = async () => {
-        onClose();
+        if (!files.length) {
+            return;
+        }
 
-        await uploadFiles(user?.accessToken, undefined, files);
+        try {
+            enqueueSnackbar(`Uploading ${files.length} item${files.length > 1 ? "s" : ""}`, {
+                variant: "info",
+            });
+
+            isFilesUploading.onTrue();
+
+            await uploadFiles(user?.accessToken, undefined, files);
+
+            isFilesUploading.onFalse();
+
+            onClose();
+
+            enqueueSnackbar(
+                `${files.length} item${files.length > 1 ? "s" : ""} uploaded with success`,
+                {
+                    variant: "success",
+                }
+            );
+        } catch (error: any) {
+            enqueueSnackbar(getErrorMessage(error) || "An error occured while uploading", {
+                variant: "error",
+                persist: true,
+            });
+        }
     };
 
     const handleRemoveFile = (inputFile: File | string) => {
@@ -78,6 +111,7 @@ export default function FileManagerNewFolderDialog({
     };
 
     const handleRemoveAllFiles = () => {
+        onClose();
         setFiles([]);
     };
 
@@ -96,13 +130,17 @@ export default function FileManagerNewFolderDialog({
                     />
                 )}
 
-                {isUploading && (
-                    <Upload
-                        multiple
-                        files={files}
-                        onDrop={handleDrop}
-                        onRemove={handleRemoveFile}
-                    />
+                {isFilesUploading.value ? (
+                    <LoadingScreen />
+                ) : (
+                    isUpload && (
+                        <Upload
+                            multiple
+                            files={files}
+                            onDrop={handleDrop}
+                            onRemove={handleRemoveFile}
+                        />
+                    )
                 )}
             </DialogContent>
 
@@ -112,11 +150,12 @@ export default function FileManagerNewFolderDialog({
                     <TertiaryButton onClick={handleRemoveAllFiles}>Remove all</TertiaryButton>
                 )}
 
-                {isUploading && (
+                {isUpload && (
                     <PrimaryButton
                         variant="contained"
                         startIcon={<Iconify icon="eva:cloud-upload-fill" />}
                         onClick={handleUpload}
+                        disabled={!hasFiles}
                     >
                         Upload
                     </PrimaryButton>

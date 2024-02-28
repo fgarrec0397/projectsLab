@@ -120,6 +120,8 @@ export default function FileManagerNewFolderDialog({
             <DialogTitle sx={{ p: (theme) => theme.spacing(3, 3, 2, 3) }}> {title} </DialogTitle>
 
             <DialogContent dividers sx={{ pt: 1, pb: 0, border: "none" }}>
+                {isFilesUploading.value && <LoadingScreen fullWidth />}
+
                 {(onCreate || onUpdate) && (
                     <TextField
                         fullWidth
@@ -129,18 +131,13 @@ export default function FileManagerNewFolderDialog({
                         sx={{ mb: 3 }}
                     />
                 )}
-
-                {isFilesUploading.value ? (
-                    <LoadingScreen />
-                ) : (
-                    isUpload && (
-                        <Upload
-                            multiple
-                            files={files}
-                            onDrop={handleDrop}
-                            onRemove={handleRemoveFile}
-                        />
-                    )
+                {isUpload && (
+                    <Upload
+                        multiple
+                        files={files}
+                        onDrop={handleDrop}
+                        onRemove={handleRemoveFile}
+                    />
                 )}
             </DialogContent>
 

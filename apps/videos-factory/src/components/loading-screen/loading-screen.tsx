@@ -3,11 +3,15 @@ import LinearProgress from "@mui/material/LinearProgress";
 
 // ----------------------------------------------------------------------
 
-export default function LoadingScreen({ sx, ...other }: BoxProps) {
+export type LoadingScreenProps = BoxProps & {
+    fullWidth?: boolean;
+};
+
+export default function LoadingScreen({ sx, fullWidth, ...other }: LoadingScreenProps) {
     return (
         <Box
             sx={{
-                px: 5,
+                px: fullWidth ? 0 : 5,
                 width: 1,
                 flexGrow: 1,
                 minHeight: 1,
@@ -18,7 +22,7 @@ export default function LoadingScreen({ sx, ...other }: BoxProps) {
             }}
             {...other}
         >
-            <LinearProgress color="inherit" sx={{ width: 1, maxWidth: 360 }} />
+            <LinearProgress color="inherit" sx={{ width: 1, maxWidth: fullWidth ? "100%" : 360 }} />
         </Box>
     );
 }

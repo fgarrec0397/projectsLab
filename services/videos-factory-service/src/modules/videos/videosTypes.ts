@@ -1,5 +1,3 @@
-import { BaseResult } from "src/common/database/databaseTypes";
-
 export type StructureType = "quickTips" | "storytelling" | "vlog" | "tops";
 
 export type SpecificityLevel = "broader" | "specific";
@@ -17,7 +15,7 @@ export enum VideoStatus {
     "Published" = "published",
 }
 
-export type IVideo = BaseResult & {
+export type IVideo = {
     id: string;
     name: string;
     location: string;

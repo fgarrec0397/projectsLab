@@ -1,5 +1,4 @@
 import { Injectable } from "@nestjs/common";
-import { uidGenerator } from "@projectslab/helpers";
 import { DatabaseConfig, InjectDatabase } from "src/config/database-config.module";
 import { VideoProcessingService } from "src/modules/video-processing/video-processing.service";
 
@@ -21,7 +20,6 @@ export class VideosService {
         }
 
         const defaultVideoDraft = {
-            id: uidGenerator(),
             name: "Your new awesome video",
             location: "",
             age: [18, 36],
@@ -38,8 +36,12 @@ export class VideosService {
         };
 
         const createdDocument = await this.database.create(videoCollectionPath, defaultVideoDraft);
+        const { id } = createdDocument;
 
-        return createdDocument;
+        return {
+            ...defaultVideoDraft,
+            id,
+        };
     }
 
     async getLastVideoDraft(userId: string) {
@@ -56,7 +58,7 @@ export class VideosService {
 
         const updatedDocument = await this.database.update(
             videoCollectionPath,
-            videoDraft.documentId,
+            videoDraft.id,
             videoDraft
         );
 
@@ -66,7 +68,7 @@ export class VideosService {
     async startRendering(userId: string, video: IVideo) {
         const videoCollectionPath = `users/${userId}/videos`;
 
-        const updatedDocument = await this.database.update(videoCollectionPath, video.documentId, {
+        const updatedDocument = await this.database.update(videoCollectionPath, video.id, {
             ...video,
             status: VideoStatus.Rendering,
         });

@@ -14,9 +14,9 @@ import Container from "@mui/material/Container";
 import Typography from "@mui/material/Typography";
 import Grid from "@mui/system/Unstable_Grid";
 import { m } from "framer-motion";
+import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
-import useWebSocket, { ReadyState } from "react-use-websocket";
 import * as Yup from "yup";
 
 import { useAuthContext } from "@/auth/hooks";
@@ -33,6 +33,7 @@ import RHFFilesSelector from "@/components/hook-form/rhf-files-selector";
 import { LoadingScreen } from "@/components/loading-screen";
 import { useSettingsContext } from "@/components/settings";
 import { useSnackbar } from "@/components/snackbar";
+import { paths } from "@/routes/paths";
 import { useGetFiles } from "@/services/filesService/hooks/useGetFiles";
 import { useSocket } from "@/services/socket/useSocket";
 import { useGetOrCreateVideoDraft } from "@/services/videosService/hooks/useGetOrCreateVideoDraft";
@@ -63,6 +64,7 @@ export default function VideosCreateView() {
     const [isEditingVideoName, setIsEditingVideoName] = useState(false);
     const { videoDraft, isVideoDraftLoading } = useGetOrCreateVideoDraft();
     const { sendMessage } = useSocket();
+    const router = useRouter();
 
     const NewVideoSchema = Yup.object().shape({
         name: Yup.string().required("Name is required"),
@@ -125,7 +127,7 @@ export default function VideosCreateView() {
         try {
             await saveDraft(auth.user?.accessToken, {
                 ...control._formValues,
-                documentId: videoDraft?.documentId,
+                id: videoDraft?.id,
             });
             enqueueSnackbar("Video draft saved with success!");
         } catch (error) {
@@ -138,7 +140,8 @@ export default function VideosCreateView() {
             await startRendering(auth.user?.accessToken, data);
 
             reset();
-            enqueueSnackbar("Video created with success!");
+            enqueueSnackbar("Video creation started");
+            router.push(paths.dashboard.videos.root);
         } catch (error) {
             enqueueSnackbar("Something went wrong", { variant: "error" });
         }

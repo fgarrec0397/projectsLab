@@ -1,6 +1,5 @@
 export type IVideo = {
     id: string;
-    documentId: string;
     name: string;
     location: string;
     age: number[];

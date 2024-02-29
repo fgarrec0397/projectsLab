@@ -1,8 +1,6 @@
 import { SubscribeMessage, WebSocketGateway, WebSocketServer } from "@nestjs/websockets";
 import { Server } from "socket.io";
 
-console.log(process.env.CORS_ORIGIN_ENABLED, "process.env.CORS_ORIGIN_ENABLED");
-
 @WebSocketGateway({
     cors: {
         origin: "*",

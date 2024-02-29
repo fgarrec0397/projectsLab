@@ -44,6 +44,7 @@ export class VideosController {
     }
 
     @Post("startRendering")
+    @UseInvalidateCache(videosCacheKey)
     async renderVideo(@Req() request: Request, @Body() video: IVideo) {
         return this.videosService.startRendering(request.userId, video);
     }

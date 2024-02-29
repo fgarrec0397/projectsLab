@@ -5,7 +5,7 @@ import { tap } from "rxjs/operators";
 import { FileSystem } from "src/common/FileSystem";
 import { InjectStorageConfig, StorageConfig } from "src/config/storage-config.module";
 
-import { VideoUtils } from "../video-processing/submodules/video-renderer/video.utils";
+import { VideoUtils } from "../../video-processing/submodules/video-renderer/video.utils";
 
 @Injectable()
 export class AfterFilesUploadInterceptor implements NestInterceptor {

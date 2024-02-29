@@ -2,7 +2,7 @@ import { Injectable } from "@nestjs/common";
 import AWS from "aws-sdk";
 import { InjectStorageConfig, StorageConfig } from "src/config/storage-config.module";
 
-import { FilesService } from "./files.service";
+import { FilesService } from "../services/files.service";
 
 type FilesMapperData = {
     userId: string;

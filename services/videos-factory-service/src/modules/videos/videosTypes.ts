@@ -8,6 +8,15 @@ export type Gender = "male" | "female" | "all";
 
 export type Pace = "slow" | "fast" | "mix";
 
+export enum VideoStatus {
+    "Draft" = "draft",
+    "Pending" = "pending",
+    "Rendering" = "rendering",
+    "Rendered" = "rendered",
+    "Publishing" = "publishing",
+    "Published" = "published",
+}
+
 export type IVideo = BaseResult & {
     id: string;
     name: string;
@@ -23,7 +32,7 @@ export type IVideo = BaseResult & {
     pace: Pace;
     moreSpecificities?: string;
     files: string[];
-    status: "draft" | "pending" | "rendering" | "rendered" | "publishing" | "published";
+    status: VideoStatus;
 };
 
 export type IVideoDraft = Partial<IVideo>;

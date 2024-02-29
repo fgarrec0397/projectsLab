@@ -16,6 +16,7 @@ import Grid from "@mui/system/Unstable_Grid";
 import { m } from "framer-motion";
 import { useEffect, useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
+import useWebSocket, { ReadyState } from "react-use-websocket";
 import * as Yup from "yup";
 
 import { useAuthContext } from "@/auth/hooks";
@@ -33,6 +34,7 @@ import { LoadingScreen } from "@/components/loading-screen";
 import { useSettingsContext } from "@/components/settings";
 import { useSnackbar } from "@/components/snackbar";
 import { useGetFiles } from "@/services/filesService/hooks/useGetFiles";
+import { useSocket } from "@/services/socket/useSocket";
 import { useGetOrCreateVideoDraft } from "@/services/videosService/hooks/useGetOrCreateVideoDraft";
 import { saveDraft, startRendering } from "@/services/videosService/videosService";
 import { icon } from "@/theme/icons";
@@ -60,6 +62,7 @@ export default function VideosCreateView() {
     const { allFiles } = useGetFiles();
     const [isEditingVideoName, setIsEditingVideoName] = useState(false);
     const { videoDraft, isVideoDraftLoading } = useGetOrCreateVideoDraft();
+    const { sendMessage } = useSocket();
 
     const NewVideoSchema = Yup.object().shape({
         name: Yup.string().required("Name is required"),
@@ -104,6 +107,10 @@ export default function VideosCreateView() {
     });
 
     const { reset, handleSubmit, control } = methods;
+
+    // useEffect(() => {
+    //     console.log({ lastMessage });
+    // }, [lastMessage]);
 
     useEffect(() => {
         if (videoDraft) {

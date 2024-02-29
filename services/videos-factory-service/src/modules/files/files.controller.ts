@@ -20,10 +20,10 @@ import { UseCache } from "src/common/cache/decorators/use-cache.decorator";
 import { UseInvalidateCache } from "src/common/cache/decorators/use-invalidate-cache.decorator";
 import { MONTH_IN_SECONDS } from "src/common/constants";
 
-import { AfterFilesUploadInterceptor } from "./after-files-upload.interceptor";
-import { FilesMapper } from "./files.mapper";
-import { FilesService } from "./files.service";
-import { FilesValidationPipe } from "./files-validation.pipe";
+import { FilesService } from "./services/files.service";
+import { AfterFilesUploadInterceptor } from "./interceptors/after-files-upload.interceptor";
+import { FilesMapper } from "./mappers/files.mapper";
+import { FilesValidationPipe } from "./pipes/files-validation.pipe";
 
 const filesCacheKey = getAuthCacheKey("files-list");
 

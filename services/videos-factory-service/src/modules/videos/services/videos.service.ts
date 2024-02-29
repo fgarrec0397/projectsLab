@@ -3,7 +3,7 @@ import { uidGenerator } from "@projectslab/helpers";
 import { DatabaseConfig, InjectDatabase } from "src/config/database-config.module";
 import { VideoProcessingService } from "src/modules/video-processing/video-processing.service";
 
-import { IVideoDraft } from "../videosTypes";
+import { IVideo, IVideoDraft, VideoStatus } from "../videosTypes";
 
 @Injectable()
 export class VideosService {
@@ -34,7 +34,7 @@ export class VideosService {
             structureType: "quick tips",
             pace: "mix",
             moreSpecificities: undefined,
-            status: "draft",
+            status: VideoStatus.Draft,
         };
 
         const createdDocument = await this.database.create(videoCollectionPath, defaultVideoDraft);
@@ -63,7 +63,16 @@ export class VideosService {
         return updatedDocument;
     }
 
-    async startRendering() {
+    async startRendering(userId: string, video: IVideo) {
+        const videoCollectionPath = `users/${userId}/videos`;
+
+        const updatedDocument = await this.database.update(videoCollectionPath, video.documentId, {
+            ...video,
+            status: VideoStatus.Rendering,
+        });
+
         this.videoProcessingService.renderVideo();
+
+        return updatedDocument;
     }
 }

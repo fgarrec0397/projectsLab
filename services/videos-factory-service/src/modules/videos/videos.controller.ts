@@ -8,7 +8,7 @@ import { DatabaseConfig, InjectDatabase } from "src/config/database-config.modul
 
 import { Public } from "../auth/decorators/use-public.guard";
 import { VideosService } from "./services/videos.service";
-import { IVideoDraft } from "./videosTypes";
+import { IVideo, IVideoDraft } from "./videosTypes";
 
 const videosCacheKey = getAuthCacheKey("videos");
 
@@ -44,8 +44,8 @@ export class VideosController {
     }
 
     @Post("startRendering")
-    async renderVideo() {
-        this.videosService.startRendering();
+    async renderVideo(@Req() request: Request, @Body() video: IVideo) {
+        return this.videosService.startRendering(request.userId, video);
     }
 
     @Get("draft/getOrCreate")

@@ -3,7 +3,7 @@ import OpenAI from "openai";
 import { FileSystem } from "src/common/FileSystem";
 import { OpenAIModule } from "src/common/OpenAI";
 import { InjectStorageConfig, StorageConfig } from "src/config/storage-config.module";
-import { IVideo } from "src/modules/videos/videosTypes";
+import { IVideo } from "src/modules/videos/videos.types";
 
 import { Script } from "../script-generator/script-generator.service";
 import { BaseElement } from "../video-renderer/entities/BaseElement";

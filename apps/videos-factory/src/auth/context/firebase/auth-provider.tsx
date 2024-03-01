@@ -16,7 +16,7 @@ import {
 import { collection, doc, getDoc, getFirestore, setDoc } from "firebase/firestore";
 import { useCallback, useEffect, useMemo, useReducer } from "react";
 
-import { sessionLogin, sessionLogout } from "@/services/authService";
+import { sessionLogin, sessionLogout } from "@/services/auth/authService";
 
 import { ActionMapType, AuthStateType, AuthUserType } from "../../types";
 import { AuthContext } from "./auth-context";

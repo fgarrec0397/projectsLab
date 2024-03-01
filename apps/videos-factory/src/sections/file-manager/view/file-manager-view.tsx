@@ -195,7 +195,7 @@ export default function FileManagerView() {
             <Container maxWidth={settings.themeStretch ? false : "lg"}>
                 <Stack direction="row" alignItems="flex-start" justifyContent="space-between">
                     <CustomBreadcrumbs
-                        heading="File Manager"
+                        heading="Files Manager"
                         links={breadcrumbsLinks}
                         sx={{
                             marginTop: pxToRem(-5),

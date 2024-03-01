@@ -35,7 +35,6 @@ import { useSettingsContext } from "@/components/settings";
 import { useSnackbar } from "@/components/snackbar";
 import { paths } from "@/routes/paths";
 import { useGetFiles } from "@/services/filesService/hooks/useGetFiles";
-import { useSocket } from "@/services/socket/useSocket";
 import { useGetOrCreateVideoDraft } from "@/services/videosService/hooks/useGetOrCreateVideoDraft";
 import { saveDraft, startRendering } from "@/services/videosService/videosService";
 import { icon } from "@/theme/icons";
@@ -63,7 +62,6 @@ export default function VideosCreateView() {
     const { allFiles } = useGetFiles();
     const [isEditingVideoName, setIsEditingVideoName] = useState(false);
     const { videoDraft, isVideoDraftLoading } = useGetOrCreateVideoDraft();
-    const { sendMessage } = useSocket();
     const router = useRouter();
 
     const NewVideoSchema = Yup.object().shape({
@@ -109,10 +107,6 @@ export default function VideosCreateView() {
     });
 
     const { reset, handleSubmit, control } = methods;
-
-    // useEffect(() => {
-    //     console.log({ lastMessage });
-    // }, [lastMessage]);
 
     useEffect(() => {
         if (videoDraft) {

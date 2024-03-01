@@ -3,8 +3,8 @@ import { useEffect, useState } from "react";
 import { Controller, useFormContext } from "react-hook-form";
 
 import { useBoolean } from "@/hooks/use-boolean";
-import FilesSelectorModal from "@/sections/videos/components/files-selector-modal";
-import FilesTable from "@/sections/videos/components/files-table";
+import FilesSelectorModal from "@/sections/videos/components/videos-create/files-selector-modal";
+import FilesTable from "@/sections/videos/components/videos-create/files-table";
 import { pxToRem } from "@/theme/typography";
 import { IFile } from "@/types/file";
 

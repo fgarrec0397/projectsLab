@@ -3,7 +3,7 @@ import VideosListView from "@/sections/videos/view/videos-list-view";
 // ----------------------------------------------------------------------
 
 export const metadata = {
-    title: "Dashboard: One",
+    title: "Videos | Createify",
 };
 
 export default function Page() {

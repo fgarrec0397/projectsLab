@@ -58,7 +58,7 @@ export class VideoProcessingService {
 
             if (!template) {
                 throw new HttpException(
-                    "The template was not generated",
+                    "An issue happened and the template was not generated",
                     HttpStatus.INTERNAL_SERVER_ERROR
                 );
             }
@@ -86,7 +86,7 @@ export class VideoProcessingService {
             }
 
             throw new HttpException(
-                "The video was not generated",
+                "An issue happened and the video was not generated",
                 HttpStatus.INTERNAL_SERVER_ERROR
             );
         } catch (error) {

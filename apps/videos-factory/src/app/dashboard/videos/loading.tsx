@@ -5,7 +5,7 @@ import { LoadingScreen } from "@/components/loading-screen";
 // ----------------------------------------------------------------------
 
 export const metadata = {
-    title: "Overview | Createify",
+    title: "Videos | Createify",
 };
 
 export default function Loading() {

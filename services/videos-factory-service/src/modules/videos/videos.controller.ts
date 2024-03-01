@@ -6,9 +6,8 @@ import { UseInvalidateCache } from "src/common/cache/decorators/use-invalidate-c
 import { MONTH_IN_SECONDS } from "src/common/constants";
 import { DatabaseConfig, InjectDatabase } from "src/config/database-config.module";
 
-import { Public } from "../auth/decorators/use-public.guard";
 import { VideosService } from "./services/videos.service";
-import { IVideo, IVideoDraft } from "./videosTypes";
+import { IVideo, IVideoDraft } from "./videos.types";
 
 const videosCacheKey = getAuthCacheKey("videos");
 
@@ -20,27 +19,8 @@ export class VideosController {
     ) {}
 
     @Get()
-    @Public()
-    async getVideo() {
-        return "not authenticated route";
-    }
-
-    @Post()
-    async createVideo(@Req() request: Request) {
-        const userRef = this.database.getDB().collection("users").doc(request.userId);
-        const videosRef = userRef.collection("videos");
-        const videoData = {
-            title: "My First Video",
-            description: "This is a description of my first video.",
-            uploaded: new Date(),
-        };
-
-        await videosRef
-            .add(videoData)
-            .then((docRef) => console.log("Video added with ID: ", docRef.id))
-            .catch((error) => console.error("Error adding video: ", error));
-
-        return { result: "video created" };
+    async getVideos(@Req() request: Request) {
+        return this.videosService.getVideos(request.userId);
     }
 
     @Post("startRendering")

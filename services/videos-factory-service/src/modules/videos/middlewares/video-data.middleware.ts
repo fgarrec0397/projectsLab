@@ -1,7 +1,7 @@
 import { Injectable, NestMiddleware } from "@nestjs/common";
 import { NextFunction, Request, Response } from "express";
 
-import { IVideo } from "../videosTypes";
+import { IVideo } from "../videos.types";
 
 @Injectable()
 export class VideoDataMiddleware implements NestMiddleware {

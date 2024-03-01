@@ -8,7 +8,7 @@ export type DatabaseTypes = {
     update: unknown;
     delete: unknown;
     findWithQuery: unknown;
-    operator: unknown;
+    findWithQueryOptions: any;
 };
 
 export interface DatabaseStrategy<T extends DatabaseTypes> {
@@ -27,13 +27,7 @@ export interface DatabaseStrategy<T extends DatabaseTypes> {
         data: TData
     ): T["update"];
     delete(collection: string, id: string): T["delete"];
-    findWithQuery(
-        collection: string,
-        conditions: { field: string; operator: T["operator"]; value: any }[],
-        orderByField?: string,
-        orderByDirection?: "asc" | "desc",
-        limitNumber?: number
-    ): T["findWithQuery"];
+    findWithQuery(collection: string, options: T["findWithQueryOptions"]): T["findWithQuery"];
 }
 
 export const DATABASE_TOKEN = "DatabaseToken";
@@ -76,19 +70,7 @@ export class Database<T extends DatabaseTypes> {
         return this.databaseStrategy.delete(collection, id);
     }
 
-    async findWithQuery<TData>(
-        collection: string,
-        conditions: { field: string; operator: T["operator"]; value: any }[],
-        orderByField?: string,
-        orderByDirection?: "asc" | "desc",
-        limitNumber?: number
-    ) {
-        return this.databaseStrategy.findWithQuery(
-            collection,
-            conditions,
-            orderByField,
-            orderByDirection,
-            limitNumber
-        ) as TData[];
+    async findWithQuery<TData>(collection: string, options: T["findWithQueryOptions"]) {
+        return this.databaseStrategy.findWithQuery(collection, options) as TData[];
     }
 }

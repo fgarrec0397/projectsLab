@@ -1,3 +1,11 @@
+export type StructureType = "quickTips" | "storytelling" | "vlog" | "tops";
+
+export type SpecificityLevel = "broader" | "specific";
+
+export type Gender = "male" | "female" | "all";
+
+export type Pace = "slow" | "fast" | "mix";
+
 export enum VideoStatus {
     "Draft" = "draft",
     "GeneratingScript" = "generatingScript",
@@ -14,20 +22,18 @@ export type IVideo = {
     id: string;
     name: string;
     location: string;
-    age: number[];
-    gender: string;
+    age: [number, number];
+    gender: Gender;
     language: string;
     interests?: string;
-    challenges?: string;
+    challenges?: undefined;
     topic: string;
-    specificityLevel: string;
-    structureType: string;
-    pace: string;
+    specificityLevel: SpecificityLevel;
+    structureType: StructureType;
+    pace: Pace;
     moreSpecificities?: string;
     files: string[];
     status: VideoStatus;
 };
 
 export type IVideoDraft = Partial<IVideo>;
-
-export type IFormVideo = Omit<IVideo, "id" | "documentId" | "status">;

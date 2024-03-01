@@ -2,7 +2,7 @@ import { Injectable } from "@nestjs/common";
 import { DatabaseConfig, InjectDatabase } from "src/config/database-config.module";
 import { VideoProcessingService } from "src/modules/video-processing/video-processing.service";
 
-import { IVideo, IVideoDraft, VideoStatus } from "../videosTypes";
+import { IVideo, IVideoDraft, VideoStatus } from "../videos.types";
 
 @Injectable()
 export class VideosService {
@@ -10,6 +10,16 @@ export class VideosService {
         @InjectDatabase() private readonly database: DatabaseConfig,
         private readonly videoProcessingService: VideoProcessingService
     ) {}
+
+    async getVideos(userId: string) {
+        const videoCollectionPath = `users/${userId}/videos`;
+        const videos = await this.database.findWithQuery<IVideo>(videoCollectionPath, {
+            orderByField: "createdAt",
+            orderByDirection: "asc",
+        });
+
+        return videos;
+    }
 
     async getOrCreateLastVideoDraft(userId: string) {
         const videoCollectionPath = `users/${userId}/videos`;
@@ -46,9 +56,9 @@ export class VideosService {
 
     async getLastVideoDraft(userId: string) {
         const videoCollectionPath = `users/${userId}/videos`;
-        const lastVideoDraft = await this.database.findWithQuery<IVideoDraft>(videoCollectionPath, [
-            { field: "status", operator: "==", value: "draft" },
-        ]);
+        const lastVideoDraft = await this.database.findWithQuery<IVideoDraft>(videoCollectionPath, {
+            conditions: [{ field: "status", operator: "==", value: "draft" }],
+        });
 
         return lastVideoDraft[0];
     }

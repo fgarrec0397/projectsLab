@@ -12,16 +12,21 @@ type FirebaseTypes = {
             admin.firestore.DocumentData
         >
     >;
-    findAll: Promise<
-        admin.firestore.QuerySnapshot<admin.firestore.DocumentData, admin.firestore.DocumentData>
-    >;
+    findAll: unknown;
     findOne: Promise<
         admin.firestore.DocumentSnapshot<admin.firestore.DocumentData, admin.firestore.DocumentData>
     >;
     update: Promise<admin.firestore.WriteResult>;
     delete: Promise<admin.firestore.WriteResult>;
     findWithQuery: unknown;
-    operator: WhereFilterOp;
+    findWithQueryOptions: FindWithQueryOptions;
+};
+
+type FindWithQueryOptions = {
+    conditions?: { field: string; operator: WhereFilterOp; value: any }[];
+    orderByField?: string;
+    orderByDirection?: "asc" | "desc";
+    limitNumber?: number;
 };
 
 @Injectable()
@@ -46,8 +51,15 @@ export class FirebaseDatabase implements DatabaseStrategy<FirebaseTypes> {
         return this.getDB().collection(collection).add(sanitizedData);
     }
 
-    async findAll(collection: string) {
-        return this.getDB().collection(collection).get();
+    async findAll<TValue>(collectionPath: string): Promise<TValue[]> {
+        const collection = await this.getDB().collection(collectionPath).get();
+
+        const documents = collection.docs.map((doc) => ({
+            id: doc.id,
+            ...doc.data(),
+        }));
+
+        return documents as TValue[];
     }
 
     async findOne(collection: string, id: string) {
@@ -66,18 +78,16 @@ export class FirebaseDatabase implements DatabaseStrategy<FirebaseTypes> {
         return this.getDB().collection(collection).doc(id).delete();
     }
 
-    async findWithQuery<TData>(
-        collection: string,
-        conditions: { field: string; operator: WhereFilterOp; value: any }[],
-        orderByField?: string,
-        orderByDirection?: "asc" | "desc",
-        limitNumber?: number
-    ) {
+    async findWithQuery<TData>(collection: string, options: FindWithQueryOptions) {
         let query: Query = this.getDB().collection(collection);
 
-        conditions.forEach((condition) => {
-            query = query.where(condition.field, condition.operator, condition.value);
-        });
+        const { conditions, orderByDirection, orderByField, limitNumber } = options;
+
+        if (conditions.length) {
+            conditions.forEach((condition) => {
+                query = query.where(condition.field, condition.operator, condition.value);
+            });
+        }
 
         if (orderByField) {
             query = query.orderBy(orderByField, orderByDirection);

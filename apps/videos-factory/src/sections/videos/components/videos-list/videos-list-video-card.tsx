@@ -5,7 +5,6 @@ import CustomPopover, { usePopover } from "@/components/custom-popover";
 import Iconify from "@/components/iconify";
 import Image from "@/components/image";
 import Label from "@/components/label";
-import { useResponsive } from "@/hooks/use-responsive";
 import { RouterLink } from "@/routes/components";
 import { icon } from "@/theme/icons";
 import { pxToRem } from "@/theme/typography";
@@ -17,28 +16,28 @@ type Props = {
 
 export default function VideosListVideoCard({ video }: Props) {
     const popover = usePopover();
-    const smUp = useResponsive("up", "sm");
 
     return (
         <>
             <Stack component={Card} direction="row">
-                {smUp && (
-                    <Box
-                        sx={{
-                            width: 180,
-                            height: 240,
-                            position: "relative",
-                            flexShrink: 0,
-                            p: 1,
-                        }}
-                    >
-                        <Image
-                            alt="title"
-                            src="https://placehold.co/600x400"
-                            sx={{ height: 1, borderRadius: 1.5 }}
-                        />
-                    </Box>
-                )}
+                <Box
+                    sx={{
+                        maxWidth: 135,
+                        maxHeight: 240,
+                        width: 1,
+                        height: 1,
+                        position: "relative",
+                        flexShrink: 0,
+                        p: 1,
+                    }}
+                >
+                    <Image
+                        alt="title"
+                        src="https://placehold.co/600x400"
+                        ratio="9/16"
+                        sx={{ borderRadius: 1.5 }}
+                    />
+                </Box>
                 <Stack
                     sx={{
                         width: 1,

@@ -5,12 +5,13 @@ import { io, Socket } from "socket.io-client";
 const SOCKET_URL = process.env.NEXT_PUBLIC_CREATEIFY_SERVICE_WEBSOCKET_URL || ""; // Update with your server's URL
 
 interface UseSocketOptions {
+    event: string;
     onConnect?: () => void;
     onDisconnect?: (reason: string) => void;
-    onMessage?: (message: any) => void;
+    onMessage?: <TMessage>(message: TMessage) => void;
 }
 
-export const useSocket = (options?: UseSocketOptions) => {
+export const useSocket = (options: UseSocketOptions) => {
     const [socket, setSocket] = useState<Socket | null>(null);
 
     useEffect(() => {
@@ -26,9 +27,12 @@ export const useSocket = (options?: UseSocketOptions) => {
         // Listen for messages from the server
         // if (options?.onMessage) {
         // }
-        socketIo.on("videoProcessingSteps", (message: any) => {
-            console.log(message, "message");
-        });
+        // videoProcessingSteps
+        if (options.onMessage) {
+            socketIo.on(options.event, (message: any) => {
+                console.log(message, "message");
+            });
+        }
 
         // Handle disconnection
         socketIo.on("disconnect", (reason) => {

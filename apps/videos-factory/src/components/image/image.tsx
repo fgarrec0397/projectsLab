@@ -17,7 +17,6 @@ const Image = forwardRef<HTMLSpanElement, ImageProps>(
             //
             alt,
             src,
-            afterLoad,
             delayTime,
             threshold,
             beforeLoad,
@@ -55,7 +54,6 @@ const Image = forwardRef<HTMLSpanElement, ImageProps>(
                 //
                 alt={alt}
                 src={src}
-                afterLoad={afterLoad}
                 delayTime={delayTime}
                 threshold={threshold}
                 beforeLoad={beforeLoad}

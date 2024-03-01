@@ -43,6 +43,8 @@ export class VideosService {
             pace: "mix",
             moreSpecificities: undefined,
             status: VideoStatus.Draft,
+            createdAt: new Date(),
+            updatedAt: new Date(),
         };
 
         const createdDocument = await this.database.create(videoCollectionPath, defaultVideoDraft);
@@ -78,12 +80,9 @@ export class VideosService {
     async startRendering(userId: string, video: IVideo) {
         const videoCollectionPath = `users/${userId}/videos`;
 
-        const updatedDocument = await this.database.update(videoCollectionPath, video.id, {
-            ...video,
-            status: VideoStatus.Rendering,
-        });
+        const updatedDocument = await this.database.update(videoCollectionPath, video.id, video);
 
-        this.videoProcessingService.renderVideo();
+        this.videoProcessingService.renderVideo(userId, video);
 
         return updatedDocument;
     }

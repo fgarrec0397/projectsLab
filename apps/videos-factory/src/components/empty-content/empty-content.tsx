@@ -28,7 +28,8 @@ export default function EmptyContent({
             alignItems="center"
             justifyContent="center"
             sx={{
-                px: 3,
+                p: 3,
+                pb: 6,
                 height: 1,
                 ...(filled && {
                     borderRadius: 2,
@@ -65,7 +66,7 @@ export default function EmptyContent({
                 </Typography>
             )}
 
-            {action && action}
+            {action && <Stack sx={{ mt: 2 }}>{action}</Stack>}
         </Stack>
     );
 }

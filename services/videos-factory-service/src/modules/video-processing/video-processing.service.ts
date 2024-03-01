@@ -1,5 +1,8 @@
 import { HttpException, HttpStatus, Injectable } from "@nestjs/common";
+import { CacheService } from "src/common/cache/cache.service";
+import { DatabaseConfig, InjectDatabase } from "src/config/database-config.module";
 
+import { IVideo } from "../videos/videos.types";
 import { VideoEventsGateway } from "./gateways/video-events.gateway";
 import {
     Script,
@@ -23,38 +26,35 @@ export class VideoProcessingService {
         private readonly scriptService: ScriptGeneratorService,
         @InjectTemplateGenerator() private readonly templateService: TemplateGeneratorService,
         private readonly videoService: VideoRendererService,
-        private readonly eventsGateway: VideoEventsGateway
+        private readonly eventsGateway: VideoEventsGateway,
+        @InjectDatabase() private readonly database: DatabaseConfig,
+        private readonly cacheService: CacheService
     ) {}
 
-    async renderVideo() {
+    async renderVideo(userId: string, video: IVideo) {
         let script: Script = {};
         let template: Template | undefined = undefined;
 
         if (canGenerateScript) {
-            this.eventsGateway.notifyVideoProcessStep({
-                status: VideoProcessingStepDataStatus.GeneratingScript,
-            });
+            await this.notifyClient(userId, video, VideoProcessingStepDataStatus.GeneratingScript);
 
             script = await this.scriptService.generateScript();
 
-            this.eventsGateway.notifyVideoProcessStep({
-                status: VideoProcessingStepDataStatus.ScriptGenerated,
-                data: script,
-            });
+            await this.notifyClient(userId, video, VideoProcessingStepDataStatus.ScriptGenerated);
         }
 
         if (canGenerateTemplate) {
-            this.eventsGateway.notifyVideoProcessStep({
-                status: VideoProcessingStepDataStatus.GeneratingTemplate,
-            });
+            await this.notifyClient(
+                userId,
+                video,
+                VideoProcessingStepDataStatus.GeneratingTemplate
+            );
 
             this.templateService.prepareTemplate(script);
 
             template = await this.templateService.createTemplate();
 
-            this.eventsGateway.notifyVideoProcessStep({
-                status: VideoProcessingStepDataStatus.TemplateGenerated,
-            });
+            await this.notifyClient(userId, video, VideoProcessingStepDataStatus.TemplateGenerated);
 
             if (!template) {
                 throw new HttpException(
@@ -66,21 +66,20 @@ export class VideoProcessingService {
 
         try {
             if (!canRenderVideo) {
-                return { result: "Video not created" };
+                throw new HttpException(
+                    "An issue happened and the video was not generated",
+                    HttpStatus.INTERNAL_SERVER_ERROR
+                );
             }
 
             if (template) {
-                this.eventsGateway.notifyVideoProcessStep({
-                    status: VideoProcessingStepDataStatus.Rendering,
-                });
+                await this.notifyClient(userId, video, VideoProcessingStepDataStatus.Rendering);
 
                 this.videoService.init(template);
 
                 await this.videoService.initRender();
 
-                this.eventsGateway.notifyVideoProcessStep({
-                    status: VideoProcessingStepDataStatus.Rendered,
-                });
+                await this.notifyClient(userId, video, VideoProcessingStepDataStatus.Rendered);
 
                 return { result: "Video created" };
             }
@@ -92,5 +91,22 @@ export class VideoProcessingService {
         } catch (error) {
             throw new HttpException(error as Record<string, any>, HttpStatus.BAD_REQUEST);
         }
+    }
+
+    private async notifyClient(
+        userId: string,
+        video: IVideo,
+        status: VideoProcessingStepDataStatus
+    ) {
+        const videoCollectionPath = `users/${userId}/videos`;
+
+        await this.database.update(videoCollectionPath, video.id, {
+            ...video,
+            status,
+        });
+
+        this.eventsGateway.notifyVideoProcessStep({
+            status,
+        });
     }
 }

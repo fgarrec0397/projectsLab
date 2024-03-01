@@ -10,7 +10,7 @@ import { getVideos } from "../videosService";
 export const useGetVideos = () => {
     const auth = useAuthContext();
 
-    const { data, isLoading, error, isValidating } = useSWR<IVideo[]>(
+    const { data, isLoading, error, isValidating, mutate } = useSWR<IVideo[]>(
         auth.user?.accessToken,
         getVideos,
         {
@@ -25,8 +25,9 @@ export const useGetVideos = () => {
             isVideosLoading: isLoading,
             videosError: error,
             isVideosValidating: isValidating,
+            mutateVideos: mutate,
         }),
-        [data, isLoading, error, isValidating]
+        [data, isLoading, error, isValidating, mutate]
     );
 
     return memoizedResponse;

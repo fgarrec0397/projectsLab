@@ -83,7 +83,7 @@ export class FirebaseDatabase implements DatabaseStrategy<FirebaseTypes> {
 
         const { conditions, orderByDirection, orderByField, limitNumber } = options;
 
-        if (conditions.length) {
+        if (conditions?.length) {
             conditions.forEach((condition) => {
                 query = query.where(condition.field, condition.operator, condition.value);
             });
@@ -109,7 +109,7 @@ export class FirebaseDatabase implements DatabaseStrategy<FirebaseTypes> {
 
     private removeUndefinedProperties(obj: Record<string, any>): Record<string, any> {
         return Object.entries(obj)
-            .filter(([_, value]) => value !== undefined)
+            .filter(([, value]) => value !== undefined)
             .reduce((acc, [key, value]) => ({ ...acc, [key]: value }), {});
     }
 }

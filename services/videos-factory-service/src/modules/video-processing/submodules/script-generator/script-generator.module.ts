@@ -18,7 +18,6 @@ import { OpenAIVoiceGeneratorStrategy } from "./strategies/VoiceGeneratorStrateg
         {
             provide: TEXT_GENERATOR_STRATEGY_TOKEN,
             useFactory: async (request: Request) => {
-                console.log(request.videoData, "request.videoData in useFactory");
                 return new OpenAITextGeneratorStrategy(request.videoData);
             },
             inject: [REQUEST],

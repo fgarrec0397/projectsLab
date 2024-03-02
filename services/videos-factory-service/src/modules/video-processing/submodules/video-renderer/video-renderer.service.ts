@@ -3,14 +3,14 @@ import ffmpeg, { FfmpegCommand } from "fluent-ffmpeg";
 import { FileSystem } from "src/common/FileSystem";
 import { CanvasRendererService } from "src/modules/canvas-renderer/canvas-renderer.service";
 
+import { ComplexFilterBuilder } from "./builders/video-complexfilter.builder";
 import { IElementComponent } from "./components/BaseComponent";
 import { IFragmentableComponent } from "./components/FragmentableComponent";
 import { SourceableElement } from "./entities/SourceableElement";
 import { Text } from "./entities/Text";
-import { ComplexFilterBuilder } from "./video-complexfilter.builder";
-import { ElementComponentFactory } from "./video-element-component.factory";
+import { ElementComponentFactory } from "./factories/video-element-component.factory";
+import { VideoTemplateMapper } from "./mappers/video-template.mapper";
 import { Template } from "./video-renderer.types";
-import { VideoTemplateMapper } from "./video-template.mapper";
 
 export type TemplateAsset = SourceableElement & {
     decompressPath?: string;

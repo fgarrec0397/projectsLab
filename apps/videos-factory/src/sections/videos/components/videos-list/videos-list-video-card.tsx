@@ -1,4 +1,13 @@
-import { Card, IconButton, Link, MenuItem, Stack, Typography } from "@mui/material";
+import {
+    alpha,
+    Card,
+    IconButton,
+    Link,
+    MenuItem,
+    Stack,
+    Typography,
+    useTheme,
+} from "@mui/material";
 import Box from "@mui/material/Box";
 import { useRouter } from "next/navigation";
 
@@ -12,15 +21,18 @@ import { useDeleteVideo } from "@/services/videosService/hooks/useDeleteVideo";
 import { icon } from "@/theme/icons";
 import { pxToRem } from "@/theme/typography";
 import { IVideo, VideoStatus } from "@/types/video";
+import { formatSeconds, formatServerTimestamp } from "@/utils/format-time";
 
 type Props = {
     video: IVideo;
 };
 
 export default function VideosListVideoCard({ video }: Props) {
+    const theme = useTheme();
     const popover = usePopover();
     const router = useRouter();
     const deleteVideo = useDeleteVideo();
+    const thumbnail = video.thumbnail || "https://placehold.co/135x240";
 
     const handleDeleteVideo = async () => {
         await deleteVideo(video.id);
@@ -32,26 +44,43 @@ export default function VideosListVideoCard({ video }: Props) {
             <Stack component={Card} direction="row">
                 <Box
                     sx={{
-                        maxWidth: 135,
-                        maxHeight: 240,
-                        width: 1,
-                        height: 1,
+                        width: 135,
+                        height: 240,
                         position: "relative",
                         flexShrink: 0,
-                        p: 1,
+                        backgroundColor: alpha(theme.palette.primary.lighter, 0.25),
                     }}
                 >
-                    <Image
-                        alt="title"
-                        src="https://placehold.co/600x400"
-                        ratio="9/16"
-                        sx={{ borderRadius: 1.5 }}
-                    />
+                    {thumbnail ? (
+                        <Image
+                            alt={video.name}
+                            src={video.thumbnail || "https://placehold.co/135x240"}
+                            ratio="9/16"
+                        />
+                    ) : (
+                        <Stack
+                            justifyContent="center"
+                            sx={{
+                                width: 1,
+                                height: 1,
+                            }}
+                        >
+                            <Typography
+                                component="span"
+                                variant="overline"
+                                sx={{
+                                    color: theme.palette.primary.darker,
+                                }}
+                            >
+                                Thumbnail not generated yet
+                            </Typography>
+                        </Stack>
+                    )}
                 </Box>
                 <Stack
                     sx={{
                         width: 1,
-                        p: (theme) => theme.spacing(3, 3, 2, 3),
+                        p: theme.spacing(3, 3, 2, 3),
                     }}
                 >
                     <Stack
@@ -64,7 +93,7 @@ export default function VideosListVideoCard({ video }: Props) {
                             component="span"
                             sx={{ typography: "caption", color: "text.disabled" }}
                         >
-                            August 30, 2023
+                            {formatServerTimestamp(video.updatedAt)}
                         </Box>
                         <Label variant="soft" color="default">
                             {video.status}
@@ -89,7 +118,9 @@ export default function VideosListVideoCard({ video }: Props) {
                                     ml: 1,
                                 }}
                             >
-                                1 min 30s
+                                {video.duration !== undefined
+                                    ? formatSeconds(video.duration)
+                                    : "No duration yet"}
                             </Typography>
                         </Stack>
                     </Stack>

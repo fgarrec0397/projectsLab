@@ -6,7 +6,7 @@ import { paths } from "@/routes/paths";
 import { startRendering } from "@/services/videosService/videosService";
 import { IVideo } from "@/types/video";
 
-import { useGetOrCreateVideoDraft } from "./useGetOrCreateVideoDraft";
+import { useGetVideoDraft } from "./useGetVideoDraft";
 import { useGetVideos } from "./useGetVideos";
 
 export const useRenderVideo = () => {
@@ -14,7 +14,7 @@ export const useRenderVideo = () => {
     const auth = useAuthContext();
     const { enqueueSnackbar } = useSnackbar();
     const { mutateVideos } = useGetVideos();
-    const { mutateVideoDraft } = useGetOrCreateVideoDraft();
+    const { mutateVideoDraft } = useGetVideoDraft();
 
     const renderVideo = async (video: IVideo) => {
         try {

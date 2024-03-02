@@ -1,11 +1,11 @@
-import { IElementComponent } from "./components/BaseComponent";
-import { IFragmentableComponent } from "./components/FragmentableComponent";
-import { BaseElement } from "./entities/BaseElement";
-import { Composition } from "./entities/Composition";
-import { SourceableElement } from "./entities/SourceableElement";
-import { ElementComponentFactory } from "./video-element-component.factory";
-import { TemplateAsset } from "./video-renderer.service";
-import { Template } from "./video-renderer.types";
+import { IElementComponent } from "../components/BaseComponent";
+import { IFragmentableComponent } from "../components/FragmentableComponent";
+import { BaseElement } from "../entities/BaseElement";
+import { Composition } from "../entities/Composition";
+import { SourceableElement } from "../entities/SourceableElement";
+import { ElementComponentFactory } from "../factories/video-element-component.factory";
+import { TemplateAsset } from "../video-renderer.service";
+import { Template } from "../video-renderer.types";
 
 export class VideoTemplateMapper {
     template: Template;

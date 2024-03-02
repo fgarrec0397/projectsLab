@@ -31,7 +31,7 @@ import RHFFilesSelector from "@/components/hook-form/rhf-files-selector";
 import { LoadingScreen } from "@/components/loading-screen";
 import { useSettingsContext } from "@/components/settings";
 import { useGetFiles } from "@/services/filesService/hooks/useGetFiles";
-import { useGetOrCreateVideoDraft } from "@/services/videosService/hooks/useGetOrCreateVideoDraft";
+import { useGetVideoDraft } from "@/services/videosService/hooks/useGetVideoDraft";
 import { useRenderVideo } from "@/services/videosService/hooks/useRenderVideo";
 import { useSaveDraft } from "@/services/videosService/hooks/useSaveDraft";
 import { icon } from "@/theme/icons";
@@ -56,7 +56,7 @@ export default function VideosCreateView() {
     const settings = useSettingsContext();
     const { allFiles } = useGetFiles();
     const [isEditingVideoName, setIsEditingVideoName] = useState(false);
-    const { videoDraft, isVideoDraftLoading } = useGetOrCreateVideoDraft();
+    const { videoDraft, isVideoDraftLoading } = useGetVideoDraft();
     const saveDraft = useSaveDraft();
     const renderVideo = useRenderVideo();
 

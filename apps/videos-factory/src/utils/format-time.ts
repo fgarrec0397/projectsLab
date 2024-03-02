@@ -1,4 +1,6 @@
-import { format, formatDistanceToNow, getTime } from "date-fns";
+import { format, formatDistanceToNow, getTime, intervalToDuration } from "date-fns";
+
+import { ServerTimestamp } from "@/types/date";
 
 // ----------------------------------------------------------------------
 
@@ -49,4 +51,30 @@ export function isAfter(startDate: Date | null, endDate: Date | null) {
         startDate && endDate ? new Date(startDate).getTime() > new Date(endDate).getTime() : false;
 
     return results;
+}
+
+export function formatServerTimestamp(timestamp: ServerTimestamp) {
+    const date = new Date(timestamp._seconds * 1000 + timestamp._nanoseconds / 1000000);
+
+    return fDate(date);
+}
+
+export function formatSeconds(seconds: number) {
+    const duration = intervalToDuration({ start: 0, end: seconds * 1000 });
+
+    let shortDuration = "";
+
+    if (duration.hours) {
+        shortDuration += `${duration.hours}h `;
+    }
+
+    if (duration.minutes || duration.hours) {
+        shortDuration += `${duration.minutes}min `;
+    }
+
+    if (duration.seconds || duration.minutes || duration.hours) {
+        shortDuration += `${duration.seconds}s`;
+    }
+
+    return shortDuration.trim();
 }

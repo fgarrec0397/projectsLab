@@ -1,20 +1,10 @@
 import axios from "axios";
-import { mutate } from "swr";
 
 import { endpoints } from "@/routes/endpoints";
 import { IVideo, IVideoDraft } from "@/types/video";
 
-export const mutateVideosDraft = (accessToken: string | undefined) =>
-    mutate([accessToken, "videoDraft"]);
-
-export const mutateVideos = (accessToken: string | undefined) => {
-    mutate([accessToken, "videos"]);
-};
-
 export const getVideos = async (accessToken: string | undefined) => {
     const url = `${endpoints.videos.get}`;
-
-    console.log("getVideos called");
 
     const response = await axios.get<IVideo[]>(url, {
         headers: {
@@ -39,9 +29,8 @@ export const getVideoById = async (accessToken: string | undefined, videoId: str
     return response.data;
 };
 
-export const getOrCreateVideoDraft = async (accessToken: string | undefined) => {
-    const url = `${endpoints.videos.draft.getOrCreate}`;
-    console.log("getOrCreateVideoDraft called");
+export const getVideoDraft = async (accessToken: string | undefined) => {
+    const url = `${endpoints.videos.draft.getLast}`;
 
     const response = await axios.get<IVideoDraft>(url, {
         headers: {
@@ -50,14 +39,11 @@ export const getOrCreateVideoDraft = async (accessToken: string | undefined) => 
         },
     });
 
-    // mutateVideos(accessToken);
-
     return response.data;
 };
 
 export const saveDraft = async (accessToken: string | undefined, videoDraft: IVideoDraft) => {
     const url = `${endpoints.videos.draft.save}`;
-    console.log("saveDraft called");
 
     const response = await axios.patch<IVideoDraft>(url, videoDraft, {
         headers: {
@@ -79,9 +65,6 @@ export const startRendering = async (accessToken: string | undefined, videoDraft
         },
     });
 
-    mutateVideos(accessToken);
-    // mutateVideosDraft(accessToken);
-
     return response.data;
 };
 
@@ -94,8 +77,6 @@ export const deleteVideo = async (accessToken: string | undefined, videoId: stri
             Authorization: `Bearer ${accessToken}`,
         },
     });
-
-    mutateVideos(accessToken);
 
     return response.data;
 };

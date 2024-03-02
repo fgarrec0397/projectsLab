@@ -1,16 +1,16 @@
 import { CanvasRendererService } from "src/modules/canvas-renderer/canvas-renderer.service";
 
-import { AudioComponent } from "./components/AudioComponent";
-import { IElementComponent } from "./components/BaseComponent";
-import { CompositionComponent } from "./components/CompositionComponent";
-import { TextComponent } from "./components/TextComponent";
-import { VideoComponent } from "./components/VideoComponent";
-import { Audio } from "./entities/Audio";
-import { BaseElement } from "./entities/BaseElement";
-import { Composition } from "./entities/Composition";
-import { Text } from "./entities/Text";
-import { Video } from "./entities/Video";
-import { ComplexFilterBuilder } from "./video-complexfilter.builder";
+import { ComplexFilterBuilder } from "../builders/video-complexfilter.builder";
+import { AudioComponent } from "../components/AudioComponent";
+import { IElementComponent } from "../components/BaseComponent";
+import { CompositionComponent } from "../components/CompositionComponent";
+import { TextComponent } from "../components/TextComponent";
+import { VideoComponent } from "../components/VideoComponent";
+import { Audio } from "../entities/Audio";
+import { BaseElement } from "../entities/BaseElement";
+import { Composition } from "../entities/Composition";
+import { Text } from "../entities/Text";
+import { Video } from "../entities/Video";
 
 export class ElementComponentFactory {
     canvasRenderer: CanvasRendererService;

@@ -1,5 +1,6 @@
 import { Injectable } from "@nestjs/common";
 import { uidGenerator } from "@projectslab/helpers";
+import admin from "firebase-admin";
 import { DatabaseConfig, InjectDatabase } from "src/config/database-config.module";
 import { VideoProcessingService } from "src/modules/video-processing/video-processing.service";
 
@@ -22,10 +23,8 @@ export class VideosService {
         return videos;
     }
 
-    async getOrCreateLastVideoDraft(userId: string) {
-        const videoCollectionPath = `users/${userId}/videos`;
+    async getLastOrDefaultVideoDraft(userId: string) {
         const lastVideoDraft = await this.getLastVideoDraft(userId);
-        console.log(lastVideoDraft, "lastVideoDraft");
 
         if (lastVideoDraft) {
             return lastVideoDraft;
@@ -46,11 +45,9 @@ export class VideosService {
             pace: "mix",
             moreSpecificities: undefined,
             status: VideoStatus.Draft,
-            createdAt: new Date(),
-            updatedAt: new Date(),
+            createdAt: admin.firestore.Timestamp.now(),
+            updatedAt: admin.firestore.Timestamp.now(),
         };
-
-        await this.database.createOrUpdate(videoCollectionPath, defaultVideoDraft);
 
         return defaultVideoDraft;
     }
@@ -67,11 +64,12 @@ export class VideosService {
     async saveLastVideoDraft(userId: string, videoDraft: IVideoDraft) {
         const videoCollectionPath = `users/${userId}/videos`;
 
-        const updatedDocument = await this.database.update(
-            videoCollectionPath,
-            videoDraft.id,
-            videoDraft
-        );
+        const updatedDocument = await this.database.createOrUpdate(videoCollectionPath, {
+            ...videoDraft,
+            updatedAt: admin.firestore.Timestamp.now(),
+        });
+
+        console.log(admin.firestore.Timestamp.now(), "admin.firestore.Timestamp.now()");
 
         return updatedDocument;
     }

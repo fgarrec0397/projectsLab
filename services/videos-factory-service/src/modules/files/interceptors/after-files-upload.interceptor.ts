@@ -18,8 +18,6 @@ export class AfterFilesUploadInterceptor implements NestInterceptor {
                     return of(data);
                 }
 
-                console.log("Files upload processing started ");
-
                 this.processFilesInBackground(data.uploadedFilesIds)
                     .then(() => {
                         console.log("Files upload processing completed");

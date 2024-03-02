@@ -32,12 +32,10 @@ export class VideosController {
         return this.videosService.deleteVideo(request.userId, id);
     }
 
-    @Get("draft/getOrCreate")
+    @Get("draft/getLast")
     @UseInvalidateCache(videosCacheKey)
-    async getOrCreateVideoDraft(@Req() request: Request) {
-        console.log("getOrCreate");
-
-        return this.videosService.getOrCreateLastVideoDraft(request.userId);
+    async getLastOrDefaultVideoDraft(@Req() request: Request) {
+        return this.videosService.getLastOrDefaultVideoDraft(request.userId);
     }
 
     @Patch("draft/save")

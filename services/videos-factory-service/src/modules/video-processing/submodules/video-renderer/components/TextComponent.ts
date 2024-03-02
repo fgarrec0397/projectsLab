@@ -3,7 +3,7 @@ import { FileSystem } from "src/common/FileSystem";
 import { CanvasRendererService } from "src/modules/canvas-renderer/canvas-renderer.service";
 
 import { Text } from "../entities/Text";
-import { ComplexFilterBuilder } from "../video-complexfilter.builder";
+import { ComplexFilterBuilder } from "../builders/video-complexfilter.builder";
 import { TimedText } from "../video-renderer.types";
 import { FragmentableComponent, IFragmentableComponent } from "./FragmentableComponent";
 

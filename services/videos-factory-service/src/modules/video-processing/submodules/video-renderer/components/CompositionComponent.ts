@@ -1,7 +1,7 @@
 import ffmpeg from "fluent-ffmpeg";
 
 import { Composition } from "../entities/Composition";
-import { ComplexFilterBuilder } from "../video-complexfilter.builder";
+import { ComplexFilterBuilder } from "../builders/video-complexfilter.builder";
 import { Template } from "../video-renderer.types";
 import { BaseComponent, IElementComponent } from "./BaseComponent";
 

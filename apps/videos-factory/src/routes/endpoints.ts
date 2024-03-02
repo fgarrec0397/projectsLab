@@ -17,7 +17,7 @@ export const endpoints = {
         delete: `${baseURL}/videos`,
         startRendering: `${baseURL}/videos/startRendering`,
         draft: {
-            getOrCreate: `${baseURL}/videos/draft/getOrCreate`,
+            getLast: `${baseURL}/videos/draft/getLast`,
             save: `${baseURL}/videos/draft/save`,
         },
     },

@@ -4,14 +4,14 @@ import { useAuthContext } from "@/auth/hooks";
 import { saveDraft as saveDraftService } from "@/services/videosService/videosService";
 import { IVideoDraft } from "@/types/video";
 
-import { useGetOrCreateVideoDraft } from "./useGetOrCreateVideoDraft";
+import { useGetVideoDraft } from "./useGetVideoDraft";
 import { useGetVideos } from "./useGetVideos";
 
 export const useSaveDraft = () => {
     const auth = useAuthContext();
     const { enqueueSnackbar } = useSnackbar();
     const { mutateVideos } = useGetVideos();
-    const { mutateVideoDraft } = useGetOrCreateVideoDraft();
+    const { mutateVideoDraft } = useGetVideoDraft();
 
     const saveDraft = async (videoDraft: IVideoDraft) => {
         try {

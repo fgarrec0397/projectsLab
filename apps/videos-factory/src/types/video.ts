@@ -1,3 +1,5 @@
+import { ServerTimestamp } from "./date";
+
 export enum VideoStatus {
     "Draft" = "draft",
     "GeneratingScript" = "generatingScript",
@@ -26,6 +28,10 @@ export type IVideo = {
     moreSpecificities?: string;
     files: string[];
     status: VideoStatus;
+    duration?: number;
+    thumbnail?: string;
+    createdAt: ServerTimestamp;
+    updatedAt: ServerTimestamp;
 };
 
 export type IVideoDraft = Partial<IVideo>;

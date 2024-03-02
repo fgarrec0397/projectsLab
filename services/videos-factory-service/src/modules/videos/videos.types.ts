@@ -1,3 +1,5 @@
+import { Timestamp } from "firebase-admin/firestore";
+
 export type StructureType = "quickTips" | "storytelling" | "vlog" | "tops";
 
 export type SpecificityLevel = "broader" | "specific";
@@ -34,8 +36,10 @@ export type IVideo = {
     moreSpecificities?: string;
     files: string[];
     status: VideoStatus;
-    createdAt: Date;
-    updatedAt: Date;
+    duration?: number;
+    thumbnail?: string;
+    createdAt: Timestamp;
+    updatedAt: Timestamp;
 };
 
 export type IVideoDraft = Omit<Partial<IVideo>, "id"> & {

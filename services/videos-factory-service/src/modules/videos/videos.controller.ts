@@ -33,8 +33,10 @@ export class VideosController {
     }
 
     @Get("draft/getOrCreate")
-    @UseCache(videosCacheKey, MONTH_IN_SECONDS)
+    @UseInvalidateCache(videosCacheKey)
     async getOrCreateVideoDraft(@Req() request: Request) {
+        console.log("getOrCreate");
+
         return this.videosService.getOrCreateLastVideoDraft(request.userId);
     }
 

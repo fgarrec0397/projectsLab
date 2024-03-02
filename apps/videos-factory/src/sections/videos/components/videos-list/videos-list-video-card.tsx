@@ -2,15 +2,13 @@ import { Card, IconButton, Link, MenuItem, Stack, Typography } from "@mui/materi
 import Box from "@mui/material/Box";
 import { useRouter } from "next/navigation";
 
-import { useAuthContext } from "@/auth/hooks";
 import CustomPopover, { usePopover } from "@/components/custom-popover";
 import Iconify from "@/components/iconify";
 import Image from "@/components/image";
 import Label from "@/components/label";
-import { useSnackbar } from "@/components/snackbar";
 import { RouterLink } from "@/routes/components";
 import { paths } from "@/routes/paths";
-import { deleteVideo } from "@/services/videosService/videosService";
+import { useDeleteVideo } from "@/services/videosService/hooks/useDeleteVideo";
 import { icon } from "@/theme/icons";
 import { pxToRem } from "@/theme/typography";
 import { IVideo, VideoStatus } from "@/types/video";
@@ -20,21 +18,13 @@ type Props = {
 };
 
 export default function VideosListVideoCard({ video }: Props) {
-    const { user } = useAuthContext();
     const popover = usePopover();
     const router = useRouter();
-    const { enqueueSnackbar } = useSnackbar();
+    const deleteVideo = useDeleteVideo();
 
     const handleDeleteVideo = async () => {
-        try {
-            await deleteVideo(user?.accessToken, video.id);
-            popover.onClose();
-            enqueueSnackbar("Video deleted with success");
-        } catch (error) {
-            enqueueSnackbar("Something happened wrong, the video was not deleted", {
-                variant: "error",
-            });
-        }
+        await deleteVideo(video.id);
+        popover.onClose();
     };
 
     return (

@@ -14,12 +14,10 @@ import Container from "@mui/material/Container";
 import Typography from "@mui/material/Typography";
 import Grid from "@mui/system/Unstable_Grid";
 import { m } from "framer-motion";
-import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 import * as Yup from "yup";
 
-import { useAuthContext } from "@/auth/hooks";
 import { varHover } from "@/components/animate";
 import { SecondaryButton } from "@/components/button";
 import { TertiaryButton } from "@/components/button/tertiary-button";
@@ -32,14 +30,13 @@ import FormProvider, {
 import RHFFilesSelector from "@/components/hook-form/rhf-files-selector";
 import { LoadingScreen } from "@/components/loading-screen";
 import { useSettingsContext } from "@/components/settings";
-import { useSnackbar } from "@/components/snackbar";
-import { paths } from "@/routes/paths";
 import { useGetFiles } from "@/services/filesService/hooks/useGetFiles";
 import { useGetOrCreateVideoDraft } from "@/services/videosService/hooks/useGetOrCreateVideoDraft";
-import { saveDraft, startRendering } from "@/services/videosService/videosService";
+import { useRenderVideo } from "@/services/videosService/hooks/useRenderVideo";
+import { useSaveDraft } from "@/services/videosService/hooks/useSaveDraft";
 import { icon } from "@/theme/icons";
 import { pxToRem } from "@/theme/typography";
-import { IFormVideo } from "@/types/video";
+import { IFormVideo, IVideo } from "@/types/video";
 
 // ----------------------------------------------------------------------
 
@@ -56,13 +53,12 @@ const STRUCTURE_TYPE_OPTIONS = [
 ];
 
 export default function VideosCreateView() {
-    const auth = useAuthContext();
-    const { enqueueSnackbar } = useSnackbar();
     const settings = useSettingsContext();
     const { allFiles } = useGetFiles();
     const [isEditingVideoName, setIsEditingVideoName] = useState(false);
     const { videoDraft, isVideoDraftLoading } = useGetOrCreateVideoDraft();
-    const router = useRouter();
+    const saveDraft = useSaveDraft();
+    const renderVideo = useRenderVideo();
 
     const NewVideoSchema = Yup.object().shape({
         name: Yup.string().required("Name is required"),
@@ -118,27 +114,12 @@ export default function VideosCreateView() {
     }, [videoDraft, reset, defaultValues]);
 
     const onSaveDraft = async () => {
-        try {
-            await saveDraft(auth.user?.accessToken, {
-                ...control._formValues,
-                id: videoDraft?.id,
-            });
-            enqueueSnackbar("Video draft saved with success!");
-        } catch (error) {
-            enqueueSnackbar("The video draft was not saved correctly", { variant: "error" });
-        }
+        await saveDraft(control._formValues);
     };
 
     const onSubmit = handleSubmit(async (data) => {
-        try {
-            await startRendering(auth.user?.accessToken, data);
-
-            reset();
-            enqueueSnackbar("Video creation started");
-            router.push(paths.dashboard.videos.root);
-        } catch (error) {
-            enqueueSnackbar("Something went wrong", { variant: "error" });
-        }
+        await renderVideo(data as IVideo);
+        reset();
     });
 
     if (isVideoDraftLoading) {

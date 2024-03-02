@@ -1,21 +1,41 @@
 import { Card, IconButton, Link, MenuItem, Stack, Typography } from "@mui/material";
 import Box from "@mui/material/Box";
+import { useRouter } from "next/navigation";
 
+import { useAuthContext } from "@/auth/hooks";
 import CustomPopover, { usePopover } from "@/components/custom-popover";
 import Iconify from "@/components/iconify";
 import Image from "@/components/image";
 import Label from "@/components/label";
+import { useSnackbar } from "@/components/snackbar";
 import { RouterLink } from "@/routes/components";
+import { paths } from "@/routes/paths";
+import { deleteVideo } from "@/services/videosService/videosService";
 import { icon } from "@/theme/icons";
 import { pxToRem } from "@/theme/typography";
-import { IVideo } from "@/types/video";
+import { IVideo, VideoStatus } from "@/types/video";
 
 type Props = {
     video: IVideo;
 };
 
 export default function VideosListVideoCard({ video }: Props) {
+    const { user } = useAuthContext();
     const popover = usePopover();
+    const router = useRouter();
+    const { enqueueSnackbar } = useSnackbar();
+
+    const handleDeleteVideo = async () => {
+        try {
+            await deleteVideo(user?.accessToken, video.id);
+            popover.onClose();
+            enqueueSnackbar("Video deleted with success");
+        } catch (error) {
+            enqueueSnackbar("Something happened wrong, the video was not deleted", {
+                variant: "error",
+            });
+        }
+    };
 
     return (
         <>
@@ -62,7 +82,11 @@ export default function VideosListVideoCard({ video }: Props) {
                     </Stack>
 
                     <Stack spacing={1} flexGrow={1}>
-                        <Link color="inherit" component={RouterLink} href="#">
+                        <Link
+                            color="inherit"
+                            component={RouterLink}
+                            href={paths.dashboard.videos.create}
+                        >
                             <Typography variant="h5">{video.name}</Typography>
                         </Link>
 
@@ -97,7 +121,7 @@ export default function VideosListVideoCard({ video }: Props) {
                 arrow="bottom-center"
                 sx={{ width: 140 }}
             >
-                <MenuItem
+                {/* <MenuItem
                     onClick={() => {
                         popover.onClose();
                         // router.push(paths.dashboard.post.details(title));
@@ -105,24 +129,21 @@ export default function VideosListVideoCard({ video }: Props) {
                 >
                     <Iconify icon="solar:eye-bold" />
                     View
-                </MenuItem>
+                </MenuItem> */}
 
-                <MenuItem
-                    onClick={() => {
-                        popover.onClose();
-                        // router.push(paths.dashboard.post.edit(title));
-                    }}
-                >
-                    <Iconify icon="solar:pen-bold" />
-                    Edit
-                </MenuItem>
+                {video.status === VideoStatus.Draft && (
+                    <MenuItem
+                        onClick={() => {
+                            popover.onClose();
+                            router.push(paths.dashboard.videos.create);
+                        }}
+                    >
+                        <Iconify icon="solar:pen-bold" />
+                        Edit
+                    </MenuItem>
+                )}
 
-                <MenuItem
-                    onClick={() => {
-                        popover.onClose();
-                    }}
-                    sx={{ color: "error.main" }}
-                >
+                <MenuItem onClick={handleDeleteVideo} sx={{ color: "error.main" }}>
                     <Iconify icon="solar:trash-bin-trash-bold" />
                     Delete
                 </MenuItem>

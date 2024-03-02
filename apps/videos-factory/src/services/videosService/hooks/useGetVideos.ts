@@ -7,12 +7,13 @@ import { useAuthContext } from "@/auth/hooks";
 import { IVideo } from "@/types/video";
 
 import { getVideos } from "../videosService";
+
 export const useGetVideos = () => {
     const auth = useAuthContext();
 
     const { data, isLoading, error, isValidating, mutate } = useSWR<IVideo[]>(
-        auth.user?.accessToken,
-        getVideos,
+        [auth.user?.accessToken, "videos"],
+        () => getVideos(auth.user?.accessToken),
         {
             revalidateIfStale: false,
             revalidateOnFocus: false,

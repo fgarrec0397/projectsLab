@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Patch, Post, Req } from "@nestjs/common";
+import { Body, Controller, Delete, Get, Param, Patch, Post, Req } from "@nestjs/common";
 import { Request } from "express";
 import { getAuthCacheKey } from "src/common/cache/cache.utils";
 import { UseCache } from "src/common/cache/decorators/use-cache.decorator";
@@ -24,6 +24,12 @@ export class VideosController {
     @UseInvalidateCache(videosCacheKey)
     async renderVideo(@Req() request: Request, @Body() video: IVideo) {
         return this.videosService.startRendering(request.userId, video);
+    }
+
+    @Delete("/:id")
+    @UseInvalidateCache(videosCacheKey)
+    async deleteVideo(@Req() request: Request, @Param("id") id: string) {
+        return this.videosService.deleteVideo(request.userId, id);
     }
 
     @Get("draft/getOrCreate")

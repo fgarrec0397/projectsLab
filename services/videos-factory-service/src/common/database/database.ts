@@ -3,6 +3,7 @@ import { Inject, Injectable } from "@nestjs/common";
 export type DatabaseTypes = {
     getDB: unknown;
     create: unknown;
+    createOrUpdate: unknown;
     findAll: unknown;
     findOne: unknown;
     update: unknown;
@@ -15,6 +16,10 @@ export interface DatabaseStrategy<T extends DatabaseTypes> {
     init(): void;
     getDB(): T["getDB"];
     create<TData>(collection: string, data: TData): T["create"];
+    createOrUpdate<TData extends { id: string }>(
+        collection: string,
+        data: TData
+    ): T["createOrUpdate"];
     findAll(collectionPath: string): T["findAll"];
     findOne(collectionPath: string, id: string): T["findOne"];
     update<
@@ -47,6 +52,10 @@ export class Database<T extends DatabaseTypes> {
     }
 
     async create<TData>(collection: string, data: TData) {
+        return this.databaseStrategy.create(collection, data);
+    }
+
+    async createOrUpdate<TData extends { id: string }>(collection: string, data: TData) {
         return this.databaseStrategy.create(collection, data);
     }
 

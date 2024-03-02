@@ -12,6 +12,7 @@ type FirebaseTypes = {
             admin.firestore.DocumentData
         >
     >;
+    createOrUpdate: Promise<admin.firestore.WriteResult>;
     findAll: unknown;
     findOne: Promise<
         admin.firestore.DocumentSnapshot<admin.firestore.DocumentData, admin.firestore.DocumentData>
@@ -49,6 +50,13 @@ export class FirebaseDatabase implements DatabaseStrategy<FirebaseTypes> {
     async create<TData>(collection: string, data: TData) {
         const sanitizedData = this.removeUndefinedProperties(data);
         return this.getDB().collection(collection).add(sanitizedData);
+    }
+
+    async createOrUpdate<TData extends { id: string }>(collection: string, data: TData) {
+        const sanitizedData = this.removeUndefinedProperties(data);
+        const document = this.getDB().collection(collection).doc(data.id);
+
+        return document.set(sanitizedData);
     }
 
     async findAll<TValue>(collectionPath: string): Promise<TValue[]> {

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo } from "react";
+import { useMemo } from "react";
 import useSWR from "swr";
 
 import { useAuthContext } from "@/auth/hooks";
@@ -12,8 +12,8 @@ export const useGetOrCreateVideoDraft = () => {
     const auth = useAuthContext();
 
     const { data, isLoading, error, isValidating, mutate } = useSWR<IVideoDraft>(
-        auth.user?.accessToken,
-        getOrCreateVideoDraft,
+        [auth.user?.accessToken, "videoDraft"],
+        () => getOrCreateVideoDraft(auth.user?.accessToken),
         {
             revalidateIfStale: false,
             revalidateOnFocus: false,
@@ -30,10 +30,6 @@ export const useGetOrCreateVideoDraft = () => {
         }),
         [data, isLoading, error, isValidating, mutate]
     );
-
-    useEffect(() => {
-        mutate(auth.user?.accessToken);
-    }, [auth.user?.accessToken, mutate]);
 
     return memoizedResponse;
 };

@@ -66,10 +66,7 @@ export class VideoProcessingService {
 
         try {
             if (!canRenderVideo) {
-                throw new HttpException(
-                    "An issue happened and the video was not generated",
-                    HttpStatus.INTERNAL_SERVER_ERROR
-                );
+                return;
             }
 
             if (template) {
@@ -107,6 +104,7 @@ export class VideoProcessingService {
 
         this.eventsGateway.notifyVideoProcessStep({
             status,
+            data: video,
         });
     }
 }

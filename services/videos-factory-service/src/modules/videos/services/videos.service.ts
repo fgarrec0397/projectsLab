@@ -1,4 +1,5 @@
 import { Injectable } from "@nestjs/common";
+import { uidGenerator } from "@projectslab/helpers";
 import { DatabaseConfig, InjectDatabase } from "src/config/database-config.module";
 import { VideoProcessingService } from "src/modules/video-processing/video-processing.service";
 
@@ -24,12 +25,14 @@ export class VideosService {
     async getOrCreateLastVideoDraft(userId: string) {
         const videoCollectionPath = `users/${userId}/videos`;
         const lastVideoDraft = await this.getLastVideoDraft(userId);
+        console.log(lastVideoDraft, "lastVideoDraft");
 
         if (lastVideoDraft) {
             return lastVideoDraft;
         }
 
-        const defaultVideoDraft = {
+        const defaultVideoDraft: IVideoDraft = {
+            id: uidGenerator(),
             name: "Your new awesome video",
             location: "",
             age: [18, 36],
@@ -37,9 +40,9 @@ export class VideosService {
             language: "en-US",
             interests: undefined,
             challenges: undefined,
-            contentType: "",
-            specificityLevel: "broader audience",
-            structureType: "quick tips",
+            topic: "",
+            specificityLevel: "broader",
+            structureType: "quickTips",
             pace: "mix",
             moreSpecificities: undefined,
             status: VideoStatus.Draft,
@@ -47,13 +50,9 @@ export class VideosService {
             updatedAt: new Date(),
         };
 
-        const createdDocument = await this.database.create(videoCollectionPath, defaultVideoDraft);
-        const { id } = createdDocument;
+        await this.database.createOrUpdate(videoCollectionPath, defaultVideoDraft);
 
-        return {
-            ...defaultVideoDraft,
-            id,
-        };
+        return defaultVideoDraft;
     }
 
     async getLastVideoDraft(userId: string) {
@@ -75,6 +74,13 @@ export class VideosService {
         );
 
         return updatedDocument;
+    }
+
+    async deleteVideo(userId: string, videoId: string) {
+        const videoCollectionPath = `users/${userId}/videos`;
+        console.log(videoId, "videoId");
+
+        return this.database.delete(videoCollectionPath, videoId);
     }
 
     async startRendering(userId: string, video: IVideo) {

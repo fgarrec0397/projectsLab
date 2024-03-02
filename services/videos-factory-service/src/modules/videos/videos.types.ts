@@ -34,6 +34,10 @@ export type IVideo = {
     moreSpecificities?: string;
     files: string[];
     status: VideoStatus;
+    createdAt: Date;
+    updatedAt: Date;
 };
 
-export type IVideoDraft = Partial<IVideo>;
+export type IVideoDraft = Omit<Partial<IVideo>, "id"> & {
+    id: string;
+};

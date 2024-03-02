@@ -14,6 +14,7 @@ export const endpoints = {
     },
     videos: {
         get: `${baseURL}/videos`,
+        delete: `${baseURL}/videos`,
         startRendering: `${baseURL}/videos/startRendering`,
         draft: {
             getOrCreate: `${baseURL}/videos/draft/getOrCreate`,

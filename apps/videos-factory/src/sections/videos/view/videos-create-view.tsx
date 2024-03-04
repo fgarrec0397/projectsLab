@@ -118,8 +118,10 @@ export default function VideosCreateView() {
     };
 
     const onSubmit = handleSubmit(async (data) => {
-        await renderVideo(data as IVideo);
-        reset();
+        try {
+            await renderVideo(data as IVideo);
+            // reset();
+        } catch (error) {}
     });
 
     if (isVideoDraftLoading) {

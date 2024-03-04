@@ -17,8 +17,8 @@ import { Template } from "./submodules/video-renderer/video-renderer.types";
 import { VideoProcessingStepDataStatus } from "./video-processing.types";
 
 const canGenerateScript = true;
-const canGenerateTemplate = false;
-const canRenderVideo = false;
+const canGenerateTemplate = true;
+const canRenderVideo = true;
 
 @Injectable()
 export class VideoProcessingService {
@@ -74,7 +74,9 @@ export class VideoProcessingService {
 
                 this.videoService.init(template);
 
-                await this.videoService.initRender();
+                await this.videoService.initRender(async (videoPath) => {
+                    console.log(videoPath, "videoPath");
+                });
 
                 await this.notifyClient(userId, video, VideoProcessingStepDataStatus.Rendered);
 

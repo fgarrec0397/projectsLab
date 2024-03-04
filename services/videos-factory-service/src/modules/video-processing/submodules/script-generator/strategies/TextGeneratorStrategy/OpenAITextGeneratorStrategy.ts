@@ -29,7 +29,7 @@ export class OpenAITextGeneratorStrategy implements TextGeneratorStrategy {
                         We are ${date} and your job is to write a concise and precise text for a targeted audience on a subject.
                         To do so, you will receive a name (name of the text), a location (where the text should happen),  an age range (of the targeted audience), a gender (of the targeted audience), a language (in which the text should be written in), maybe some interests (of the targeted audience), maybe some challenges (that the targeted audience are facing), a topic (the topic of the text), a specificity level (if the text should appeal a broader audience or not), a structure type (of your text. Eg a vlog, quick tips, etc), a pace (pace of the text) and maybe more specificities (more instruction about how the text should be formatted). 
                         
-                        The text should last 1 minute when read loudly
+                        The text should last 30 seconds when read loudly
                         
                         No titles nor subtitles, only plain text
                         

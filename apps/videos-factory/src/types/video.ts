@@ -36,4 +36,7 @@ export type IVideo = {
 
 export type IVideoDraft = Partial<IVideo>;
 
-export type IFormVideo = Omit<IVideo, "id" | "documentId" | "status">;
+export type IFormVideo = Omit<
+    IVideo,
+    "id" | "documentId" | "status" | "thumbnail" | "createdAt" | "updatedAt"
+>;

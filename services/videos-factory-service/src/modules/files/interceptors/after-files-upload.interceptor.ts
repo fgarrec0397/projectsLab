@@ -32,18 +32,18 @@ export class AfterFilesUploadInterceptor implements NestInterceptor {
     }
 
     private async processFilesInBackground(fileIds: string[]): Promise<void> {
-        const tempFolder = FileSystem.getTempFolderPath();
+        const { tempFolderPath, cleanUp } =
+            await FileSystem.getTempFolderPath("files-upload-processing");
 
-        await FileSystem.createDirectory(tempFolder);
+        await FileSystem.createDirectory(tempFolderPath);
 
         try {
             for (const fileId of fileIds) {
                 const date = new Date();
-                const tempFileFolder = FileSystem.getTempFolderPath(
+                const { tempFolderPath: tempFileFolder } = await FileSystem.getTempFolderPath(
+                    "files-upload-processing",
                     `${date.getTime()}-${uidGenerator()}`
                 );
-
-                await FileSystem.createDirectory(tempFileFolder);
 
                 const inputFilePath = await this.storageConfig.downloadFile(fileId, tempFileFolder);
 
@@ -61,7 +61,7 @@ export class AfterFilesUploadInterceptor implements NestInterceptor {
                 }
             }
 
-            await FileSystem.removeFile(tempFolder);
+            await cleanUp();
         } catch (error) {
             console.error("Error processing files in background", error);
         }

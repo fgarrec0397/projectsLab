@@ -15,16 +15,20 @@ export class FileSystem {
         return FileSystem.getPath("./assets/poc", assetPath || ""); // TODO - config - "./assets/poc"
     }
 
-    static getTempFolderPath(id?: string) {
-        let folderPath = "temp";
+    static async getTempFolderPath(subFolder: string, id?: string) {
+        let folderPath = `temp/${subFolder}`;
 
         if (id) {
             folderPath += `/${id}`;
         }
 
-        const tempPath = FileSystem.getAssetsPath(folderPath);
+        const tempFolderPath = FileSystem.getAssetsPath(folderPath);
 
-        return tempPath;
+        const cleanUp = () => FileSystem.removeFile(folderPath);
+
+        await FileSystem.createDirectory(tempFolderPath);
+
+        return { tempFolderPath, cleanUp };
     }
 
     static getPath(...filePath: string[]) {

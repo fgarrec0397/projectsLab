@@ -1,7 +1,9 @@
-import { Injectable } from "@nestjs/common";
+import { Inject, Injectable } from "@nestjs/common";
+import { uidGenerator } from "@projectslab/helpers";
 import ffmpeg, { FfmpegCommand } from "fluent-ffmpeg";
 import { FileSystem } from "src/common/FileSystem";
 import { CanvasRendererService } from "src/modules/canvas-renderer/canvas-renderer.service";
+import { IVideo } from "src/modules/videos/videos.types";
 
 import { ComplexFilterBuilder } from "./builders/video-complexfilter.builder";
 import { IElementComponent } from "./components/BaseComponent";
@@ -25,9 +27,13 @@ export type TemplateSize = {
 
 @Injectable()
 export class VideoRendererService {
-    outputPath = FileSystem.getAssetsPath("out/refactor-video.mp4");
+    cleanUpTempFolder: () => Promise<void>;
 
-    tempOutputPath = FileSystem.getAssetsPath("tmp/videos/temp-video.mov");
+    tempFolder: string;
+
+    outputPath: string;
+
+    tempOutputPath: string;
 
     assets: TemplateAsset[] = [];
 
@@ -86,11 +92,28 @@ export class VideoRendererService {
         this.mapTemplate();
 
         this.shouldProcessFragments = this.fragmentableElements.length > 0;
+
+        const initContructor = async () => {
+            const date = new Date();
+            const id = `${date.getTime()}-${uidGenerator()}`;
+
+            const { tempFolderPath, cleanUp } = await FileSystem.getTempFolderPath(
+                "video-rendering",
+                id
+            );
+
+            this.tempFolder = tempFolderPath;
+            this.cleanUpTempFolder = cleanUp;
+            this.outputPath = `${this.tempFolder}/video.mp4`;
+
+            this.tempOutputPath = `${this.tempFolder}/temp-video.mov`;
+        };
+
+        initContructor();
     }
 
-    public async initRender() {
+    public async initRender(afterRender?: (filePath: string) => Promise<void>) {
         console.time("Video Rendered");
-        await this.beforeRender();
 
         await this.processElements();
 
@@ -111,6 +134,11 @@ export class VideoRendererService {
 
         await this.renderFinalVideo();
 
+        if (afterRender) {
+            await afterRender(this.outputPath);
+        }
+
+        await this.cleanUpDirectories();
         console.timeEnd("Video Rendered");
     }
 
@@ -142,9 +170,7 @@ export class VideoRendererService {
 
                 for (let i = 0; i < fragments.length; i += batchSize) {
                     const batch: string[] = fragments.slice(i, i + batchSize);
-                    this.tempOutputPath = FileSystem.getAssetsPath(
-                        `tmp/videos/intermediate_${i}.mov`
-                    );
+                    this.tempOutputPath = `${this.tempFolder}/intermediate_${i}.mov`;
 
                     this.complexFilterBuilder.setCrop(this.size);
 
@@ -260,10 +286,6 @@ export class VideoRendererService {
         });
     }
 
-    private async beforeRender() {
-        await this.cleanUpDirectories();
-    }
-
     private mapTemplate() {
         if (!this.templateMapper) {
             throw new Error("VideoRender.init was not called");
@@ -276,14 +298,18 @@ export class VideoRendererService {
     }
 
     private async cleanUpDirectories() {
-        for (const path of [
-            FileSystem.getAssetsPath("out"),
-            FileSystem.getAssetsPath("tmp/output"),
-            FileSystem.getAssetsPath("tmp/inputs-list"),
-            FileSystem.getAssetsPath("tmp/videos"),
-        ]) {
-            await FileSystem.removeFile(path);
-            await FileSystem.createDirectory(path);
-        }
+        // this.cleanUpTempFolder();
+        // for (const path of [
+        //     FileSystem.getAssetsPath("out"),
+        //     FileSystem.getAssetsPath("tmp/output"),
+        //     FileSystem.getAssetsPath("tmp/inputs-list"),
+        //     FileSystem.getAssetsPath("tmp/videos"),
+        // ]) {
+        //     await FileSystem.removeFile(path);
+        //     await FileSystem.createDirectory(path);
+        // }
+        console.log("cleanUpTempFolder");
+
+        this.cleanUpTempFolder();
     }
 }

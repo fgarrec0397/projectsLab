@@ -1,9 +1,8 @@
-import { Inject, Injectable } from "@nestjs/common";
+import { Injectable } from "@nestjs/common";
 import { uidGenerator } from "@projectslab/helpers";
 import ffmpeg, { FfmpegCommand } from "fluent-ffmpeg";
 import { FileSystem } from "src/common/FileSystem";
 import { CanvasRendererService } from "src/modules/canvas-renderer/canvas-renderer.service";
-import { IVideo } from "src/modules/videos/videos.types";
 
 import { ComplexFilterBuilder } from "./builders/video-complexfilter.builder";
 import { IElementComponent } from "./components/BaseComponent";
@@ -101,6 +100,8 @@ export class VideoRendererService {
                 "video-rendering",
                 id
             );
+
+            await FileSystem.createDirectory(tempFolderPath);
 
             this.tempFolder = tempFolderPath;
             this.cleanUpTempFolder = cleanUp;

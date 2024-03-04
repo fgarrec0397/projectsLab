@@ -26,8 +26,6 @@ export class FileSystem {
 
         const cleanUp = () => FileSystem.removeFile(folderPath);
 
-        await FileSystem.createDirectory(tempFolderPath);
-
         return { tempFolderPath, cleanUp };
     }
 

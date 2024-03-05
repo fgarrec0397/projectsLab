@@ -69,8 +69,6 @@ export class VideosService {
             updatedAt: admin.firestore.Timestamp.now(),
         });
 
-        console.log(admin.firestore.Timestamp.now(), "admin.firestore.Timestamp.now()");
-
         return updatedDocument;
     }
 
@@ -84,7 +82,10 @@ export class VideosService {
     async startRendering(userId: string, video: IVideo) {
         const videoCollectionPath = `users/${userId}/videos`;
 
-        const updatedDocument = await this.database.update(videoCollectionPath, video.id, video);
+        const updatedDocument = await this.database.createOrUpdate(videoCollectionPath, {
+            ...video,
+            updatedAt: admin.firestore.Timestamp.now(),
+        });
 
         this.videoProcessingService.renderVideo(userId, video);
 

@@ -85,14 +85,16 @@ export default function FileManagerNewFolderDialog({
 
             isFilesUploading.onTrue();
 
-            await uploadFiles(user?.accessToken, undefined, files);
+            const { uploadedFilesIds } = await uploadFiles(user?.accessToken, undefined, files);
 
             isFilesUploading.onFalse();
 
             onClose();
 
             enqueueSnackbar(
-                `${files.length} item${files.length > 1 ? "s" : ""} uploaded with success`,
+                `${uploadedFilesIds.length} item${
+                    uploadedFilesIds.length > 1 ? "s" : ""
+                } uploaded with success`,
                 {
                     variant: "success",
                 }

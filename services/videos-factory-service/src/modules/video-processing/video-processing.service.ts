@@ -1,6 +1,7 @@
 import { HttpException, HttpStatus, Injectable } from "@nestjs/common";
 import { CacheService } from "src/common/cache/cache.service";
 import { DatabaseConfig, InjectDatabase } from "src/config/database-config.module";
+import { InjectStorageConfig, StorageConfig } from "src/config/storage-config.module";
 
 import { IVideo } from "../videos/videos.types";
 import { VideoEventsGateway } from "./gateways/video-events.gateway";
@@ -28,6 +29,7 @@ export class VideoProcessingService {
         private readonly videoService: VideoRendererService,
         private readonly eventsGateway: VideoEventsGateway,
         @InjectDatabase() private readonly database: DatabaseConfig,
+        @InjectStorageConfig() private readonly storage: StorageConfig,
         private readonly cacheService: CacheService
     ) {}
 
@@ -75,10 +77,23 @@ export class VideoProcessingService {
                 this.videoService.init(template);
 
                 await this.videoService.initRender(async (videoPath) => {
-                    console.log(videoPath, "videoPath");
-                });
+                    try {
+                        const fileName = `system/${userId}/videos/${video.name}.mp4`;
 
-                await this.notifyClient(userId, video, VideoProcessingStepDataStatus.Rendered);
+                        await this.storage.uploadFile(videoPath, fileName);
+
+                        await this.notifyClient(
+                            userId,
+                            video,
+                            VideoProcessingStepDataStatus.Rendered
+                        );
+                    } catch (error) {
+                        throw new HttpException(
+                            "The generate video was not uploaded successfully to the storage provider",
+                            HttpStatus.INTERNAL_SERVER_ERROR
+                        );
+                    }
+                });
 
                 return { result: "Video created" };
             }

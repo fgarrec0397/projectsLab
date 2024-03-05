@@ -15,7 +15,7 @@ export class FileSystem {
         return FileSystem.getPath("./assets/poc", assetPath || ""); // TODO - config - "./assets/poc"
     }
 
-    static async getTempFolderPath(subFolder: string, id?: string) {
+    static async getTempFolderPath(subFolder: string, id: string) {
         let folderPath = `temp/${subFolder}`;
 
         if (id) {
@@ -24,7 +24,7 @@ export class FileSystem {
 
         const tempFolderPath = FileSystem.getAssetsPath(folderPath);
 
-        const cleanUp = () => FileSystem.removeFile(folderPath);
+        const cleanUp = () => FileSystem.removeFile(tempFolderPath);
 
         return { tempFolderPath, cleanUp };
     }

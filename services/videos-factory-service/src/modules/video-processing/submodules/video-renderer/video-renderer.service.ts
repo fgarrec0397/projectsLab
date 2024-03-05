@@ -299,18 +299,6 @@ export class VideoRendererService {
     }
 
     private async cleanUpDirectories() {
-        // this.cleanUpTempFolder();
-        // for (const path of [
-        //     FileSystem.getAssetsPath("out"),
-        //     FileSystem.getAssetsPath("tmp/output"),
-        //     FileSystem.getAssetsPath("tmp/inputs-list"),
-        //     FileSystem.getAssetsPath("tmp/videos"),
-        // ]) {
-        //     await FileSystem.removeFile(path);
-        //     await FileSystem.createDirectory(path);
-        // }
-        console.log("cleanUpTempFolder");
-
         this.cleanUpTempFolder();
     }
 }

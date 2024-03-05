@@ -32,25 +32,25 @@ export class AfterFilesUploadInterceptor implements NestInterceptor {
     }
 
     private async processFilesInBackground(fileIds: string[]): Promise<void> {
-        const { tempFolderPath, cleanUp } =
-            await FileSystem.getTempFolderPath("files-upload-processing");
-
-        await FileSystem.createDirectory(tempFolderPath);
+        // const { tempFolderPath, cleanUp } =
+        //     await FileSystem.getTempFolderPath("files-upload-processing");
 
         try {
             for (const fileId of fileIds) {
                 const date = new Date();
-                const { tempFolderPath: tempFileFolder } = await FileSystem.getTempFolderPath(
+                const { tempFolderPath, cleanUp } = await FileSystem.getTempFolderPath(
                     "files-upload-processing",
                     `${date.getTime()}-${uidGenerator()}`
                 );
 
-                const inputFilePath = await this.storageConfig.downloadFile(fileId, tempFileFolder);
+                await FileSystem.createDirectory(tempFolderPath);
+
+                const inputFilePath = await this.storageConfig.downloadFile(fileId, tempFolderPath);
 
                 const hasFileAudio = await VideoUtils.hasAudioStream(inputFilePath);
 
                 if (!hasFileAudio) {
-                    const tempFolderOutput = `${tempFileFolder}/output`;
+                    const tempFolderOutput = `${tempFolderPath}/output`;
                     const outputFilePath = `${tempFolderOutput}/${this.storageConfig.getFileName(
                         fileId
                     )}`;
@@ -59,9 +59,9 @@ export class AfterFilesUploadInterceptor implements NestInterceptor {
                     await VideoUtils.addSilentAudioToVideo(inputFilePath, outputFilePath);
                     await this.storageConfig.uploadFile(outputFilePath, fileId);
                 }
-            }
 
-            await cleanUp();
+                await cleanUp();
+            }
         } catch (error) {
             console.error("Error processing files in background", error);
         }

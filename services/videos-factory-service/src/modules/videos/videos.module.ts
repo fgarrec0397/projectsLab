@@ -1,4 +1,4 @@
-import { MiddlewareConsumer, Module, RequestMethod } from "@nestjs/common";
+import { MiddlewareConsumer, Module } from "@nestjs/common";
 
 import { VideoProcessingModule } from "../video-processing/video-processing.module";
 import { VideoDataMiddleware } from "./middlewares/video-data.middleware";
@@ -12,8 +12,6 @@ import { VideosController } from "./videos.controller";
 })
 export class VideosModule {
     configure(consumer: MiddlewareConsumer) {
-        consumer
-            .apply(VideoDataMiddleware)
-            .forRoutes({ path: "videos/startRendering", method: RequestMethod.POST });
+        consumer.apply(VideoDataMiddleware).forRoutes(VideosController);
     }
 }

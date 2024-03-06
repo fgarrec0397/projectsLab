@@ -35,9 +35,7 @@ export default function VideosListView() {
                     description="Create a video to see them appear here"
                     filled
                     action={
-                        <PrimaryButton onClick={handleCreateVideo}>
-                            Create a video now
-                        </PrimaryButton>
+                        <PrimaryButton onClick={handleCreateVideo}>Create a video</PrimaryButton>
                     }
                 />
             )}

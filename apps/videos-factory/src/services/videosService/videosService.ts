@@ -15,7 +15,7 @@ export const getVideos = async (accessToken: string | undefined) => {
     return response.data;
 };
 
-export const getVideoById = async (accessToken: string | undefined, videoId: string) => {
+export const getVideoById = async (accessToken: string | undefined, videoId?: string) => {
     const url = `${endpoints.videos.get}/${videoId}`;
 
     const response = await axiosInstance.get<IVideo>(url, {

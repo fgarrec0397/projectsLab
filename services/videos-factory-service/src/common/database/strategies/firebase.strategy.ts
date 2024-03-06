@@ -70,8 +70,10 @@ export class FirebaseDatabase implements DatabaseStrategy<FirebaseTypes> {
         return documents as TValue[];
     }
 
-    async findOne(collection: string, id: string) {
-        return this.getDB().collection(collection).doc(id).get();
+    async findOne<TValue>(collection: string, id: string): Promise<TValue> {
+        const snapshot = await this.getDB().collection(collection).doc(id).get();
+
+        return snapshot.data() as TValue;
     }
 
     async update<

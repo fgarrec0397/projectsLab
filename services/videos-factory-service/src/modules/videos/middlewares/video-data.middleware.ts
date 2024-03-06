@@ -7,10 +7,10 @@ import { IVideo } from "../videos.types";
 export class VideoDataMiddleware implements NestMiddleware {
     use(request: Request, _: Response, next: NextFunction) {
         const videoData = request.body as IVideo;
+        const videoId = request.params.videoId as string;
 
+        request.videoId = videoId;
         request.videoData = videoData;
-
-        console.log(request.videoData, "request.videoData VideoDataMiddleware");
 
         next();
     }

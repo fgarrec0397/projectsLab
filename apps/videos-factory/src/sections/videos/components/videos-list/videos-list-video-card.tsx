@@ -104,7 +104,11 @@ export default function VideosListVideoCard({ video }: Props) {
                         <Link
                             color="inherit"
                             component={RouterLink}
-                            href={paths.dashboard.videos.create}
+                            href={
+                                video.status === VideoStatus.Draft
+                                    ? paths.dashboard.videos.create
+                                    : paths.dashboard.videos.byId(video.id)
+                            }
                         >
                             <Typography variant="h5">{video.name}</Typography>
                         </Link>

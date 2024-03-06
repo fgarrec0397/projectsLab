@@ -1,3 +1,5 @@
+import VideosDetailsView from "@/sections/videos/view/videos-details-view";
+
 interface Props {
     params: {
         id: string;
@@ -7,6 +9,5 @@ interface Props {
 export default function VideoDetailsPage({ params }: Props) {
     const { id } = params;
 
-    // return <PostDetailsHomeView title={title} />;
-    return <>Video details {id}</>;
+    return <VideosDetailsView videoId={id} />;
 }

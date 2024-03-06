@@ -9,6 +9,7 @@ const ROOTS = {
 
 export const paths = {
     minimalUI: "https://mui.com/store/items/minimal-dashboard/",
+    notFound: "/page-not-found",
     // AUTH
     auth: {
         login: `${ROOTS.AUTH}/login`,
@@ -26,6 +27,7 @@ export const paths = {
         videos: {
             root: `${ROOTS.DASHBOARD}/videos`,
             create: `${ROOTS.DASHBOARD}/videos/create`,
+            byId: (id: string) => `${ROOTS.DASHBOARD}/videos/${id}`,
         },
         fileManager: `${ROOTS.DASHBOARD}/file-manager`,
         group: {

@@ -1,25 +1,37 @@
 "use client";
 
-import Grid from "@mui/system/Unstable_Grid";
 import { useRouter } from "next/navigation";
+import ReactPlayer from "react-player";
 
-import { PrimaryButton } from "@/components/button";
-import EmptyContent from "@/components/empty-content";
 import PageWrapper from "@/components/page-wrapper/page-wrapper";
 import { paths } from "@/routes/paths";
-import { useGetVideos } from "@/services/videosService/hooks/useGetVideos";
-
-import VideosListVideoCard from "../components/videos-list/videos-list-video-card";
+import { useGetVideoById } from "@/services/videosService/hooks/useGetVideoById";
+import { VideoStatus } from "@/types/video";
 
 // ----------------------------------------------------------------------
 
-export default function VideosDetailsView() {
+type Props = {
+    videoId?: string;
+};
+
+export default function VideosDetailsView({ videoId }: Props) {
     const router = useRouter();
-    const { videos, isVideosLoading } = useGetVideos();
+    const { video, isVideoLoading, isVideoReady } = useGetVideoById(videoId);
+
+    if (!video && isVideoReady) {
+        router.push(paths.notFound);
+    }
+
+    if (video?.status === VideoStatus.Draft) {
+        router.push(paths.dashboard.videos.create);
+    }
 
     return (
-        <PageWrapper title="Video name" isLoading={isVideosLoading}>
-            video details
+        <PageWrapper title={video?.name} isLoading={isVideoLoading}>
+            <ReactPlayer
+                url="https://test-videos.co.uk/vids/bigbuckbunny/mp4/h264/360/Big_Buck_Bunny_360_10s_1MB.mp4"
+                controls
+            />
         </PageWrapper>
     );
 }

@@ -9,6 +9,7 @@ import { VideosService } from "./services/videos.service";
 import { IVideo, IVideoDraft } from "./videos.types";
 
 const videosCacheKey = getAuthCacheKey("videos");
+const videoByIdCacheKey = (request: Request) => `videoById-${request.videoId}`;
 
 @Controller("videos")
 export class VideosController {
@@ -20,14 +21,22 @@ export class VideosController {
         return this.videosService.getVideos(request.userId);
     }
 
+    @Get("/:videoId")
+    @UseCache(videoByIdCacheKey, MONTH_IN_SECONDS)
+    async getVideoById(@Req() request: Request, @Param("videoId") videoId: string) {
+        return this.videosService.getVideoById(request.userId, videoId);
+    }
+
     @Post("startRendering")
     @UseInvalidateCache(videosCacheKey)
+    @UseInvalidateCache(videoByIdCacheKey)
     async renderVideo(@Req() request: Request, @Body() video: IVideo) {
         return this.videosService.startRendering(request.userId, video);
     }
 
     @Delete("/:id")
     @UseInvalidateCache(videosCacheKey)
+    @UseInvalidateCache(videoByIdCacheKey)
     async deleteVideo(@Req() request: Request, @Param("id") id: string) {
         return this.videosService.deleteVideo(request.userId, id);
     }

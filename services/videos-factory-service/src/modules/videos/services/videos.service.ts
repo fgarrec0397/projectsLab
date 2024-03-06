@@ -23,6 +23,13 @@ export class VideosService {
         return videos;
     }
 
+    async getVideoById(userId: string, videoId) {
+        const videoCollectionPath = `users/${userId}/videos`;
+        const video = await this.database.findOne<IVideo>(videoCollectionPath, videoId);
+
+        return video;
+    }
+
     async getLastOrDefaultVideoDraft(userId: string) {
         const lastVideoDraft = await this.getLastVideoDraft(userId);
 

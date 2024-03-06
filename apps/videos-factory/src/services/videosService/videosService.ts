@@ -1,19 +1,11 @@
-import axios from "axios";
-
 import { endpoints } from "@/routes/endpoints";
 import { IVideo, IVideoDraft } from "@/types/video";
+import axiosInstance from "@/utils/axios";
 
 export const getVideos = async (accessToken: string | undefined) => {
     const url = `${endpoints.videos.get}`;
 
-    axios.interceptors.request.use((config) => {
-        // Replace the valid token with an expired or invalid one
-        const expiredToken = "YOUR_EXPIRED_OR_INVALID_TOKEN";
-        config.headers.Authorization = `Bearer ${expiredToken}`;
-        return config;
-    });
-
-    const response = await axios.get<IVideo[]>(url, {
+    const response = await axiosInstance.get<IVideo[]>(url, {
         headers: {
             Accept: "application/json",
             Authorization: `Bearer ${accessToken}`,
@@ -26,7 +18,7 @@ export const getVideos = async (accessToken: string | undefined) => {
 export const getVideoById = async (accessToken: string | undefined, videoId: string) => {
     const url = `${endpoints.videos.get}/${videoId}`;
 
-    const response = await axios.get<IVideo>(url, {
+    const response = await axiosInstance.get<IVideo>(url, {
         headers: {
             Accept: "application/json",
             Authorization: `Bearer ${accessToken}`,
@@ -39,7 +31,7 @@ export const getVideoById = async (accessToken: string | undefined, videoId: str
 export const getVideoDraft = async (accessToken: string | undefined) => {
     const url = `${endpoints.videos.draft.getLast}`;
 
-    const response = await axios.get<IVideoDraft>(url, {
+    const response = await axiosInstance.get<IVideoDraft>(url, {
         headers: {
             Accept: "application/json",
             Authorization: `Bearer ${accessToken}`,
@@ -52,7 +44,7 @@ export const getVideoDraft = async (accessToken: string | undefined) => {
 export const saveDraft = async (accessToken: string | undefined, videoDraft: IVideoDraft) => {
     const url = `${endpoints.videos.draft.save}`;
 
-    const response = await axios.patch<IVideoDraft>(url, videoDraft, {
+    const response = await axiosInstance.patch<IVideoDraft>(url, videoDraft, {
         headers: {
             Accept: "application/json",
             Authorization: `Bearer ${accessToken}`,
@@ -65,7 +57,7 @@ export const saveDraft = async (accessToken: string | undefined, videoDraft: IVi
 export const startRendering = async (accessToken: string | undefined, videoDraft: IVideoDraft) => {
     const url = `${endpoints.videos.startRendering}`;
 
-    const response = await axios.post<IVideoDraft>(url, videoDraft, {
+    const response = await axiosInstance.post<IVideoDraft>(url, videoDraft, {
         headers: {
             Accept: "application/json",
             Authorization: `Bearer ${accessToken}`,
@@ -78,7 +70,7 @@ export const startRendering = async (accessToken: string | undefined, videoDraft
 export const deleteVideo = async (accessToken: string | undefined, videoId: string) => {
     const url = `${endpoints.videos.delete}/${videoId}`;
 
-    const response = await axios.delete<IVideoDraft>(url, {
+    const response = await axiosInstance.delete<IVideoDraft>(url, {
         headers: {
             Accept: "application/json",
             Authorization: `Bearer ${accessToken}`,

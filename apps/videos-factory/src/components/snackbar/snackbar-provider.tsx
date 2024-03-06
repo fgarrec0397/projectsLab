@@ -3,7 +3,9 @@
 import Collapse from "@mui/material/Collapse";
 import IconButton from "@mui/material/IconButton";
 import { closeSnackbar, SnackbarProvider as NotistackProvider } from "notistack";
-import { useRef } from "react";
+import { useEffect, useRef } from "react";
+
+import { setSnackbarUtils } from "@/utils/notistackManager";
 
 import Iconify from "../iconify";
 import { useSettingsContext } from "../settings";
@@ -19,8 +21,12 @@ export default function SnackbarProvider({ children }: Props) {
     const settings = useSettingsContext();
 
     const isRTL = settings.themeDirection === "rtl";
-
+    // setSnackbarUtils
     const notistackRef = useRef<any>(null);
+
+    useEffect(() => {
+        setSnackbarUtils(notistackRef.current.enqueueSnackbar, notistackRef.current.closeSnackbar);
+    }, []);
 
     return (
         <NotistackProvider

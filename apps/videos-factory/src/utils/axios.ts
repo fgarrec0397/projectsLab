@@ -1,6 +1,8 @@
-import axios, { AxiosRequestConfig } from "axios";
+import axios from "axios";
 
 import { HOST_API } from "@/config-global";
+
+import { showSnackbar } from "./notistackManager";
 
 // ----------------------------------------------------------------------
 
@@ -8,20 +10,17 @@ const axiosInstance = axios.create({ baseURL: HOST_API });
 
 axiosInstance.interceptors.response.use(
     (res) => res,
-    (error) => Promise.reject((error.response && error.response.data) || "Something went wrong")
+    (error) => {
+        if (error.response && error.response.status === 401) {
+            showSnackbar("Session expired. Please reload the page or log in again", {
+                variant: "error",
+            });
+        }
+        return Promise.reject(error);
+    }
 );
 
 export default axiosInstance;
-
-// ----------------------------------------------------------------------
-
-export const fetcher = async (args: string | [string, AxiosRequestConfig]) => {
-    const [url, config] = Array.isArray(args) ? args : [args];
-
-    const res = await axiosInstance.get(url, { ...config });
-
-    return res.data;
-};
 
 // ----------------------------------------------------------------------
 

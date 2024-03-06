@@ -1,10 +1,9 @@
-import axios from "axios";
-
 import { endpoints } from "@/routes/endpoints";
+import axiosInstance from "@/utils/axios";
 
 export async function sessionLogin(idToken: string | undefined) {
     try {
-        return await axios.post(
+        return await axiosInstance.post(
             endpoints.auth.login,
             { idToken },
             {
@@ -23,7 +22,7 @@ export async function sessionLogin(idToken: string | undefined) {
 
 export async function sessionLogout() {
     try {
-        return await axios.post(endpoints.auth.logout, undefined, {
+        return await axiosInstance.post(endpoints.auth.logout, undefined, {
             method: "POST",
             withCredentials: true,
         });

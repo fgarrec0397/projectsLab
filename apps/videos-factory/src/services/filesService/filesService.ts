@@ -1,8 +1,8 @@
-import axios from "axios";
 import { mutate } from "swr";
 
 import { endpoints } from "@/routes/endpoints";
 import { IFile } from "@/types/file";
+import axiosInstance from "@/utils/axios";
 
 export type GetFilesParams = [string | undefined, string | undefined];
 
@@ -17,7 +17,7 @@ export const getFiles = async (accessToken: string | undefined, path: string | u
         url += `&path=${path}`;
     }
 
-    const response = await axios.get<IFile[]>(url, {
+    const response = await axiosInstance.get<IFile[]>(url, {
         headers: {
             Accept: "application/json",
             Authorization: `Bearer ${accessToken}`,
@@ -42,7 +42,7 @@ export const uploadFiles = async (
     });
 
     try {
-        const response = await axios.post(url, formData, {
+        const response = await axiosInstance.post(url, formData, {
             headers: {
                 "Content-Type": "multipart/form-data",
                 Authorization: `Bearer ${accessToken}`,
@@ -66,7 +66,7 @@ export const createFolder = async (
     const swrKey: GetFilesParams = [accessToken, undefined];
 
     try {
-        const response = await axios.post(url, undefined, {
+        const response = await axiosInstance.post(url, undefined, {
             headers: {
                 Accept: "application/json",
                 Authorization: `Bearer ${accessToken}`,
@@ -92,7 +92,7 @@ export const renameFile = async (
     const swrKey: GetFilesParams = [accessToken, undefined];
 
     try {
-        const response = await axios.patch(
+        const response = await axiosInstance.patch(
             url,
             {
                 filePath,
@@ -123,7 +123,7 @@ export const renameFolder = async (
     const swrKey: GetFilesParams = [accessToken, undefined];
 
     try {
-        const response = await axios.patch(
+        const response = await axiosInstance.patch(
             url,
             {
                 filePath: folderName,
@@ -156,7 +156,7 @@ export const deleteFiles = async (accessToken: string | undefined, fileId: strin
     const swrKey: GetFilesParams = [accessToken, undefined];
 
     try {
-        const response = await axios.delete(url, {
+        const response = await axiosInstance.delete(url, {
             headers: {
                 Accept: "application/json",
                 Authorization: `Bearer ${accessToken}`,

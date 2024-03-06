@@ -10,7 +10,6 @@ import {
     MenuItem,
     Stack,
 } from "@mui/material";
-import Container from "@mui/material/Container";
 import Typography from "@mui/material/Typography";
 import Grid from "@mui/system/Unstable_Grid";
 import { m } from "framer-motion";
@@ -28,8 +27,7 @@ import FormProvider, {
     RHFTextField,
 } from "@/components/hook-form";
 import RHFFilesSelector from "@/components/hook-form/rhf-files-selector";
-import { LoadingScreen } from "@/components/loading-screen";
-import { useSettingsContext } from "@/components/settings";
+import PageWrapper from "@/components/page-wrapper/page-wrapper";
 import { useGetFiles } from "@/services/filesService/hooks/useGetFiles";
 import { useGetVideoDraft } from "@/services/videosService/hooks/useGetVideoDraft";
 import { useRenderVideo } from "@/services/videosService/hooks/useRenderVideo";
@@ -53,7 +51,6 @@ const STRUCTURE_TYPE_OPTIONS = [
 ];
 
 export default function VideosCreateView() {
-    const settings = useSettingsContext();
     const { allFiles } = useGetFiles();
     const [isEditingVideoName, setIsEditingVideoName] = useState(false);
     const { videoDraft, isVideoDraftLoading } = useGetVideoDraft();
@@ -124,22 +121,11 @@ export default function VideosCreateView() {
         } catch (error) {}
     });
 
-    if (isVideoDraftLoading) {
-        return <LoadingScreen />;
-    }
-
     return (
-        <>
-            <FormProvider methods={methods} onSubmit={onSubmit}>
-                <Container maxWidth={settings.themeStretch ? false : "xl"}>
-                    <Stack
-                        direction="row"
-                        alignItems="center"
-                        justifyContent="space-between"
-                        sx={{
-                            mb: { xs: 3, md: 5 },
-                        }}
-                    >
+        <FormProvider methods={methods} onSubmit={onSubmit}>
+            <PageWrapper
+                title={
+                    <>
                         {isEditingVideoName ? (
                             <Stack direction="row" alignItems="center">
                                 <RHFTextField
@@ -201,142 +187,131 @@ export default function VideosCreateView() {
                                 </IconButton>
                             </Stack>
                         )}
-                        <Stack direction="row">
-                            <TertiaryButton onClick={onSaveDraft} sx={{ mr: 1 }}>
-                                Save Draft
-                            </TertiaryButton>
-                            <SecondaryButton type="submit">Start rendering</SecondaryButton>
-                        </Stack>
-                    </Stack>
-
-                    <Grid container spacing={3}>
-                        <Grid xs={12} md={6}>
-                            <Card>
-                                <CardHeader title="Target audience" sx={{ mb: 2 }} />
-                                <CardContent>
-                                    <Grid container spacing={3}>
-                                        <Grid xs={12} md={8}>
-                                            <RHFTextField
-                                                name="location"
-                                                label="Location"
-                                                fullWidth
-                                            />
-                                        </Grid>
-                                        <Grid xs={12} md={4}>
-                                            <RHFSlider name="age" helperText="Age range" />
-                                        </Grid>
-                                        <Grid xs={12} md={6}>
-                                            <RHFRadioGroup
-                                                name="gender"
-                                                label="Gender"
-                                                row
-                                                options={[
-                                                    { label: "Male", value: "male" },
-                                                    { label: "Female", value: "female" },
-                                                    { label: "All", value: "all" },
-                                                ]}
-                                            />
-                                        </Grid>
-                                        <Grid xs={12} md={6}>
-                                            <RHFTextField
-                                                name="language"
-                                                label="Language"
-                                                fullWidth
-                                            />
-                                        </Grid>
-                                        <Grid xs={12}>
-                                            <RHFTextField
-                                                name="interests"
-                                                label="Hobbies, interests, preferences"
-                                                fullWidth
-                                                multiline
-                                                minRows={3}
-                                            />
-                                        </Grid>
-                                        <Grid xs={12}>
-                                            <RHFTextField
-                                                name="challenges"
-                                                label="What challenges are they facing?"
-                                                fullWidth
-                                                multiline
-                                                minRows={3}
-                                            />
-                                        </Grid>
+                    </>
+                }
+                titleItem={
+                    <>
+                        <TertiaryButton onClick={onSaveDraft} sx={{ mr: 1 }}>
+                            Save Draft
+                        </TertiaryButton>
+                        <SecondaryButton type="submit">Start rendering</SecondaryButton>
+                    </>
+                }
+                isLoading={isVideoDraftLoading}
+            >
+                <Grid container spacing={3}>
+                    <Grid xs={12} md={6}>
+                        <Card>
+                            <CardHeader title="Target audience" sx={{ mb: 2 }} />
+                            <CardContent>
+                                <Grid container spacing={3}>
+                                    <Grid xs={12} md={8}>
+                                        <RHFTextField name="location" label="Location" fullWidth />
                                     </Grid>
-                                </CardContent>
-                            </Card>
-                        </Grid>
-                        <Grid xs={12} md={6}>
-                            <RHFFilesSelector name="files" label="Assets" files={allFiles} />
-                        </Grid>
-                        <Grid xs={12} md={6}>
-                            <Card>
-                                <CardHeader title="Content" sx={{ mb: 2 }} />
-                                <CardContent>
-                                    <Grid container spacing={3}>
-                                        <Grid xs={12} md={6}>
-                                            <RHFTextField name="topic" label="Topic" fullWidth />
-                                        </Grid>
-                                        <Grid xs={12} md={6}>
-                                            <RHFSelect
-                                                name="specificityLevel"
-                                                label="Specificity"
-                                                defaultValue={SPECIFICITY_OPTIONS[0].value}
-                                            >
-                                                {SPECIFICITY_OPTIONS.map((option) => (
-                                                    <MenuItem
-                                                        key={option.value}
-                                                        value={option.value}
-                                                    >
-                                                        {option.label}
-                                                    </MenuItem>
-                                                ))}
-                                            </RHFSelect>
-                                        </Grid>
-                                        <Grid xs={12} md={6}>
-                                            <RHFSelect
-                                                name="structureType"
-                                                label="Structure type"
-                                                defaultValue={STRUCTURE_TYPE_OPTIONS[0].value}
-                                            >
-                                                {STRUCTURE_TYPE_OPTIONS.map((option) => (
-                                                    <MenuItem
-                                                        key={option.value}
-                                                        value={option.value}
-                                                    >
-                                                        {option.label}
-                                                    </MenuItem>
-                                                ))}
-                                            </RHFSelect>
-                                        </Grid>
-                                        <Grid xs={12} md={6}>
-                                            <RHFRadioGroup
-                                                name="pace"
-                                                label="Pace"
-                                                row
-                                                options={[
-                                                    { label: "Slow", value: "slow" },
-                                                    { label: "Fast", value: "fast" },
-                                                    { label: "Mix", value: "mix" },
-                                                ]}
-                                            />
-                                        </Grid>
-                                        <Grid xs={12}>
-                                            <RHFTextField
-                                                name="moreSpecificities"
-                                                label="More specificities"
-                                                fullWidth
-                                                multiline
-                                                minRows={3}
-                                            />
-                                        </Grid>
+                                    <Grid xs={12} md={4}>
+                                        <RHFSlider name="age" helperText="Age range" />
                                     </Grid>
-                                </CardContent>
-                            </Card>
-                        </Grid>
+                                    <Grid xs={12} md={6}>
+                                        <RHFRadioGroup
+                                            name="gender"
+                                            label="Gender"
+                                            row
+                                            options={[
+                                                { label: "Male", value: "male" },
+                                                { label: "Female", value: "female" },
+                                                { label: "All", value: "all" },
+                                            ]}
+                                        />
+                                    </Grid>
+                                    <Grid xs={12} md={6}>
+                                        <RHFTextField name="language" label="Language" fullWidth />
+                                    </Grid>
+                                    <Grid xs={12}>
+                                        <RHFTextField
+                                            name="interests"
+                                            label="Hobbies, interests, preferences"
+                                            fullWidth
+                                            multiline
+                                            minRows={3}
+                                        />
+                                    </Grid>
+                                    <Grid xs={12}>
+                                        <RHFTextField
+                                            name="challenges"
+                                            label="What challenges are they facing?"
+                                            fullWidth
+                                            multiline
+                                            minRows={3}
+                                        />
+                                    </Grid>
+                                </Grid>
+                            </CardContent>
+                        </Card>
                     </Grid>
-                </Container>
-            </FormProvider>
-        </>
+                    <Grid xs={12} md={6}>
+                        <RHFFilesSelector name="files" label="Assets" files={allFiles} />
+                    </Grid>
+                    <Grid xs={12} md={6}>
+                        <Card>
+                            <CardHeader title="Content" sx={{ mb: 2 }} />
+                            <CardContent>
+                                <Grid container spacing={3}>
+                                    <Grid xs={12} md={6}>
+                                        <RHFTextField name="topic" label="Topic" fullWidth />
+                                    </Grid>
+                                    <Grid xs={12} md={6}>
+                                        <RHFSelect
+                                            name="specificityLevel"
+                                            label="Specificity"
+                                            defaultValue={SPECIFICITY_OPTIONS[0].value}
+                                        >
+                                            {SPECIFICITY_OPTIONS.map((option) => (
+                                                <MenuItem key={option.value} value={option.value}>
+                                                    {option.label}
+                                                </MenuItem>
+                                            ))}
+                                        </RHFSelect>
+                                    </Grid>
+                                    <Grid xs={12} md={6}>
+                                        <RHFSelect
+                                            name="structureType"
+                                            label="Structure type"
+                                            defaultValue={STRUCTURE_TYPE_OPTIONS[0].value}
+                                        >
+                                            {STRUCTURE_TYPE_OPTIONS.map((option) => (
+                                                <MenuItem key={option.value} value={option.value}>
+                                                    {option.label}
+                                                </MenuItem>
+                                            ))}
+                                        </RHFSelect>
+                                    </Grid>
+                                    <Grid xs={12} md={6}>
+                                        <RHFRadioGroup
+                                            name="pace"
+                                            label="Pace"
+                                            row
+                                            options={[
+                                                { label: "Slow", value: "slow" },
+                                                { label: "Fast", value: "fast" },
+                                                { label: "Mix", value: "mix" },
+                                            ]}
+                                        />
+                                    </Grid>
+                                    <Grid xs={12}>
+                                        <RHFTextField
+                                            name="moreSpecificities"
+                                            label="More specificities"
+                                            fullWidth
+                                            multiline
+                                            minRows={3}
+                                        />
+                                    </Grid>
+                                </Grid>
+                            </CardContent>
+                        </Card>
+                    </Grid>
+                </Grid>
+            </PageWrapper>
+        </FormProvider>
     );
 }

@@ -2,6 +2,7 @@ import { Body, Controller, HttpException, HttpStatus, Post, Req, Res } from "@ne
 import { Request, Response } from "express";
 
 import { AuthService } from "./auth.service";
+import { Public } from "./decorators/use-public.guard";
 
 /**
  * The sign in / sign out endpoints are technically useless since Firebase already sign the token for us.
@@ -13,9 +14,14 @@ export class AuthController {
     constructor(private readonly authService: AuthService) {}
 
     @Post("sessionLogin")
+    @Public()
     async createSession(@Body("idToken") idToken: string, @Req() req: Request) {
+        console.log("createSession");
+
         try {
             const firebaseUser = await this.authService.verifyIdToken(idToken);
+            console.log(firebaseUser, "firebaseUser");
+
             (req.session as any).uid = firebaseUser.uid;
 
             return { success: true };

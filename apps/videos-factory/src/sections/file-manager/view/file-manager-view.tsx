@@ -1,7 +1,6 @@
 "use client";
 
 import Button from "@mui/material/Button";
-import Container from "@mui/material/Container";
 import Stack from "@mui/material/Stack";
 import ToggleButton from "@mui/material/ToggleButton";
 import ToggleButtonGroup from "@mui/material/ToggleButtonGroup";
@@ -16,8 +15,7 @@ import { ConfirmDialog } from "@/components/custom-dialog";
 import EmptyContent from "@/components/empty-content";
 import { fileFormat } from "@/components/file-thumbnail";
 import Iconify from "@/components/iconify";
-import { LoadingScreen } from "@/components/loading-screen";
-import { useSettingsContext } from "@/components/settings";
+import PageWrapper from "@/components/page-wrapper/page-wrapper";
 import { useSnackbar } from "@/components/snackbar";
 import { getComparator, useTable } from "@/components/table";
 import { useBoolean } from "@/hooks/use-boolean";
@@ -57,8 +55,6 @@ export default function FileManagerView() {
     const { enqueueSnackbar } = useSnackbar();
 
     const table = useTable({ defaultRowsPerPage: 10 });
-
-    const settings = useSettingsContext();
 
     const openDateRange = useBoolean();
 
@@ -192,8 +188,8 @@ export default function FileManagerView() {
 
     return (
         <>
-            <Container maxWidth={settings.themeStretch ? false : "lg"}>
-                <Stack direction="row" alignItems="flex-start" justifyContent="space-between">
+            <PageWrapper
+                title={
                     <CustomBreadcrumbs
                         heading="Files Manager"
                         links={breadcrumbsLinks}
@@ -201,6 +197,8 @@ export default function FileManagerView() {
                             marginTop: pxToRem(-5),
                         }}
                     />
+                }
+                titleItem={
                     <Button
                         variant="contained"
                         startIcon={<Iconify icon="eva:cloud-upload-fill" />}
@@ -208,20 +206,16 @@ export default function FileManagerView() {
                     >
                         Upload
                     </Button>
-                </Stack>
+                }
+                subContent={
+                    <>
+                        {renderFilters}
 
-                <Stack
-                    spacing={2.5}
-                    sx={{
-                        my: { xs: 3, md: 5 },
-                    }}
-                >
-                    {renderFilters}
-
-                    {canReset && renderResults}
-                </Stack>
-
-                {isFilesLoading && <LoadingScreen />}
+                        {canReset && renderResults}
+                    </>
+                }
+                isLoading={isFilesLoading}
+            >
                 {notFound ? (
                     <EmptyContent
                         filled
@@ -250,7 +244,7 @@ export default function FileManagerView() {
                         )}
                     </>
                 )}
-            </Container>
+            </PageWrapper>
 
             <FileManagerNewFolderDialog open={upload.value} onClose={upload.onFalse} />
 

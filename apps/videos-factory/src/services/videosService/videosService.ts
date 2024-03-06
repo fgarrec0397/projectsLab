@@ -6,6 +6,13 @@ import { IVideo, IVideoDraft } from "@/types/video";
 export const getVideos = async (accessToken: string | undefined) => {
     const url = `${endpoints.videos.get}`;
 
+    axios.interceptors.request.use((config) => {
+        // Replace the valid token with an expired or invalid one
+        const expiredToken = "YOUR_EXPIRED_OR_INVALID_TOKEN";
+        config.headers.Authorization = `Bearer ${expiredToken}`;
+        return config;
+    });
+
     const response = await axios.get<IVideo[]>(url, {
         headers: {
             Accept: "application/json",

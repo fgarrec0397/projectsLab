@@ -87,8 +87,6 @@ export class FileSystem {
                     return;
                 }
 
-                console.log(data, "data");
-
                 resolve(data);
             });
         });

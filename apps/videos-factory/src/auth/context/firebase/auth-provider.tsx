@@ -6,7 +6,6 @@ import {
     GithubAuthProvider,
     GoogleAuthProvider,
     onAuthStateChanged,
-    onIdTokenChanged,
     sendEmailVerification,
     sendPasswordResetEmail,
     signInWithEmailAndPassword,
@@ -82,15 +81,6 @@ export function AuthProvider({ children }: Props) {
 
                         const profile = docSnap.data();
 
-                        console.log({
-                            user: {
-                                ...user,
-                                ...profile,
-                                id: user.uid,
-                                role: "admin",
-                            },
-                        });
-
                         dispatch({
                             type: Types.INITIAL,
                             payload: {
@@ -117,16 +107,6 @@ export function AuthProvider({ children }: Props) {
                             user: null,
                         },
                     });
-                }
-            });
-            onIdTokenChanged(AUTH, async (user) => {
-                if (user) {
-                    const token = await user.getIdToken();
-                    console.log({ user, token }, "onIdTokenChanged");
-
-                    await sessionLogin(token);
-
-                    // Send this token to your backend via an API call to refresh the session
                 }
             });
         } catch (error) {

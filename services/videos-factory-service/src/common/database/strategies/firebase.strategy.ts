@@ -108,7 +108,6 @@ export class FirebaseDatabase implements DatabaseStrategy<FirebaseTypes> {
         const snapshot = await query.get();
 
         const data = snapshot.docs.map((doc) => doc.data());
-        console.log(data, "data");
 
         return data as TData[];
     }

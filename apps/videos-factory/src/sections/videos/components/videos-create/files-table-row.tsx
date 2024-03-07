@@ -19,9 +19,9 @@ import { IFileManager } from "@/types/file";
 
 type Props = {
     row: IFileManager;
-    selected: boolean;
-    onSelectRow: (event: React.MouseEvent<HTMLElement, MouseEvent>, fileId: string) => void;
-    onRemoveFile: (fileId: string) => void;
+    selected?: boolean;
+    onSelectRow?: (event: React.MouseEvent<HTMLElement, MouseEvent>, fileId: string) => void;
+    onRemoveFile?: (fileId: string) => void;
 };
 
 export default function FilesTableRow({ row, selected, onSelectRow, onRemoveFile }: Props) {
@@ -34,9 +34,14 @@ export default function FilesTableRow({ row, selected, onSelectRow, onRemoveFile
     return (
         <>
             <TableRow selected={selected}>
-                <TableCell padding="checkbox">
-                    <Checkbox checked={selected} onClick={(event) => onSelectRow(event, id)} />
-                </TableCell>
+                {onSelectRow && (
+                    <TableCell padding="checkbox">
+                        <Checkbox
+                            checked={selected}
+                            onClick={(event) => onSelectRow?.(event, id)}
+                        />
+                    </TableCell>
+                )}
 
                 <TableCell>
                     <Stack direction="row" alignItems="center" spacing={2}>
@@ -47,7 +52,7 @@ export default function FilesTableRow({ row, selected, onSelectRow, onRemoveFile
                                 variant="inherit"
                                 sx={{
                                     maxWidth: 200,
-                                    cursor: "pointer",
+                                    cursor: onSelectRow ? "pointer" : "default",
                                 }}
                             >
                                 {name}
@@ -55,49 +60,59 @@ export default function FilesTableRow({ row, selected, onSelectRow, onRemoveFile
                         </Tooltip>
                     </Stack>
                 </TableCell>
-                <TableCell
-                    align="right"
-                    sx={{
-                        px: 1,
-                        whiteSpace: "nowrap",
-                    }}
-                >
-                    <IconButton
-                        color={popover.open ? "inherit" : "default"}
-                        onClick={popover.onOpen}
+                {onRemoveFile && (
+                    <TableCell
+                        align="right"
+                        sx={{
+                            px: 1,
+                            whiteSpace: "nowrap",
+                        }}
                     >
-                        <Iconify icon="eva:more-vertical-fill" />
-                    </IconButton>
-                </TableCell>
+                        <IconButton
+                            color={popover.open ? "inherit" : "default"}
+                            onClick={popover.onOpen}
+                        >
+                            <Iconify icon="eva:more-vertical-fill" />
+                        </IconButton>
+                    </TableCell>
+                )}
             </TableRow>
-            <CustomPopover
-                open={popover.open}
-                onClose={popover.onClose}
-                arrow="right-top"
-                sx={{ width: 160 }}
-            >
-                <MenuItem
-                    onClick={() => {
-                        confirm.onTrue();
-                        popover.onClose();
-                    }}
-                    sx={{ color: "error.main" }}
-                >
-                    <Iconify icon="solar:trash-bin-trash-bold" />
-                    Remove
-                </MenuItem>
-            </CustomPopover>
-            <ConfirmDialog
-                open={confirm.value}
-                onClose={confirm.onFalse}
-                title="Remove"
-                content="Are you sure want to remove it from the list?"
-                action={
-                    <Button variant="contained" color="error" onClick={() => onRemoveFile(id)}>
-                        Remove
-                    </Button>
-                }
-            />
+            {onRemoveFile && (
+                <>
+                    <CustomPopover
+                        open={popover.open}
+                        onClose={popover.onClose}
+                        arrow="right-top"
+                        sx={{ width: 160 }}
+                    >
+                        <MenuItem
+                            onClick={() => {
+                                confirm.onTrue();
+                                popover.onClose();
+                            }}
+                            sx={{ color: "error.main" }}
+                        >
+                            <Iconify icon="solar:trash-bin-trash-bold" />
+                            Remove
+                        </MenuItem>
+                    </CustomPopover>
+                    <ConfirmDialog
+                        open={confirm.value}
+                        onClose={confirm.onFalse}
+                        title="Remove"
+                        content="Are you sure want to remove it from the list?"
+                        action={
+                            <Button
+                                variant="contained"
+                                color="error"
+                                onClick={() => onRemoveFile?.(id)}
+                            >
+                                Remove
+                            </Button>
+                        }
+                    />
+                </>
+            )}
         </>
     );
 }

@@ -14,8 +14,12 @@ export const endpoints = {
     },
     videos: {
         get: `${baseURL}/videos`,
+        byId: (videoId?: string) => `${baseURL}/videos/${videoId}`,
         delete: `${baseURL}/videos`,
         startRendering: `${baseURL}/videos/startRendering`,
+        videoUrl: {
+            byId: (videoId?: string) => `${baseURL}/videos/videoUrl/${videoId}`,
+        },
         draft: {
             getLast: `${baseURL}/videos/draft/getLast`,
             save: `${baseURL}/videos/draft/save`,

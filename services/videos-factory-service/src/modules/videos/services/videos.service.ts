@@ -2,6 +2,7 @@ import { Injectable } from "@nestjs/common";
 import { uidGenerator } from "@projectslab/helpers";
 import admin from "firebase-admin";
 import { DatabaseConfig, InjectDatabase } from "src/config/database-config.module";
+import { InjectStorageConfig, StorageConfig } from "src/config/storage-config.module";
 import { VideoProcessingService } from "src/modules/video-processing/video-processing.service";
 
 import { IVideo, IVideoDraft, VideoStatus } from "../videos.types";
@@ -10,6 +11,7 @@ import { IVideo, IVideoDraft, VideoStatus } from "../videos.types";
 export class VideosService {
     constructor(
         @InjectDatabase() private readonly database: DatabaseConfig,
+        @InjectStorageConfig() private readonly storage: StorageConfig,
         private readonly videoProcessingService: VideoProcessingService
     ) {}
 
@@ -23,11 +25,17 @@ export class VideosService {
         return videos;
     }
 
-    async getVideoById(userId: string, videoId) {
+    async getVideoById(userId: string, videoId: string) {
         const videoCollectionPath = `users/${userId}/videos`;
         const video = await this.database.findOne<IVideo>(videoCollectionPath, videoId);
 
         return video;
+    }
+
+    async getVideoUrlById(userId: string, videoId: string) {
+        const video = await this.getVideoById(userId, videoId);
+
+        return this.storage.getFileUrl(video.videoKey);
     }
 
     async getLastOrDefaultVideoDraft(userId: string) {

@@ -29,6 +29,8 @@ export type IVideo = {
     files: string[];
     status: VideoStatus;
     duration?: number;
+    videoKey?: string;
+    videoUrl?: string;
     thumbnail?: string;
     createdAt: ServerTimestamp;
     updatedAt: ServerTimestamp;

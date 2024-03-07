@@ -1,5 +1,4 @@
 import { Injectable } from "@nestjs/common";
-import { uidGenerator } from "@projectslab/helpers";
 import ffmpeg, { FfmpegCommand } from "fluent-ffmpeg";
 import { FileSystem } from "src/common/FileSystem";
 import { CanvasRendererService } from "src/modules/canvas-renderer/canvas-renderer.service";
@@ -93,13 +92,7 @@ export class VideoRendererService {
         this.shouldProcessFragments = this.fragmentableElements.length > 0;
 
         const initContructor = async () => {
-            const date = new Date();
-            const id = `${date.getTime()}-${uidGenerator()}`;
-
-            const { tempFolderPath, cleanUp } = await FileSystem.getTempFolderPath(
-                "video-rendering",
-                id
-            );
+            const { tempFolderPath, cleanUp } = FileSystem.getTempFolderPath("video-rendering");
 
             await FileSystem.createDirectory(tempFolderPath);
 

@@ -1,15 +1,13 @@
-import { Button, Card, CardContent, CardHeader, FormHelperText, Stack } from "@mui/material";
+import { Button, FormHelperText, Stack } from "@mui/material";
 import { useEffect, useState } from "react";
 import { Controller, useFormContext } from "react-hook-form";
 
 import { useBoolean } from "@/hooks/use-boolean";
 import FilesSelectorModal from "@/sections/videos/components/videos-create/files-selector-modal";
-import FilesTable from "@/sections/videos/components/videos-create/files-table";
-import { pxToRem } from "@/theme/typography";
 import { IFile } from "@/types/file";
 
 import { ConfirmDialog } from "../custom-dialog";
-import EmptyContent from "../empty-content";
+import FilesTableCard from "../files-table-card/files-table-card";
 import { useTable } from "../table";
 
 // ----------------------------------------------------------------------
@@ -87,48 +85,31 @@ export default function RHFFilesSelector({ name, label, helperText, files }: Pro
                 name={name}
                 control={control}
                 render={({ fieldState: { error } }) => (
-                    <Card sx={{ height: "100%", maxHeight: pxToRem(505), overflowY: "scroll" }}>
-                        <CardHeader
-                            title={
-                                <Stack>
-                                    {label}
-                                    {(!!error || helperText) && (
-                                        <FormHelperText error={!!error} sx={{ mx: 0 }}>
-                                            {error ? error?.message : helperText}
-                                        </FormHelperText>
-                                    )}
-                                </Stack>
-                            }
-                            sx={{ mb: 2 }}
-                            action={
-                                <>
-                                    {table.selected.length > 0 && (
-                                        <Button onClick={isConfirmRemoveModalOpen.onTrue}>
-                                            Remove
-                                        </Button>
-                                    )}
-                                    <Button onClick={isFilesModalOpen.onTrue}>Add</Button>
-                                </>
-                            }
-                        />
-                        <CardContent>
-                            {selectedFiles.length ? (
-                                <FilesTable
-                                    table={table}
-                                    files={selectedFiles}
-                                    onRemoveFile={onTableRemoveFile}
-                                />
-                            ) : (
-                                <EmptyContent
-                                    filled
-                                    title="No Data"
-                                    sx={{
-                                        py: 10,
-                                    }}
-                                />
-                            )}
-                        </CardContent>
-                    </Card>
+                    <FilesTableCard
+                        title={
+                            <Stack>
+                                {label}
+                                {(!!error || helperText) && (
+                                    <FormHelperText error={!!error} sx={{ mx: 0 }}>
+                                        {error ? error?.message : helperText}
+                                    </FormHelperText>
+                                )}
+                            </Stack>
+                        }
+                        action={
+                            <>
+                                {table.selected.length > 0 && (
+                                    <Button onClick={isConfirmRemoveModalOpen.onTrue}>
+                                        Remove
+                                    </Button>
+                                )}
+                                <Button onClick={isFilesModalOpen.onTrue}>Add</Button>
+                            </>
+                        }
+                        table={table}
+                        files={selectedFiles}
+                        onRemoveFile={onTableRemoveFile}
+                    />
                 )}
             />
             <FilesSelectorModal

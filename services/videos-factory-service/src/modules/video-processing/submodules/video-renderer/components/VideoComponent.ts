@@ -1,7 +1,7 @@
 import ffmpeg from "fluent-ffmpeg";
 
+import { VideoUtils } from "../../../../../common/utils/video.utils";
 import { Video } from "../entities/Video";
-import { VideoUtils } from "../video.utils";
 import { Template } from "../video-renderer.types";
 import { BaseComponent, IElementComponent } from "./BaseComponent";
 

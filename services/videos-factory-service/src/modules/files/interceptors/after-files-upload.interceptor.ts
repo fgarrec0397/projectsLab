@@ -1,11 +1,10 @@
 import { CallHandler, ExecutionContext, Injectable, NestInterceptor } from "@nestjs/common";
-import { uidGenerator } from "@projectslab/helpers";
 import { Observable, of } from "rxjs";
 import { tap } from "rxjs/operators";
 import { FileSystem } from "src/common/FileSystem";
 import { InjectStorageConfig, StorageConfig } from "src/config/storage-config.module";
 
-import { VideoUtils } from "../../video-processing/submodules/video-renderer/video.utils";
+import { VideoUtils } from "../../../common/utils/video.utils";
 
 @Injectable()
 export class AfterFilesUploadInterceptor implements NestInterceptor {
@@ -32,16 +31,10 @@ export class AfterFilesUploadInterceptor implements NestInterceptor {
     }
 
     private async processFilesInBackground(fileIds: string[]): Promise<void> {
-        // const { tempFolderPath, cleanUp } =
-        //     await FileSystem.getTempFolderPath("files-upload-processing");
-
         try {
             for (const fileId of fileIds) {
-                const date = new Date();
-                const { tempFolderPath, cleanUp } = await FileSystem.getTempFolderPath(
-                    "files-upload-processing",
-                    `${date.getTime()}-${uidGenerator()}`
-                );
+                const { tempFolderPath, cleanUp } =
+                    await FileSystem.getTempFolderPath("files-upload-processing");
 
                 await FileSystem.createDirectory(tempFolderPath);
 

@@ -16,9 +16,22 @@ export const getVideos = async (accessToken: string | undefined) => {
 };
 
 export const getVideoById = async (accessToken: string | undefined, videoId?: string) => {
-    const url = `${endpoints.videos.get}/${videoId}`;
+    const url = endpoints.videos.byId(videoId);
 
     const response = await axiosInstance.get<IVideo>(url, {
+        headers: {
+            Accept: "application/json",
+            Authorization: `Bearer ${accessToken}`,
+        },
+    });
+
+    return response.data;
+};
+
+export const getVideoUrlById = async (accessToken: string | undefined, videoId?: string) => {
+    const url = endpoints.videos.videoUrl.byId(videoId);
+
+    const response = await axiosInstance.get<string>(url, {
         headers: {
             Accept: "application/json",
             Authorization: `Bearer ${accessToken}`,

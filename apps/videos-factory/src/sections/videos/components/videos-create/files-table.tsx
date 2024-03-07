@@ -1,34 +1,35 @@
-import { Table, TableBody, TableContainer } from "@mui/material";
+import { Table, TableBody } from "@mui/material";
 
+import Scrollbar from "@/components/scrollbar";
 import { TableProps } from "@/components/table";
+import { pxToRem } from "@/theme/typography";
 import { IFile } from "@/types/file";
 
 import FilesTableRow from "./files-table-row";
 
 type Props = {
-    table: TableProps;
+    table?: TableProps;
     files: IFile[];
-    onRemoveFile: (fileId: string) => void;
+    scrollHeightPx?: number;
+    onRemoveFile?: (fileId: string) => void;
 };
 
-export default function FilesTable({ table, files, onRemoveFile }: Props) {
-    const { onSelectRow, selected } = table;
-
+export default function FilesTable({ table, files, scrollHeightPx, onRemoveFile }: Props) {
     return (
-        <TableContainer>
+        <Scrollbar sx={{ height: scrollHeightPx ? pxToRem(scrollHeightPx) : undefined }}>
             <Table size="small">
                 <TableBody>
                     {files.map((row) => (
                         <FilesTableRow
                             key={row.id}
                             row={row}
-                            selected={selected.includes(row.id)}
-                            onSelectRow={onSelectRow}
+                            selected={table?.selected.includes(row.id)}
+                            onSelectRow={table?.onSelectRow}
                             onRemoveFile={onRemoveFile}
                         />
                     ))}
                 </TableBody>
             </Table>
-        </TableContainer>
+        </Scrollbar>
     );
 }

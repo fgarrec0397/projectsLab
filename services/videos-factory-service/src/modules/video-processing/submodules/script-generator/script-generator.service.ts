@@ -25,9 +25,9 @@ export class ScriptGeneratorService {
 
     private voiceBuffer: Buffer | undefined;
 
-    private voiceFilePath: string = FileSystem.getAssetsPath("speech.mp3");
-
     private text: string | undefined;
+
+    private speechFilePath: string | undefined;
 
     constructor(
         @Inject(TEXT_GENERATOR_STRATEGY_TOKEN)
@@ -38,7 +38,8 @@ export class ScriptGeneratorService {
         private timestampsGeneratorStrategy: TimestampsGeneratorStrategy
     ) {}
 
-    async generateScript() {
+    async generateScript(speechFilePath: string) {
+        this.speechFilePath = speechFilePath;
         await this.generateText();
         await this.generateVoice();
         await this.generateTimestampsBasedOnAudio();
@@ -55,11 +56,14 @@ export class ScriptGeneratorService {
             return;
         }
 
+        await FileSystem.createFile(this.speechFilePath);
+
         this.voiceBuffer = await this.voiceGeneratorStrategy.generateVoice(
             this.text,
-            this.voiceFilePath
+            this.speechFilePath
         );
-        await FileSystem.createFile(this.voiceFilePath, this.voiceBuffer);
+
+        await FileSystem.createFile(this.speechFilePath, this.voiceBuffer);
     }
 
     private async generateTimestampsBasedOnAudio() {

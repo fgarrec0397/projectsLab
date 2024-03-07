@@ -1,6 +1,5 @@
 import { Inject, Injectable, Scope } from "@nestjs/common";
 import OpenAI from "openai";
-import { FileSystem } from "src/common/FileSystem";
 import { OpenAIModule } from "src/common/OpenAI";
 import { InjectStorageConfig, StorageConfig } from "src/config/storage-config.module";
 import { IVideo } from "src/modules/videos/videos.types";
@@ -31,6 +30,8 @@ export const InjectTemplateGenerator = () => Inject(TEMPLATE_GENERATOR_SERVICE_T
 
 @Injectable({ scope: Scope.REQUEST })
 export class TemplateGeneratorService<T extends BaseTemplateData = BaseTemplateData> {
+    speechFilePath: string | undefined;
+
     templateElements: TemplateAIElement[] | undefined;
 
     mappedFetchedAssets: MappedFetchedAsset[] | undefined = [];
@@ -61,8 +62,9 @@ export class TemplateGeneratorService<T extends BaseTemplateData = BaseTemplateD
         return template;
     }
 
-    prepareTemplate(script: Script) {
+    prepareTemplate(script: Script, speechFilePath: string) {
         this.data = { script } as T;
+        this.speechFilePath = speechFilePath;
     }
 
     private async fetchAvailableAssets() {
@@ -165,7 +167,7 @@ export class TemplateGeneratorService<T extends BaseTemplateData = BaseTemplateD
         elements.push(
             new VideoEntities.Audio({
                 name: "audio1",
-                sourcePath: FileSystem.getAssetsPath("speech.mp3"),
+                sourcePath: this.speechFilePath,
                 isVideoLengthHandler: true,
             }),
             new VideoEntities.Text({

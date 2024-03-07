@@ -1,5 +1,6 @@
 import { HttpException, HttpStatus, Injectable } from "@nestjs/common";
 import { CacheService } from "src/common/cache/cache.service";
+import { FileSystem } from "src/common/FileSystem";
 import { DatabaseConfig, InjectDatabase } from "src/config/database-config.module";
 import { InjectStorageConfig, StorageConfig } from "src/config/storage-config.module";
 
@@ -34,13 +35,16 @@ export class VideoProcessingService {
     ) {}
 
     async renderVideo(userId: string, video: IVideo) {
+        const finalVoiceTempFolder = FileSystem.getTempFolderPath("final-voice-generation");
+        const speechFilePath = `${finalVoiceTempFolder.tempFolderPath}/speech.mp3`;
+
         let script: Script = {};
         let template: Template | undefined = undefined;
 
         if (canGenerateScript) {
             await this.notifyClient(userId, video, VideoProcessingStepDataStatus.GeneratingScript);
 
-            script = await this.scriptService.generateScript();
+            script = await this.scriptService.generateScript(speechFilePath);
 
             await this.notifyClient(userId, video, VideoProcessingStepDataStatus.ScriptGenerated);
         }
@@ -52,7 +56,7 @@ export class VideoProcessingService {
                 VideoProcessingStepDataStatus.GeneratingTemplate
             );
 
-            this.templateService.prepareTemplate(script);
+            this.templateService.prepareTemplate(script, speechFilePath);
 
             template = await this.templateService.createTemplate();
 
@@ -84,7 +88,7 @@ export class VideoProcessingService {
 
                         await this.notifyClient(
                             userId,
-                            video,
+                            { ...video, videoKey: fileName },
                             VideoProcessingStepDataStatus.Rendered
                         );
                     } catch (error) {
@@ -94,6 +98,8 @@ export class VideoProcessingService {
                         );
                     }
                 });
+
+                await finalVoiceTempFolder.cleanUp();
 
                 return { result: "Video created" };
             }
@@ -124,4 +130,6 @@ export class VideoProcessingService {
             data: video,
         });
     }
+
+    // private async
 }

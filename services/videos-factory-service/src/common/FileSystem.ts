@@ -1,3 +1,4 @@
+import { uidGenerator } from "@projectslab/helpers";
 import {
     createReadStream,
     createWriteStream,
@@ -10,12 +11,20 @@ import {
 } from "fs";
 import path from "path";
 
+export type TempFolder = {
+    tempFolderPath: string;
+    cleanUp: () => Promise<void>;
+};
+
 export class FileSystem {
     static getAssetsPath(assetPath?: string) {
         return FileSystem.getPath("./assets/poc", assetPath || ""); // TODO - config - "./assets/poc"
     }
 
-    static async getTempFolderPath(subFolder: string, id: string) {
+    static getTempFolderPath(subFolder: string): TempFolder {
+        const date = new Date();
+        const id = `${date.getTime()}-${uidGenerator()}`;
+
         let folderPath = `temp/${subFolder}`;
 
         if (id) {
@@ -66,9 +75,9 @@ export class FileSystem {
         await promises.mkdir(directoryPath, { recursive: true });
     }
 
-    static async createFile(filePath: string, data: string | Buffer): Promise<void> {
+    static async createFile(filePath: string, data?: string | Buffer): Promise<void> {
         await FileSystem.ensureDirectoryExists(filePath);
-        await promises.writeFile(filePath, data);
+        await promises.writeFile(filePath, data || "");
     }
 
     static async createReadStream(filePath: string): Promise<ReadStream> {

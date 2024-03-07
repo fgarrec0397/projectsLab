@@ -38,6 +38,8 @@ export type IVideo = {
     status: VideoStatus;
     duration?: number;
     thumbnail?: string;
+    videoKey?: string;
+    videoUrl?: string;
     createdAt: Timestamp;
     updatedAt: Timestamp;
 };

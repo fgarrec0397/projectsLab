@@ -16,7 +16,9 @@ type Props = {
 
 export default function FilesTable({ table, files, scrollHeightPx, onRemoveFile }: Props) {
     return (
-        <Scrollbar sx={{ height: scrollHeightPx ? pxToRem(scrollHeightPx) : undefined }}>
+        <Scrollbar
+            sx={{ height: "100%", maxHeight: scrollHeightPx ? pxToRem(scrollHeightPx) : undefined }}
+        >
             <Table size="small">
                 <TableBody>
                     {files.map((row) => (

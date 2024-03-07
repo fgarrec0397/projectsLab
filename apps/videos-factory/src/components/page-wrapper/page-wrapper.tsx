@@ -1,12 +1,15 @@
 "use client";
 
-import { Stack } from "@mui/material";
+import { IconButton, Stack } from "@mui/material";
 import Container from "@mui/material/Container";
 import Typography from "@mui/material/Typography";
 import { PropsWithChildren, ReactNode } from "react";
 
 import { LoadingScreen } from "@/components/loading-screen";
 import { useSettingsContext } from "@/components/settings";
+import { RouterLink } from "@/routes/components";
+
+import Iconify from "../iconify";
 
 // ----------------------------------------------------------------------
 
@@ -14,10 +17,18 @@ type Props = PropsWithChildren & {
     title: ReactNode;
     titleItem?: ReactNode;
     subContent?: ReactNode;
+    backLink?: string;
     isLoading?: boolean;
 };
 
-export default function PageWrapper({ title, titleItem, subContent, isLoading, children }: Props) {
+export default function PageWrapper({
+    title,
+    titleItem,
+    subContent,
+    backLink,
+    isLoading,
+    children,
+}: Props) {
     const settings = useSettingsContext();
 
     if (isLoading) {
@@ -38,11 +49,18 @@ export default function PageWrapper({ title, titleItem, subContent, isLoading, c
                     mb: { xs: 3, md: 5 },
                 }}
             >
-                {typeof title === "string" ? (
-                    <Typography variant="h3"> {title} </Typography>
-                ) : (
-                    title
-                )}
+                <Stack direction="row" alignItems="center">
+                    {backLink && (
+                        <IconButton component={RouterLink} href={backLink} sx={{ mr: 1 }}>
+                            <Iconify icon="eva:arrow-ios-back-fill" />
+                        </IconButton>
+                    )}
+                    {typeof title === "string" ? (
+                        <Typography variant="h3"> {title} </Typography>
+                    ) : (
+                        title
+                    )}
+                </Stack>
                 {titleItem !== undefined && <Stack direction="row">{titleItem}</Stack>}
             </Stack>
             <Stack>

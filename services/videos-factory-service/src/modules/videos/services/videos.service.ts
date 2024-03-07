@@ -34,6 +34,7 @@ export class VideosService {
 
     async getVideoUrlById(userId: string, videoId: string) {
         const video = await this.getVideoById(userId, videoId);
+        console.log(video, "video");
 
         return this.storage.getFileUrl(video.videoKey);
     }

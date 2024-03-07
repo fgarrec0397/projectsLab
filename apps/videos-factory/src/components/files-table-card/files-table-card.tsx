@@ -15,12 +15,20 @@ type Props = {
     action?: ReactNode;
     files: IFile[];
     table?: TableProps;
+    maxHeight?: number;
     onRemoveFile?: (fileId: string) => void;
 };
 
-export default function FilesTableCard({ title, action, files, table, onRemoveFile }: Props) {
+export default function FilesTableCard({
+    title,
+    action,
+    files,
+    table,
+    maxHeight = 505,
+    onRemoveFile,
+}: Props) {
     return (
-        <Card sx={{ height: "100%", maxHeight: pxToRem(505) }}>
+        <Card sx={{ height: "100%", maxHeight: pxToRem(maxHeight) }}>
             <CardHeader title={title} sx={{ mb: 2 }} action={action} />
             <CardContent>
                 {files.length ? (

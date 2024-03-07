@@ -18,6 +18,8 @@ export class VideosController {
     @Get()
     @UseCache(videosCacheKey, MONTH_IN_SECONDS)
     async getVideos(@Req() request: Request) {
+        console.log("videos controller called");
+
         return this.videosService.getVideos(request.userId);
     }
 

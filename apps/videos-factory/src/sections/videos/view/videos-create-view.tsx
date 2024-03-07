@@ -300,7 +300,7 @@ export default function VideosCreateView() {
                                     <Grid xs={12}>
                                         <RHFTextField
                                             name="moreSpecificities"
-                                            label="More specificities"
+                                            label="More specifications"
                                             fullWidth
                                             multiline
                                             minRows={3}

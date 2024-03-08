@@ -15,7 +15,6 @@ export class FirebaseStrategy extends PassportStrategy(Strategy, "firebase-auth"
         const idToken = request.headers.authorization?.split("Bearer ")[1];
 
         if (!idToken) throw new UnauthorizedException("ID token is missing");
-        console.log((request.session as any).uid, "uid in session");
 
         try {
             const decodedToken = await this.authService.verifyIdToken(idToken);

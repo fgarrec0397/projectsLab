@@ -1,6 +1,5 @@
 import { CallHandler, ExecutionContext, Injectable, NestInterceptor } from "@nestjs/common";
 import { Reflector } from "@nestjs/core";
-import { createHash } from "crypto";
 import { Request, Response } from "express";
 import { Observable, of } from "rxjs";
 import { tap } from "rxjs/operators";
@@ -29,23 +28,15 @@ export class SetCacheInterceptor implements NestInterceptor {
 
         if (cachedResponse) {
             httpResponse.setHeader("X-Cache", "HIT");
-            httpResponse.setHeader("Cache-Control", "max-age=120"); // Example: cache is fresh for 120 seconds
-            httpResponse.setHeader("ETag", cachedResponse.etag); // Assuming your cache stores ETags
+            httpResponse.setHeader("Cache-Control", "max-age=120");
+            httpResponse.setHeader("ETag", cachedResponse.etag);
             httpResponse.setHeader("Last-Modified", cachedResponse.lastModified);
+
             return of(cachedResponse.data);
         } else {
             return next.handle().pipe(
                 tap((response) => {
-                    const lastModified = new Date().toUTCString();
-                    const etag = createHash("sha1").update(JSON.stringify(response)).digest("hex");
-
-                    httpResponse.setHeader("X-Cache", "MISS");
-
-                    this.cacheService.set<CacheResponse>(
-                        key,
-                        { data: response, lastModified, etag },
-                        ttl
-                    );
+                    this.cacheService.set<CacheResponse>(key, response, httpResponse, ttl);
                 })
             );
         }

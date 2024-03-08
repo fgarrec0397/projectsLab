@@ -48,12 +48,9 @@ export class VideoUtils {
     static async addSilentAudioToVideo(inputFile: string, outputFile: string): Promise<void> {
         return new Promise<void>((resolve, reject) => {
             ffmpeg()
-                // Input silent audio
                 .input("anullsrc=channel_layout=stereo:sample_rate=44100")
                 .inputFormat("lavfi")
-                // Input video
                 .input(inputFile)
-                // Copy video codec, encode audio to AAC
                 .outputOptions(["-c:v copy", "-c:a aac", "-shortest"])
                 .on("error", (err) => {
                     reject("An error occurred: " + err.message);
@@ -62,6 +59,30 @@ export class VideoUtils {
                     resolve();
                 })
                 .save(outputFile);
+        });
+    }
+
+    static async generateThumbnail(
+        videoPath: string,
+        outputFolder: string,
+        fileName: string,
+        size: [number, number],
+        position: string = "00:00:02"
+    ) {
+        return new Promise<void>((resolve, reject) => {
+            ffmpeg(videoPath)
+                .screenshots({
+                    timestamps: [position],
+                    filename: fileName,
+                    folder: outputFolder,
+                    size: `${size[0]}x${size[1]}`,
+                })
+                .on("end", function () {
+                    resolve();
+                })
+                .on("error", function (err) {
+                    reject("An error occurred: " + err.message);
+                });
         });
     }
 }

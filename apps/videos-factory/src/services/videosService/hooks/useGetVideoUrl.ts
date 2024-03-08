@@ -4,7 +4,6 @@ import { useMemo } from "react";
 import useSWR from "swr";
 
 import { useAuthContext } from "@/auth/hooks";
-import { IVideo } from "@/types/video";
 
 import { getVideoUrlById } from "../videosService";
 

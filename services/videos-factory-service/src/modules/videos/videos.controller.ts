@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post, Query, Req } from "@nestjs/common";
+import { Body, Controller, Delete, Get, Param, Patch, Post, Req } from "@nestjs/common";
 import { Request } from "express";
 import { getAuthCacheKey } from "src/common/cache/cache.utils";
 import { UseCache } from "src/common/cache/decorators/use-cache.decorator";
@@ -18,8 +18,6 @@ export class VideosController {
     @Get()
     @UseCache(videosCacheKey, MONTH_IN_SECONDS)
     async getVideos(@Req() request: Request) {
-        console.log("videos controller called");
-
         return this.videosService.getVideos(request.userId);
     }
 
@@ -36,7 +34,7 @@ export class VideosController {
 
     @Post("startRendering")
     @UseInvalidateCache(videosCacheKey)
-    @UseInvalidateCache(videoByIdCacheKey)
+    // @UseInvalidateCache(videoByIdCacheKey)
     async renderVideo(@Req() request: Request, @Body() video: IVideo) {
         return this.videosService.startRendering(request.userId, video);
     }
@@ -49,7 +47,6 @@ export class VideosController {
     }
 
     @Get("draft/getLast")
-    @UseInvalidateCache(videosCacheKey)
     async getLastOrDefaultVideoDraft(@Req() request: Request) {
         return this.videosService.getLastOrDefaultVideoDraft(request.userId);
     }

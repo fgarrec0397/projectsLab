@@ -23,6 +23,8 @@ import { pxToRem } from "@/theme/typography";
 import { IVideo, VideoStatus } from "@/types/video";
 import { formatSeconds, formatServerTimestamp } from "@/utils/format-time";
 
+import VideosStatus from "../common/videos-status";
+
 type Props = {
     video: IVideo;
 };
@@ -95,9 +97,7 @@ export default function VideosListVideoCard({ video }: Props) {
                         >
                             {formatServerTimestamp(video.updatedAt)}
                         </Box>
-                        <Label variant="soft" color="default">
-                            {video.status}
-                        </Label>
+                        <VideosStatus status={video.status} />
                     </Stack>
 
                     <Stack spacing={1} flexGrow={1}>
@@ -124,7 +124,7 @@ export default function VideosListVideoCard({ video }: Props) {
                             >
                                 {video.duration !== undefined
                                     ? formatSeconds(video.duration)
-                                    : "No duration yet"}
+                                    : "Not available"}
                             </Typography>
                         </Stack>
                     </Stack>
@@ -146,17 +146,7 @@ export default function VideosListVideoCard({ video }: Props) {
                 arrow="bottom-center"
                 sx={{ width: 140 }}
             >
-                {/* <MenuItem
-                    onClick={() => {
-                        popover.onClose();
-                        // router.push(paths.dashboard.post.details(title));
-                    }}
-                >
-                    <Iconify icon="solar:eye-bold" />
-                    View
-                </MenuItem> */}
-
-                {video.status === VideoStatus.Draft && (
+                {video.status === VideoStatus.Draft ? (
                     <MenuItem
                         onClick={() => {
                             popover.onClose();
@@ -165,6 +155,16 @@ export default function VideosListVideoCard({ video }: Props) {
                     >
                         <Iconify icon="solar:pen-bold" />
                         Edit
+                    </MenuItem>
+                ) : (
+                    <MenuItem
+                        onClick={() => {
+                            popover.onClose();
+                            router.push(paths.dashboard.videos.byId(video.id));
+                        }}
+                    >
+                        <Iconify icon="solar:eye-bold" />
+                        View
                     </MenuItem>
                 )}
 

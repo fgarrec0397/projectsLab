@@ -12,7 +12,6 @@ import {
 const templateGeneratorService = {
     provide: TEMPLATE_GENERATOR_SERVICE_TOKEN,
     useFactory: async (request: Request) => {
-        console.log(request.videoData, "request.videoData in useFactory");
         const s3Storage = new S3StorageManager(new ConfigService());
 
         s3Storage.init();

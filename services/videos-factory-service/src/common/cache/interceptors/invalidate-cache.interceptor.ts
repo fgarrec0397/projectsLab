@@ -21,19 +21,20 @@ export class InvalidateCacheInterceptor implements NestInterceptor {
 
         const resolvedKey = typeof key === "function" ? key(request) : key;
         const httpResponse: Response = context.switchToHttp().getResponse();
+        console.log(resolvedKey, "resolvedKey in invalidate");
 
         if (!resolvedKey) return next.handle();
 
         return next.handle().pipe(
-            tap((data) => {
-                this.cacheService.invalidate(resolvedKey).then(() => {
-                    const newEtag = createHash("sha1").update(JSON.stringify(data)).digest("hex");
-                    const lastModified = new Date().toUTCString();
+            tap(async (data) => {
+                await this.cacheService.invalidate(resolvedKey, data, httpResponse);
 
-                    httpResponse.setHeader("Cache-Control", "no-cache");
-                    httpResponse.setHeader("ETag", newEtag);
-                    httpResponse.setHeader("Last-Modified", lastModified);
-                });
+                const newEtag = createHash("sha1").update(JSON.stringify(data)).digest("hex");
+                const lastModified = new Date().toUTCString();
+
+                httpResponse.setHeader("Cache-Control", "no-cache");
+                httpResponse.setHeader("ETag", newEtag);
+                httpResponse.setHeader("Last-Modified", lastModified);
             })
         );
     }

@@ -69,9 +69,7 @@ export class S3StorageManager implements StorageStrategy<S3StorageManagerTypes> 
         return extensionMatch ? extensionMatch[0] : null;
     }
 
-    getFileUrl(key: string | undefined, method = "getObject") {
-        const expirySeconds: number = 3600;
-
+    getFileUrl(key: string | undefined, method = "getObject", expirySeconds = 3600) {
         if (!key) {
             return;
         }

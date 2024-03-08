@@ -1,6 +1,8 @@
 import { HttpException, HttpStatus, Injectable } from "@nestjs/common";
 import { CacheService } from "src/common/cache/cache.service";
+import { createAuthCacheKey } from "src/common/cache/cache.utils";
 import { FileSystem } from "src/common/FileSystem";
+import { VideoUtils } from "src/common/utils/video.utils";
 import { DatabaseConfig, InjectDatabase } from "src/config/database-config.module";
 import { InjectStorageConfig, StorageConfig } from "src/config/storage-config.module";
 
@@ -35,6 +37,7 @@ export class VideoProcessingService {
     ) {}
 
     async renderVideo(userId: string, video: IVideo) {
+        const thumbnailFolder = FileSystem.getTempFolderPath("thumbnails");
         const finalVoiceTempFolder = FileSystem.getTempFolderPath("final-voice-generation");
         const speechFilePath = `${finalVoiceTempFolder.tempFolderPath}/speech.mp3`;
 
@@ -82,13 +85,32 @@ export class VideoProcessingService {
 
                 await this.videoService.initRender(async (videoPath) => {
                     try {
-                        const fileName = `system/${userId}/videos/${video.name}.mp4`;
+                        const videoFileName = `system/${userId}/videos/${video.name}.mp4`;
+                        const thumbnailFileName = `system/${userId}/thumbnails/${video.name}.jpg`;
+                        const thumbnailPath = `${thumbnailFolder.tempFolderPath}/${video.name}.jpg`;
 
-                        await this.storage.uploadFile(videoPath, fileName);
+                        await FileSystem.createDirectory(thumbnailFolder.tempFolderPath);
+
+                        await this.processingThumnail(
+                            videoPath,
+                            thumbnailFolder.tempFolderPath,
+                            `${video.name}.jpg`,
+                            [135, 240]
+                        );
+
+                        const duration = await VideoUtils.getVideoDuration(videoPath);
+
+                        await this.storage.uploadFile(thumbnailPath, thumbnailFileName);
+                        await this.storage.uploadFile(videoPath, videoFileName);
 
                         await this.notifyClient(
                             userId,
-                            { ...video, videoKey: fileName },
+                            {
+                                ...video,
+                                videoKey: videoFileName,
+                                thumbnail: thumbnailFileName,
+                                duration,
+                            },
                             VideoProcessingStepDataStatus.Rendered
                         );
                     } catch (error) {
@@ -100,6 +122,7 @@ export class VideoProcessingService {
                 });
 
                 await finalVoiceTempFolder.cleanUp();
+                await thumbnailFolder.cleanUp();
 
                 return { result: "Video created" };
             }
@@ -109,7 +132,7 @@ export class VideoProcessingService {
                 HttpStatus.INTERNAL_SERVER_ERROR
             );
         } catch (error) {
-            throw new HttpException(error as Record<string, any>, HttpStatus.BAD_REQUEST);
+            throw new HttpException(error as Record<string, any>, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -119,6 +142,8 @@ export class VideoProcessingService {
         status: VideoProcessingStepDataStatus
     ) {
         const videoCollectionPath = `users/${userId}/videos`;
+
+        this.cacheService.invalidate(createAuthCacheKey("videos", userId), video);
 
         await this.database.update(videoCollectionPath, video.id, {
             ...video,
@@ -131,5 +156,19 @@ export class VideoProcessingService {
         });
     }
 
-    // private async
+    private async processingThumnail(
+        videoPath: string,
+        outputFolder: string,
+        thumbnailFileName: string,
+        size: [number, number],
+        position?: string
+    ) {
+        await VideoUtils.generateThumbnail(
+            videoPath,
+            outputFolder,
+            thumbnailFileName,
+            size,
+            position
+        );
+    }
 }

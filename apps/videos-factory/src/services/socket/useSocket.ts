@@ -31,6 +31,7 @@ export const useSocket = (options: UseSocketOptions) => {
         if (options.onMessage) {
             socketIo.on(options.event, (message: any) => {
                 console.log(message, "message");
+                options.onMessage?.(message);
             });
         }
 

@@ -21,18 +21,18 @@ export const useGetVideoById = (videoId?: string) => {
         }
     );
 
-    // useOnVideoUpdate((value) => {
-    //     mutate(
-    //         async () => {
-    //             const promise = new Promise<IVideo>((resolve) => {
-    //                 resolve(value);
-    //             });
+    useOnVideoUpdate((value) => {
+        mutate(
+            async () => {
+                const promise = new Promise<IVideo>((resolve) => {
+                    resolve(value);
+                });
 
-    //             return promise;
-    //         },
-    //         { revalidate: false }
-    //     );
-    // });
+                return promise;
+            },
+            { revalidate: false }
+        );
+    });
 
     const memoizedResponse = useMemo(
         () => ({

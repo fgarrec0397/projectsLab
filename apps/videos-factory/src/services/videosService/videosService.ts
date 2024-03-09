@@ -4,7 +4,6 @@ import axiosInstance from "@/utils/axios";
 
 export const getVideos = async (accessToken: string | undefined) => {
     const url = `${endpoints.videos.get}`;
-    console.log("getVideos called");
 
     const response = await axiosInstance.get<IVideo[]>(url, {
         headers: {

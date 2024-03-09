@@ -21,11 +21,9 @@ export const useGetVideos = () => {
         }
     );
 
-    console.log({ videos: data });
-
     useOnVideoUpdate((value) => {
-        console.log("mutate called");
         const videoExists = data?.findIndex((x) => x.id === value?.id) !== -1;
+
         mutate(
             async () => {
                 const promise = new Promise<IVideo[]>((resolve) => {

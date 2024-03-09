@@ -47,8 +47,6 @@ export class VideoProcessingService {
             await this.notifyClient(userId, video, VideoStatus.GeneratingScript);
 
             script = await this.scriptService.generateScript(speechFilePath);
-
-            await this.notifyClient(userId, video, VideoStatus.ScriptGenerated);
         }
 
         if (canGenerateTemplate) {
@@ -57,8 +55,6 @@ export class VideoProcessingService {
             this.templateService.prepareTemplate(script, speechFilePath);
 
             template = await this.templateService.createTemplate();
-
-            await this.notifyClient(userId, video, VideoStatus.TemplateGenerated);
 
             if (!template) {
                 throw new HttpException(

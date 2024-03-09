@@ -4,6 +4,6 @@ import { VideoProcessingStepData } from "../video-processing.types";
 
 export class VideoEventsGateway extends BaseWebSocketGateway {
     notifyVideoProcessStep(data: VideoProcessingStepData) {
-        this.broadcast("videoProcessingSteps", data);
+        this.broadcast("videoUpdate", data);
     }
 }

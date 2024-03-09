@@ -21,29 +21,41 @@ export const useGetVideos = () => {
         }
     );
 
-    const updatedVideo = useOnVideoUpdate();
+    console.log({ videos: data });
 
-    const mergedVideos = useMemo(
-        () =>
-            data?.map((x) => {
-                if (x.id === updatedVideo?.id) {
-                    return { ...x, ...updatedVideo };
-                }
+    useOnVideoUpdate((value) => {
+        console.log("mutate called");
+        const videoExists = data?.findIndex((x) => x.id === value?.id) !== -1;
+        mutate(
+            async () => {
+                const promise = new Promise<IVideo[]>((resolve) => {
+                    const newData =
+                        data?.map((x) => {
+                            if (x.id === value?.id) {
+                                return { ...x, ...value };
+                            }
 
-                return x;
-            }),
-        [data, updatedVideo]
-    );
+                            return x;
+                        }) || [];
+
+                    resolve(newData);
+                });
+
+                return promise;
+            },
+            { revalidate: !videoExists }
+        );
+    });
 
     const memoizedResponse = useMemo(
         () => ({
-            videos: mergedVideos || [],
+            videos: data || [],
             isVideosLoading: isLoading,
             videosError: error,
             isVideosValidating: isValidating,
             mutateVideos: mutate,
         }),
-        [mergedVideos, isLoading, error, isValidating, mutate]
+        [data, isLoading, error, isValidating, mutate]
     );
 
     return memoizedResponse;

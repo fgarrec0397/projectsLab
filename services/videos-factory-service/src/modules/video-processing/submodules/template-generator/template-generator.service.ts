@@ -126,7 +126,7 @@ export class TemplateGeneratorService<T extends BaseTemplateData = BaseTemplateD
 
         const result = await this.openAi.chat.completions.create({
             messages,
-            model: "gpt-4-1106-preview",
+            model: "gpt-4-turbo-preview",
             response_format: {
                 type: "json_object",
             },

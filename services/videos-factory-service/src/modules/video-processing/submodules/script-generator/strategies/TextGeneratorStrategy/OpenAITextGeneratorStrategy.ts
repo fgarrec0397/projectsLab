@@ -38,7 +38,7 @@ export class OpenAITextGeneratorStrategy implements TextGeneratorStrategy {
                 },
                 { role: "user", content: promptOptions },
             ],
-            model: "gpt-4-1106-preview",
+            model: "gpt-4",
             seed,
         });
 

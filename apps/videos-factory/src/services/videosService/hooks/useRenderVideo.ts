@@ -21,8 +21,8 @@ export const useRenderVideo = () => {
             await startRendering(auth.user?.accessToken, video);
 
             enqueueSnackbar("Video creation started");
-            mutateVideos();
             mutateVideoDraft();
+            mutateVideos();
             router.push(paths.dashboard.videos.root);
         } catch (error) {
             enqueueSnackbar("Something went wrong", { variant: "error" });

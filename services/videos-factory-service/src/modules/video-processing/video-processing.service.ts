@@ -1,11 +1,11 @@
 import { HttpException, HttpStatus, Injectable } from "@nestjs/common";
 import { CacheService } from "src/common/cache/cache.service";
-import { createAuthCacheKey } from "src/common/cache/cache.utils";
 import { FileSystem } from "src/common/FileSystem";
 import { VideoUtils } from "src/common/utils/video.utils";
 import { DatabaseConfig, InjectDatabase } from "src/config/database-config.module";
 import { InjectStorageConfig, StorageConfig } from "src/config/storage-config.module";
 
+import { getVideoByIdCacheKey, getVideosCacheKey } from "../videos/utils/videos.utils";
 import { IVideo, VideoStatus } from "../videos/videos.types";
 import { VideoEventsGateway } from "./gateways/video-events.gateway";
 import {
@@ -134,8 +134,10 @@ export class VideoProcessingService {
             status,
         };
 
-        this.cacheService.invalidate(createAuthCacheKey("videos", userId), video);
         await this.database.update(videoCollectionPath, video.id, newVideo);
+
+        this.cacheService.invalidate(getVideosCacheKey(userId), video);
+        this.cacheService.invalidate(getVideoByIdCacheKey(video.id), video);
 
         this.eventsGateway.notifyVideoProcessStep(newVideo);
     }

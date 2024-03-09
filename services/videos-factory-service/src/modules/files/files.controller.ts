@@ -15,7 +15,7 @@ import {
 } from "@nestjs/common";
 import { AnyFilesInterceptor } from "@nestjs/platform-express";
 import { Request } from "express";
-import { getAuthCacheKey } from "src/common/cache/cache.utils";
+import { useAuthCacheKey } from "src/common/cache/cache.utils";
 import { UseCache } from "src/common/cache/decorators/use-cache.decorator";
 import { UseInvalidateCache } from "src/common/cache/decorators/use-invalidate-cache.decorator";
 import { MONTH_IN_SECONDS } from "src/common/constants";
@@ -25,7 +25,7 @@ import { FilesMapper } from "./mappers/files.mapper";
 import { FilesValidationPipe } from "./pipes/files-validation.pipe";
 import { FilesService } from "./services/files.service";
 
-const filesCacheKey = getAuthCacheKey("files-list");
+const filesCacheKey = useAuthCacheKey("files-list");
 
 @Controller("files")
 export class FilesController {

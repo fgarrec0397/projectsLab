@@ -1,13 +1,14 @@
 import { useMemo } from "react";
 
-import Label, { LabelColor } from "@/components/label";
+import Label, { LabelColor, LabelSize } from "@/components/label";
 import { VideoStatus } from "@/types/video";
 
 type Props = {
-    status: VideoStatus;
+    status?: VideoStatus;
+    size?: LabelSize;
 };
 
-export default function VideosStatus({ status }: Props) {
+export default function VideosStatus({ status = VideoStatus.Draft, size }: Props) {
     const statusColorMapping: Record<VideoStatus, LabelColor> = useMemo(
         () => ({
             draft: "default",
@@ -29,7 +30,7 @@ export default function VideosStatus({ status }: Props) {
     );
 
     return (
-        <Label variant="soft" color={color}>
+        <Label variant="soft" color={color} size={size}>
             {status}
         </Label>
     );

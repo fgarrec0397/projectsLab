@@ -8,12 +8,39 @@ import { LabelProps } from "./types";
 // ----------------------------------------------------------------------
 
 const Label = forwardRef<HTMLSpanElement, LabelProps>(
-    ({ children, color = "default", variant = "soft", startIcon, endIcon, sx, ...other }, ref) => {
+    (
+        {
+            children,
+            color = "default",
+            variant = "soft",
+            startIcon,
+            endIcon,
+            sx,
+            size = "small",
+            ...other
+        },
+        ref
+    ) => {
         const theme = useTheme();
 
+        const mappedIconSize = {
+            small: {
+                width: 16,
+                height: 16,
+            },
+            medium: {
+                width: 20,
+                height: 20,
+            },
+            large: {
+                width: 24,
+                height: 24,
+            },
+        };
+
         const iconStyles = {
-            width: 16,
-            height: 16,
+            width: mappedIconSize[size].width,
+            height: mappedIconSize[size].height,
             "& svg, img": { width: 1, height: 1, objectFit: "cover" },
         };
 
@@ -21,7 +48,7 @@ const Label = forwardRef<HTMLSpanElement, LabelProps>(
             <StyledLabel
                 ref={ref}
                 component="span"
-                ownerState={{ color, variant }}
+                ownerState={{ color, variant, size }}
                 sx={{
                     ...(startIcon && { pl: 0.75 }),
                     ...(endIcon && { pr: 0.75 }),

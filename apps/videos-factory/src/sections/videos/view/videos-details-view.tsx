@@ -15,6 +15,8 @@ import { useGetVideoUrl } from "@/services/videosService/hooks/useGetVideoUrl";
 import { pxToRem } from "@/theme/typography";
 import { VideoStatus } from "@/types/video";
 
+import VideosStatus from "../components/common/videos-status";
+
 // ----------------------------------------------------------------------
 
 type Props = {
@@ -27,8 +29,6 @@ export default function VideosDetailsView({ videoId }: Props) {
     const { videoUrl } = useGetVideoUrl(videoId);
     const { video, isVideoLoading, isVideoReady } = useGetVideoById(videoId);
     const theme = useTheme();
-
-    console.log(videoUrl, "videoUrl");
 
     const files = useMemo(
         () => allFiles.filter((x) => video?.files.includes(x.id)),
@@ -48,6 +48,7 @@ export default function VideosDetailsView({ videoId }: Props) {
             title={video?.name}
             backLink={paths.dashboard.videos.root}
             isLoading={isVideoLoading}
+            titleItem={<VideosStatus status={video?.status} size="medium" />}
         >
             <Grid container spacing={3}>
                 <Grid xs={12} md={8}>

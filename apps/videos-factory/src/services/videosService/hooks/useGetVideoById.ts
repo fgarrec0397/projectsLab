@@ -7,6 +7,7 @@ import { useAuthContext } from "@/auth/hooks";
 import { IVideo } from "@/types/video";
 
 import { getVideoById } from "../videosService";
+import { useOnVideoUpdate } from "./useOnVideoUpdate";
 
 export const useGetVideoById = (videoId?: string) => {
     const auth = useAuthContext();
@@ -19,6 +20,19 @@ export const useGetVideoById = (videoId?: string) => {
             revalidateOnFocus: false,
         }
     );
+
+    // useOnVideoUpdate((value) => {
+    //     mutate(
+    //         async () => {
+    //             const promise = new Promise<IVideo>((resolve) => {
+    //                 resolve(value);
+    //             });
+
+    //             return promise;
+    //         },
+    //         { revalidate: false }
+    //     );
+    // });
 
     const memoizedResponse = useMemo(
         () => ({

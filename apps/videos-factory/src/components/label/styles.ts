@@ -1,7 +1,8 @@
 import Box from "@mui/material/Box";
 import { alpha, styled, Theme } from "@mui/material/styles";
+import { CSSProperties } from "react";
 
-import { LabelColor, LabelVariant } from "./types";
+import { LabelColor, LabelSize, LabelVariant } from "./types";
 
 // ----------------------------------------------------------------------
 
@@ -13,8 +14,30 @@ export const StyledLabel = styled(Box)(({
     ownerState: {
         color: LabelColor;
         variant: LabelVariant;
+        size: LabelSize;
     };
 }) => {
+    const mappedSizeStyles: Record<LabelSize, CSSProperties> = {
+        small: {
+            height: 24,
+            minWidth: 24,
+            padding: theme.spacing(0, 0.75),
+            fontSize: theme.typography.pxToRem(12),
+        },
+        medium: {
+            height: 34,
+            minWidth: 34,
+            padding: theme.spacing(0, 1.5),
+            fontSize: theme.typography.pxToRem(16),
+        },
+        large: {
+            height: 40,
+            minWidth: 40,
+            padding: theme.spacing(0, 2),
+            fontSize: theme.typography.pxToRem(20),
+        },
+    };
+
     const lightMode = theme.palette.mode === "light";
 
     const filledVariant = ownerState.variant === "filled";
@@ -65,6 +88,8 @@ export const StyledLabel = styled(Box)(({
         }),
     };
 
+    const sizeStyle: CSSProperties = mappedSizeStyles[ownerState.size];
+
     return {
         height: 24,
         minWidth: 24,
@@ -84,5 +109,6 @@ export const StyledLabel = styled(Box)(({
         }),
         ...defaultStyle,
         ...colorStyle,
+        ...sizeStyle,
     };
 });

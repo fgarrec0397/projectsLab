@@ -7,6 +7,7 @@ import ProgressBar from "@/components/progress-bar";
 import { SettingsDrawer, SettingsProvider } from "@/components/settings";
 import { SnackbarProvider } from "@/components/snackbar";
 import { LocalizationProvider } from "@/locales";
+import { SocketProvider } from "@/services/socket/SocketContext";
 // ----------------------------------------------------------------------
 import ThemeProvider from "@/theme";
 import { primaryFont } from "@/theme/typography";
@@ -58,9 +59,11 @@ export default function RootLayout({ children }: Props) {
                             <ThemeProvider>
                                 <MotionLazy>
                                     <SnackbarProvider>
-                                        <SettingsDrawer />
-                                        <ProgressBar />
-                                        {children}
+                                        <SocketProvider>
+                                            <SettingsDrawer />
+                                            <ProgressBar />
+                                            {children}
+                                        </SocketProvider>
                                     </SnackbarProvider>
                                 </MotionLazy>
                             </ThemeProvider>

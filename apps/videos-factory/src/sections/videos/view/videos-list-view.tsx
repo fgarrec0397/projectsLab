@@ -8,6 +8,7 @@ import EmptyContent from "@/components/empty-content";
 import PageWrapper from "@/components/page-wrapper/page-wrapper";
 import { paths } from "@/routes/paths";
 import { useGetVideos } from "@/services/videosService/hooks/useGetVideos";
+import { useGetVideosStatus } from "@/services/videosService/hooks/useGetVideosStatus";
 
 import VideosListVideoCard from "../components/videos-list/videos-list-video-card";
 
@@ -16,6 +17,7 @@ import VideosListVideoCard from "../components/videos-list/videos-list-video-car
 export default function VideosListView() {
     const router = useRouter();
     const { videos, isVideosLoading } = useGetVideos();
+    useGetVideosStatus();
 
     const handleCreateVideo = () => router.push(paths.dashboard.videos.create);
 

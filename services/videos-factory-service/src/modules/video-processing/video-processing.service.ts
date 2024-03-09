@@ -6,7 +6,7 @@ import { VideoUtils } from "src/common/utils/video.utils";
 import { DatabaseConfig, InjectDatabase } from "src/config/database-config.module";
 import { InjectStorageConfig, StorageConfig } from "src/config/storage-config.module";
 
-import { IVideo } from "../videos/videos.types";
+import { IVideo, VideoStatus } from "../videos/videos.types";
 import { VideoEventsGateway } from "./gateways/video-events.gateway";
 import {
     Script,
@@ -18,7 +18,6 @@ import {
 } from "./submodules/template-generator/template-generator.service";
 import { VideoRendererService } from "./submodules/video-renderer/video-renderer.service";
 import { Template } from "./submodules/video-renderer/video-renderer.types";
-import { VideoProcessingStepDataStatus } from "./video-processing.types";
 
 const canGenerateScript = true;
 const canGenerateTemplate = true;
@@ -45,25 +44,21 @@ export class VideoProcessingService {
         let template: Template | undefined = undefined;
 
         if (canGenerateScript) {
-            await this.notifyClient(userId, video, VideoProcessingStepDataStatus.GeneratingScript);
+            await this.notifyClient(userId, video, VideoStatus.GeneratingScript);
 
             script = await this.scriptService.generateScript(speechFilePath);
 
-            await this.notifyClient(userId, video, VideoProcessingStepDataStatus.ScriptGenerated);
+            await this.notifyClient(userId, video, VideoStatus.ScriptGenerated);
         }
 
         if (canGenerateTemplate) {
-            await this.notifyClient(
-                userId,
-                video,
-                VideoProcessingStepDataStatus.GeneratingTemplate
-            );
+            await this.notifyClient(userId, video, VideoStatus.GeneratingTemplate);
 
             this.templateService.prepareTemplate(script, speechFilePath);
 
             template = await this.templateService.createTemplate();
 
-            await this.notifyClient(userId, video, VideoProcessingStepDataStatus.TemplateGenerated);
+            await this.notifyClient(userId, video, VideoStatus.TemplateGenerated);
 
             if (!template) {
                 throw new HttpException(
@@ -79,7 +74,7 @@ export class VideoProcessingService {
             }
 
             if (template) {
-                await this.notifyClient(userId, video, VideoProcessingStepDataStatus.Rendering);
+                await this.notifyClient(userId, video, VideoStatus.Rendering);
 
                 this.videoService.init(template);
 
@@ -111,7 +106,7 @@ export class VideoProcessingService {
                                 thumbnail: thumbnailFileName,
                                 duration,
                             },
-                            VideoProcessingStepDataStatus.Rendered
+                            VideoStatus.Rendered
                         );
                     } catch (error) {
                         throw new HttpException(
@@ -136,24 +131,17 @@ export class VideoProcessingService {
         }
     }
 
-    private async notifyClient(
-        userId: string,
-        video: IVideo,
-        status: VideoProcessingStepDataStatus
-    ) {
+    private async notifyClient(userId: string, video: IVideo, status: VideoStatus) {
         const videoCollectionPath = `users/${userId}/videos`;
-
-        this.cacheService.invalidate(createAuthCacheKey("videos", userId), video);
-
-        await this.database.update(videoCollectionPath, video.id, {
+        const newVideo: IVideo = {
             ...video,
             status,
-        });
+        };
 
-        this.eventsGateway.notifyVideoProcessStep({
-            status,
-            data: video,
-        });
+        this.cacheService.invalidate(createAuthCacheKey("videos", userId), video);
+        await this.database.update(videoCollectionPath, video.id, newVideo);
+
+        this.eventsGateway.notifyVideoProcessStep(newVideo);
     }
 
     private async processingThumnail(

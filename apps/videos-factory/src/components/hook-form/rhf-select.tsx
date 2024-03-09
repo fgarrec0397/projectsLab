@@ -11,7 +11,7 @@ import { Controller, useFormContext } from "react-hook-form";
 
 // ----------------------------------------------------------------------
 
-type RHFSelectProps = SelectProps & {
+type RHFSelectProps = Omit<SelectProps, "variant"> & {
     name: string;
     label?: string;
     native?: boolean;

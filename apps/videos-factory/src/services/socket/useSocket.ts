@@ -1,61 +1,54 @@
-import { useEffect, useState } from "react";
-import { io, Socket } from "socket.io-client";
+// import { useEffect, useState } from "react";
 
-// Define the URL of your WebSocket server
-const SOCKET_URL = process.env.NEXT_PUBLIC_CREATEIFY_SERVICE_WEBSOCKET_URL || ""; // Update with your server's URL
+// import { socket } from "./socket";
 
-interface UseSocketOptions {
-    event: string;
-    onConnect?: () => void;
-    onDisconnect?: (reason: string) => void;
-    onMessage?: <TMessage>(message: TMessage) => void;
-}
+// interface UseSocketOptions {
+//     event: string;
+//     onConnect?: () => void;
+//     onDisconnect?: (reason: string) => void;
+//     onMessage?: <TMessage>(message: TMessage) => void;
+// }
 
-export const useSocket = (options: UseSocketOptions) => {
-    const [socket, setSocket] = useState<Socket | null>(null);
+// export const useSocket = (options: UseSocketOptions) => {
+//     const [isConnected, setIsConnected] = useState(socket.connected);
+//     const [fooEvents, setFooEvents] = useState<any[]>([]);
 
-    useEffect(() => {
-        // Connect to WebSocket server
-        const socketIo = io(SOCKET_URL);
+//     useEffect(() => {
+//         console.log(isConnected, "isConnected");
+//     }, [isConnected]);
 
-        // Connection established
-        socketIo.on("connect", () => {
-            console.log("Connected to WebSocket server");
-            options?.onConnect?.();
-        });
+//     useEffect(() => {
+//         console.log(fooEvents, "fooEvents");
+//     }, [fooEvents]);
 
-        // Listen for messages from the server
-        // if (options?.onMessage) {
-        // }
-        // videoProcessingSteps
-        if (options.onMessage) {
-            socketIo.on(options.event, (message: any) => {
-                console.log(message, "message");
-                options.onMessage?.(message);
-            });
-        }
+//     useEffect(() => {
+//         function onConnect() {
+//             setIsConnected(true);
+//         }
 
-        // Handle disconnection
-        socketIo.on("disconnect", (reason) => {
-            console.log(`Disconnected: ${reason}`);
-            options?.onDisconnect?.(reason);
-        });
+//         function onDisconnect() {
+//             setIsConnected(false);
+//         }
 
-        // Update the state with the connected socket
-        setSocket(socketIo);
+//         function videoProcessingSteps(value: any) {
+//             setFooEvents((previous) => [...previous, value]);
+//         }
 
-        // Cleanup on unmount
-        return () => {
-            socketIo.disconnect();
-        };
-    }, [options]);
+//         if (!isConnected) {
+//             socket.on("connect", onConnect);
+//         }
 
-    // Function to send messages to the server
-    const sendMessage = (event: string, message: any) => {
-        if (!socket) return;
+//         if (isConnected) {
+//             socket.on("disconnect", onDisconnect);
+//             socket.on("videoProcessingSteps", videoProcessingSteps);
+//         }
 
-        socket.emit(event, message);
-    };
-
-    return { socket, sendMessage };
-};
+//         return () => {
+//             if (isConnected) {
+//                 socket.off("connect", onConnect);
+//                 socket.off("disconnect", onDisconnect);
+//                 socket.off("videoProcessingSteps", videoProcessingSteps);
+//             }
+//         };
+//     }, [isConnected]);
+// };

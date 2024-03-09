@@ -1,22 +1,26 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import useSWR from "swr";
 
 import { useAuthContext } from "@/auth/hooks";
-import { useSocket } from "@/services/socket/useSocket";
 import { IVideo } from "@/types/video";
 
 import { getVideos } from "../videosService";
+import { useGetVideosStatus } from "./useGetVideosStatus";
 
 export const useGetVideos = () => {
     const auth = useAuthContext();
-    // const socket = useSocket({
-    //     event: "videoProcessingSteps",
-    //     onMessage: (message) => {
-    //         console.log(message, "message");
-    //     },
-    // });
+
+    const socketOptions = useMemo(
+        () => ({
+            event: "videoProcessingSteps",
+        }),
+        []
+    );
+
+    // const socket = useGetVideosStatus();
+
     const [updatedVideo, setUpdatedVideo] = useState<IVideo>();
 
     const { data, isLoading, error, isValidating, mutate } = useSWR<IVideo[]>(

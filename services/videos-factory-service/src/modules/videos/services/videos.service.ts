@@ -34,7 +34,6 @@ export class VideosService {
 
     async getVideoUrlById(userId: string, videoId: string) {
         const video = await this.getVideoById(userId, videoId);
-        console.log(video, "video");
 
         return this.storage.getFileUrl(video.videoKey);
     }
@@ -90,7 +89,6 @@ export class VideosService {
 
     async deleteVideo(userId: string, videoId: string) {
         const videoCollectionPath = `users/${userId}/videos`;
-        console.log(videoId, "videoId");
 
         return this.database.delete(videoCollectionPath, videoId);
     }

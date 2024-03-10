@@ -19,7 +19,7 @@ export class VideosService {
         const videoCollectionPath = `users/${userId}/videos`;
         const videos = await this.database.findWithQuery<IVideo>(videoCollectionPath, {
             orderByField: "createdAt",
-            orderByDirection: "asc",
+            orderByDirection: "desc",
         });
 
         return videos;
@@ -60,8 +60,8 @@ export class VideosService {
             pace: "mix",
             moreSpecificities: undefined,
             status: VideoStatus.Draft,
-            createdAt: admin.firestore.Timestamp.now(),
-            updatedAt: admin.firestore.Timestamp.now(),
+            createdAt: new Date().getTime(),
+            updatedAt: new Date().getTime(),
         };
 
         return defaultVideoDraft;
@@ -81,7 +81,7 @@ export class VideosService {
 
         const updatedDocument = await this.database.createOrUpdate(videoCollectionPath, {
             ...videoDraft,
-            updatedAt: admin.firestore.Timestamp.now(),
+            updatedAt: new Date().getTime(),
         });
 
         return updatedDocument;

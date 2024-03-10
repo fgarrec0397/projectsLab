@@ -14,14 +14,13 @@ import { useRouter } from "next/navigation";
 import CustomPopover, { usePopover } from "@/components/custom-popover";
 import Iconify from "@/components/iconify";
 import Image from "@/components/image";
-import Label from "@/components/label";
 import { RouterLink } from "@/routes/components";
 import { paths } from "@/routes/paths";
 import { useDeleteVideo } from "@/services/videosService/hooks/useDeleteVideo";
 import { icon } from "@/theme/icons";
 import { pxToRem } from "@/theme/typography";
 import { IVideo, VideoStatus } from "@/types/video";
-import { formatSeconds, formatServerTimestamp } from "@/utils/format-time";
+import { fDate, formatSeconds } from "@/utils/format-time";
 
 import VideosStatus from "../common/videos-status";
 
@@ -95,7 +94,7 @@ export default function VideosListVideoCard({ video }: Props) {
                             component="span"
                             sx={{ typography: "caption", color: "text.disabled" }}
                         >
-                            {formatServerTimestamp(video.updatedAt)}
+                            {fDate(video.updatedAt)}
                         </Box>
                         <VideosStatus status={video.status} />
                     </Stack>

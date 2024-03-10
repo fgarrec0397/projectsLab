@@ -1,7 +1,5 @@
 import { format, formatDistanceToNow, getTime, intervalToDuration } from "date-fns";
 
-import { ServerTimestamp } from "@/types/date";
-
 // ----------------------------------------------------------------------
 
 type InputValue = Date | string | number | null | undefined;
@@ -51,12 +49,6 @@ export function isAfter(startDate: Date | null, endDate: Date | null) {
         startDate && endDate ? new Date(startDate).getTime() > new Date(endDate).getTime() : false;
 
     return results;
-}
-
-export function formatServerTimestamp(timestamp: ServerTimestamp) {
-    const date = new Date(timestamp._seconds * 1000 + timestamp._nanoseconds / 1000000);
-
-    return fDate(date);
 }
 
 export function formatSeconds(seconds: number) {

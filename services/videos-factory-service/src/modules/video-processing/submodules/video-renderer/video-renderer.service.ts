@@ -61,14 +61,11 @@ export class VideoRendererService {
 
     shouldProcessFragments?: boolean;
 
-    constructor() {
-        this.complexFilterBuilder = new ComplexFilterBuilder();
-    }
-
     public init(template: Template) {
         this.tempFfmpegCommand = ffmpeg();
         this.textFfmpegCommand = ffmpeg();
         this.finalFfmpegCommand = ffmpeg();
+        this.complexFilterBuilder = new ComplexFilterBuilder();
 
         this.template = template;
         this.canvasRenderer = new CanvasRendererService({

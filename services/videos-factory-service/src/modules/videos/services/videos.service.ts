@@ -1,15 +1,18 @@
+import { InjectQueue } from "@nestjs/bull";
 import { Injectable } from "@nestjs/common";
 import { uidGenerator } from "@projectslab/helpers";
+import { Queue } from "bull";
 import admin from "firebase-admin";
 import { DatabaseConfig, InjectDatabase } from "src/config/database-config.module";
 import { InjectStorageConfig, StorageConfig } from "src/config/storage-config.module";
-import { VideoProcessingService } from "src/modules/video-processing/video-processing.service";
+import { VideoProcessingService } from "src/modules/video-processing/services/video-processing.service";
 
 import { IVideo, IVideoDraft, VideoStatus } from "../videos.types";
 
 @Injectable()
 export class VideosService {
     constructor(
+        @InjectQueue("video-rendering") private videoRenderingQueue: Queue,
         @InjectDatabase() private readonly database: DatabaseConfig,
         @InjectStorageConfig() private readonly storage: StorageConfig,
         private readonly videoProcessingService: VideoProcessingService
@@ -101,7 +104,11 @@ export class VideosService {
             updatedAt: admin.firestore.Timestamp.now(),
         });
 
-        this.videoProcessingService.renderVideo(userId, video);
+        await this.videoRenderingQueue.add({
+            userId,
+            video,
+        });
+        // this.videoProcessingService.renderVideo(userId, video);
 
         return updatedDocument;
     }

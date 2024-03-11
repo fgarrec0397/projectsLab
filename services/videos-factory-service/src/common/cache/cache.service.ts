@@ -25,11 +25,12 @@ export class CacheService {
 
     async invalidate(key: string, data: any, httpResponse?: Response) {
         await this.cacheManager.del(key);
+        const etag = createHash("sha1").update(JSON.stringify(data)).digest("hex");
 
         const lastModified = new Date().toUTCString();
 
-        httpResponse?.setHeader("Cache-Control", "no-cache");
-        httpResponse?.setHeader("ETag", null);
+        httpResponse?.setHeader("Cache-Control", "must-revalidate");
+        httpResponse?.setHeader("ETag", etag);
         httpResponse?.setHeader("Last-Modified", lastModified);
     }
 }

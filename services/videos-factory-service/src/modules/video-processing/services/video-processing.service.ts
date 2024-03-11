@@ -5,19 +5,19 @@ import { VideoUtils } from "src/common/utils/video.utils";
 import { DatabaseConfig, InjectDatabase } from "src/config/database-config.module";
 import { InjectStorageConfig, StorageConfig } from "src/config/storage-config.module";
 
-import { getVideoByIdCacheKey, getVideosCacheKey } from "../videos/utils/videos.utils";
-import { IVideo, VideoStatus } from "../videos/videos.types";
-import { VideoEventsGateway } from "./gateways/video-events.gateway";
+import { getVideoByIdCacheKey, getVideosCacheKey } from "../../videos/utils/videos.utils";
+import { IVideo, VideoStatus } from "../../videos/videos.types";
+import { VideoEventsGateway } from "../gateways/video-events.gateway";
 import {
     Script,
     ScriptGeneratorService,
-} from "./submodules/script-generator/script-generator.service";
+} from "../submodules/script-generator/script-generator.service";
 import {
     InjectTemplateGenerator,
     TemplateGeneratorService,
-} from "./submodules/template-generator/template-generator.service";
-import { VideoRendererService } from "./submodules/video-renderer/video-renderer.service";
-import { Template } from "./submodules/video-renderer/video-renderer.types";
+} from "../submodules/template-generator/template-generator.service";
+import { VideoRendererService } from "../submodules/video-renderer/video-renderer.service";
+import { Template } from "../submodules/video-renderer/video-renderer.types";
 
 const canGenerateScript = true;
 const canGenerateTemplate = true;
@@ -28,7 +28,6 @@ export class VideoProcessingService {
     constructor(
         private readonly scriptService: ScriptGeneratorService,
         @InjectTemplateGenerator() private readonly templateService: TemplateGeneratorService,
-        private readonly videoService: VideoRendererService,
         private readonly eventsGateway: VideoEventsGateway,
         @InjectDatabase() private readonly database: DatabaseConfig,
         @InjectStorageConfig() private readonly storage: StorageConfig,
@@ -72,9 +71,9 @@ export class VideoProcessingService {
             if (template) {
                 await this.notifyClient(userId, video, VideoStatus.Rendering);
 
-                this.videoService.init(template);
+                const videoRenderer = new VideoRendererService(template);
 
-                await this.videoService.initRender(async (videoPath) => {
+                await videoRenderer.initRender(async (videoPath) => {
                     try {
                         const videoFileName = `system/${userId}/videos/${video.name}.mp4`;
                         const thumbnailFileName = `system/${userId}/thumbnails/${video.name}.jpg`;

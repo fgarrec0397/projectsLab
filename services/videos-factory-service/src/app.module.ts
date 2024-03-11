@@ -1,3 +1,4 @@
+import { BullModule } from "@nestjs/bull";
 import { Module } from "@nestjs/common";
 import { ConfigModule as EnvConfigModule } from "@nestjs/config";
 
@@ -12,6 +13,12 @@ import { VideosModule } from "./modules/videos/videos.module";
 @Module({
     imports: [
         EnvConfigModule.forRoot({ isGlobal: true }),
+        BullModule.forRoot({
+            redis: {
+                host: "localhost",
+                port: 6379,
+            },
+        }),
         ConfigModule,
         BaseWebSocketModule,
         CacheModule,

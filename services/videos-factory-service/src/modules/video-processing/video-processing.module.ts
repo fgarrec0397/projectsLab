@@ -1,14 +1,21 @@
+import { BullModule } from "@nestjs/bull";
 import { Module } from "@nestjs/common";
 
 import { VideoEventsGateway } from "./gateways/video-events.gateway";
+import { VideoProcessingService } from "./services/video-processing.service";
 import { ScriptGeneratorModule } from "./submodules/script-generator/script-generator.module";
 import { TemplateGeneratorModule } from "./submodules/template-generator/template-generator.module";
-import { VideoRendererModule } from "./submodules/video-renderer/video-renderer.module";
-import { VideoProcessingService } from "./video-processing.service";
+import { VideoProcessingProcessor } from "./video-processing.processor";
 
 @Module({
-    imports: [ScriptGeneratorModule, TemplateGeneratorModule, VideoRendererModule],
-    providers: [VideoProcessingService, VideoEventsGateway],
-    exports: [VideoProcessingService],
+    imports: [
+        BullModule.registerQueue({
+            name: "video-rendering",
+        }),
+        ScriptGeneratorModule,
+        TemplateGeneratorModule,
+    ],
+    providers: [VideoProcessingProcessor, VideoProcessingService, VideoEventsGateway],
+    exports: [VideoProcessingProcessor, VideoProcessingService],
 })
 export class VideoProcessingModule {}

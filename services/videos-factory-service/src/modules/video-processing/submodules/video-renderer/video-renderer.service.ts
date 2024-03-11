@@ -1,4 +1,3 @@
-import { Injectable } from "@nestjs/common";
 import ffmpeg, { FfmpegCommand } from "fluent-ffmpeg";
 import { FileSystem } from "src/common/FileSystem";
 import { CanvasRendererService } from "src/modules/canvas-renderer/canvas-renderer.service";
@@ -23,7 +22,6 @@ export type TemplateSize = {
     height: number;
 };
 
-@Injectable()
 export class VideoRendererService {
     cleanUpTempFolder: () => Promise<void>;
 
@@ -61,10 +59,11 @@ export class VideoRendererService {
 
     shouldProcessFragments?: boolean;
 
-    public init(template: Template) {
+    constructor(template: Template) {
         this.tempFfmpegCommand = ffmpeg();
         this.textFfmpegCommand = ffmpeg();
         this.finalFfmpegCommand = ffmpeg();
+
         this.complexFilterBuilder = new ComplexFilterBuilder();
 
         this.template = template;
@@ -103,9 +102,50 @@ export class VideoRendererService {
         initContructor();
     }
 
-    public async initRender(afterRender?: (filePath: string) => Promise<void>) {
-        console.time("Video Rendered");
+    // public init(template: Template) {
+    //     this.tempFfmpegCommand = ffmpeg();
+    //     this.textFfmpegCommand = ffmpeg();
+    //     this.finalFfmpegCommand = ffmpeg();
 
+    //     this.complexFilterBuilder = new ComplexFilterBuilder();
+
+    //     this.template = template;
+    //     this.canvasRenderer = new CanvasRendererService({
+    //         width: this.template.width,
+    //         height: this.template.height,
+    //     });
+    //     this.complexFilterBuilder = new ComplexFilterBuilder();
+    //     this.elementsFactory = new ElementComponentFactory(
+    //         this.complexFilterBuilder,
+    //         this.canvasRenderer
+    //     );
+    //     this.templateMapper = new VideoTemplateMapper(this.template, this.elementsFactory);
+
+    //     this.size = {
+    //         width: this.template.width,
+    //         height: this.template.height,
+    //     };
+
+    //     this.mapTemplate();
+
+    //     this.shouldProcessFragments = this.fragmentableElements.length > 0;
+
+    //     const initContructor = async () => {
+    //         const { tempFolderPath, cleanUp } = FileSystem.getTempFolderPath("video-rendering");
+
+    //         await FileSystem.createDirectory(tempFolderPath);
+
+    //         this.tempFolder = tempFolderPath;
+    //         this.cleanUpTempFolder = cleanUp;
+    //         this.outputPath = `${this.tempFolder}/video.mp4`;
+
+    //         this.tempOutputPath = `${this.tempFolder}/temp-video.mov`;
+    //     };
+
+    //     initContructor();
+    // }
+
+    public async initRender(afterRender?: (filePath: string) => Promise<void>) {
         await this.processElements();
 
         this.buildComplexFilterCommand();
@@ -115,7 +155,6 @@ export class VideoRendererService {
         if (!this.shouldProcessFragments) {
             await this.renderFinalVideo();
 
-            console.timeEnd("Video Rendered");
             return;
         }
 
@@ -130,7 +169,6 @@ export class VideoRendererService {
         }
 
         await this.cleanUpDirectories();
-        console.timeEnd("Video Rendered");
     }
 
     private async processElements() {
@@ -250,7 +288,6 @@ export class VideoRendererService {
             throw new Error("VideoRender.init was not called");
         }
         console.log("Final rendering started...");
-        console.time("Final rendering finished");
         console.log(this.tempOutputPath, "this.tempOutputPath");
 
         return new Promise<void>((resolve, reject) => {
@@ -267,7 +304,6 @@ export class VideoRendererService {
                     console.log(`Spawned Ffmpeg with command: ${commandLine}`);
                 })
                 .on("end", () => {
-                    console.timeEnd("Final rendering finished");
                     resolve();
                 })
                 .on("error", (error: Error) => {

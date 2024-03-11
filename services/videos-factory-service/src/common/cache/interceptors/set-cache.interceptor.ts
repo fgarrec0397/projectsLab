@@ -28,7 +28,7 @@ export class SetCacheInterceptor implements NestInterceptor {
 
         if (cachedResponse) {
             httpResponse.setHeader("X-Cache", "HIT");
-            httpResponse.setHeader("Cache-Control", "max-age=120");
+            httpResponse.setHeader("Cache-Control", "max-age=10");
             httpResponse.setHeader("ETag", cachedResponse.etag);
             httpResponse.setHeader("Last-Modified", cachedResponse.lastModified);
 

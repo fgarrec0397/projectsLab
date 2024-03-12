@@ -11,7 +11,7 @@ type VideoRenderingJobData = {
 
 export const VIDEO_RENDERING_PROCESS = "video-rendering";
 
-@Processor()
+@Processor(VIDEO_RENDERING_PROCESS)
 export class VideoProcessingProcessor {
     constructor(private videoProcessingService: VideoProcessingService) {}
 
@@ -19,6 +19,7 @@ export class VideoProcessingProcessor {
     async handleVideoRenderingJob(job: Job<VideoRenderingJobData>) {
         const { userId, video } = job.data;
         console.log({ userId, video, job }, "job");
+        console.log(this.videoProcessingService, "this.videoProcessingService");
 
         const result = await this.videoProcessingService.renderVideo(userId, video);
         console.log(`Video processed: ${JSON.stringify(result)}`);

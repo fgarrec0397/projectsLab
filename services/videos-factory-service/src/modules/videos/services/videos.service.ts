@@ -98,7 +98,7 @@ export class VideosService {
 
         const updatedDocument = await this.database.createOrUpdate(videoCollectionPath, {
             ...video,
-            updatedAt: admin.firestore.Timestamp.now(),
+            updatedAt: new Date().getTime(),
         });
 
         await this.videoProcessingService.test(userId, video);

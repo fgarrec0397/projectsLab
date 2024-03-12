@@ -39,16 +39,32 @@ export class VideoProcessingService {
 
     async test(userId: string, video: IVideo) {
         console.log({ userId, video }, "test");
+        console.log(this.videoRenderingQueue, "this.videoRenderingQueue");
 
-        const job = await this.videoRenderingQueue.add("render-video", {
+        this.videoRenderingQueue.on("completed", (job, result) => {
+            console.log(`Job completed: ${job.id}`);
+        });
+
+        this.videoRenderingQueue.on("failed", (job, err) => {
+            console.log(`Job failed: ${job.id}`, err);
+        });
+
+        this.videoRenderingQueue.on("error", (err) => {
+            console.log("A queue error occurred:", err);
+        });
+
+        this.videoRenderingQueue.on("active", (job) => {
+            console.log(`Job started: ${job.id}`);
+        });
+        await this.videoRenderingQueue.add("render-video", {
             userId,
             video,
         });
-
-        console.log(job, "job");
     }
 
     async renderVideo(userId: string, video: IVideo) {
+        console.log("renderVideo");
+
         const thumbnailFolder = FileSystem.getTempFolderPath("thumbnails");
         const finalVoiceTempFolder = FileSystem.getTempFolderPath("final-voice-generation");
         const speechFilePath = `${finalVoiceTempFolder.tempFolderPath}/speech.mp3`;
@@ -146,6 +162,8 @@ export class VideoProcessingService {
             ...video,
             status,
         };
+
+        console.log({ status }, "notifyClient");
 
         await this.database.update(videoCollectionPath, video.id, newVideo);
 

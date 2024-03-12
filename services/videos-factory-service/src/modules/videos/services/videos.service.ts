@@ -1,9 +1,8 @@
 import { Injectable } from "@nestjs/common";
 import { uidGenerator } from "@projectslab/helpers";
-import admin from "firebase-admin";
 import { DatabaseConfig, InjectDatabase } from "src/config/database-config.module";
 import { InjectStorageConfig, StorageConfig } from "src/config/storage-config.module";
-import { VideoProcessingService } from "src/modules/video-processing/services/video-processing.service";
+import { JobsService } from "src/jobs/services/jobs.service";
 
 import { IVideo, IVideoDraft, VideoStatus } from "../videos.types";
 
@@ -12,7 +11,7 @@ export class VideosService {
     constructor(
         @InjectDatabase() private readonly database: DatabaseConfig,
         @InjectStorageConfig() private readonly storage: StorageConfig,
-        private readonly videoProcessingService: VideoProcessingService
+        private readonly jobsService: JobsService
     ) {}
 
     async getVideos(userId: string) {
@@ -101,7 +100,7 @@ export class VideosService {
             updatedAt: new Date().getTime(),
         });
 
-        await this.videoProcessingService.test(userId, video);
+        await this.jobsService.startRendering({ userId, video });
 
         return updatedDocument;
     }

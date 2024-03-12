@@ -1,15 +1,11 @@
-import { Inject, Injectable } from "@nestjs/common";
-import {
-    TEXT_GENERATOR_STRATEGY_TOKEN,
-    TIMESTAMPS_GENERATOR_STRATEGY_TOKEN,
-    VOICE_GENERATOR_STRATEGY_TOKEN,
-} from "src/common/dependencies_tokens";
+import { Injectable } from "@nestjs/common";
 import { FileSystem } from "src/common/FileSystem";
+import { IVideo } from "src/modules/videos/videos.types";
 
 import { TimedSentence, TimedText } from "../video-renderer/video-renderer.types";
-import { TextGeneratorStrategy } from "./strategies/TextGeneratorStrategy/TextGeneratorStrategy";
-import { TimestampsGeneratorStrategy } from "./strategies/TimestampsGeneratorStrategy/TimestampsGeneratorStrategy";
-import { VoiceGeneratorStrategy } from "./strategies/VoiceGeneratorStrategy/VoiceGeneratorStrategy";
+import { TextGenerator } from "./generators/text.generator";
+import { TimestampsGenerator } from "./generators/timestamps.generator";
+import { VoiceGenerator } from "./generators/voice.generator";
 
 export type Script =
     | {
@@ -21,6 +17,12 @@ export type Script =
 
 @Injectable()
 export class ScriptGeneratorService {
+    private textGenerator: TextGenerator;
+
+    private voiceGenerator: VoiceGenerator;
+
+    private timestampsGenerator: TimestampsGenerator;
+
     private script: Script;
 
     private voiceBuffer: Buffer | undefined;
@@ -29,17 +31,15 @@ export class ScriptGeneratorService {
 
     private speechFilePath: string | undefined;
 
-    constructor(
-        @Inject(TEXT_GENERATOR_STRATEGY_TOKEN)
-        private textGeneratorStrategy: TextGeneratorStrategy,
-        @Inject(VOICE_GENERATOR_STRATEGY_TOKEN)
-        private voiceGeneratorStrategy: VoiceGeneratorStrategy,
-        @Inject(TIMESTAMPS_GENERATOR_STRATEGY_TOKEN)
-        private timestampsGeneratorStrategy: TimestampsGeneratorStrategy
-    ) {}
+    init(video: IVideo) {
+        this.textGenerator = new TextGenerator(video);
+        this.voiceGenerator = new VoiceGenerator();
+        this.timestampsGenerator = new TimestampsGenerator(video);
+    }
 
     async generateScript(speechFilePath: string) {
         this.speechFilePath = speechFilePath;
+
         await this.generateText();
         await this.generateVoice();
         await this.generateTimestampsBasedOnAudio();
@@ -48,7 +48,7 @@ export class ScriptGeneratorService {
     }
 
     private async generateText() {
-        this.text = await this.textGeneratorStrategy.generateText();
+        this.text = await this.textGenerator.generateText();
     }
 
     private async generateVoice() {
@@ -58,10 +58,7 @@ export class ScriptGeneratorService {
 
         await FileSystem.createFile(this.speechFilePath);
 
-        this.voiceBuffer = await this.voiceGeneratorStrategy.generateVoice(
-            this.text,
-            this.speechFilePath
-        );
+        this.voiceBuffer = await this.voiceGenerator.generateVoice(this.text, this.speechFilePath);
 
         await FileSystem.createFile(this.speechFilePath, this.voiceBuffer);
     }
@@ -70,7 +67,7 @@ export class ScriptGeneratorService {
         if (!this.voiceBuffer) {
             return;
         }
-        this.script = await this.timestampsGeneratorStrategy.generateTimestampsBasedOnAudio(
+        this.script = await this.timestampsGenerator.generateTimestampsBasedOnAudio(
             this.voiceBuffer
         );
     }

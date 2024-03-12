@@ -1,11 +1,10 @@
-import { InjectQueue } from "@nestjs/bull";
 import { HttpException, HttpStatus, Injectable } from "@nestjs/common";
-import { Queue } from "bull";
 import { CacheService } from "src/common/cache/cache.service";
 import { FileSystem } from "src/common/FileSystem";
 import { VideoUtils } from "src/common/utils/video.utils";
 import { DatabaseConfig, InjectDatabase } from "src/config/database-config.module";
 import { InjectStorageConfig, StorageConfig } from "src/config/storage-config.module";
+import { JobsService } from "src/jobs/services/jobs.service";
 
 import { getVideoByIdCacheKey, getVideosCacheKey } from "../../videos/utils/videos.utils";
 import { IVideo, VideoStatus } from "../../videos/videos.types";
@@ -14,10 +13,7 @@ import {
     Script,
     ScriptGeneratorService,
 } from "../submodules/script-generator/script-generator.service";
-import {
-    InjectTemplateGenerator,
-    TemplateGeneratorService,
-} from "../submodules/template-generator/template-generator.service";
+import { TemplateGeneratorService } from "../submodules/template-generator/template-generator.service";
 import { VideoRendererService } from "../submodules/video-renderer/video-renderer.service";
 import { Template } from "../submodules/video-renderer/video-renderer.types";
 
@@ -28,43 +24,17 @@ const canRenderVideo = true;
 @Injectable()
 export class VideoProcessingService {
     constructor(
-        @InjectQueue("video-rendering") private videoRenderingQueue: Queue,
+        // @InjectQueue("render-video") private videoRenderingQueue: Queue,
         private readonly scriptService: ScriptGeneratorService,
-        @InjectTemplateGenerator() private readonly templateService: TemplateGeneratorService,
+        private readonly templateService: TemplateGeneratorService,
         private readonly eventsGateway: VideoEventsGateway,
         @InjectDatabase() private readonly database: DatabaseConfig,
         @InjectStorageConfig() private readonly storage: StorageConfig,
-        private readonly cacheService: CacheService
+        private readonly cacheService: CacheService,
+        private readonly jobsService: JobsService
     ) {}
 
-    async test(userId: string, video: IVideo) {
-        console.log({ userId, video }, "test");
-        console.log(this.videoRenderingQueue, "this.videoRenderingQueue");
-
-        this.videoRenderingQueue.on("completed", (job, result) => {
-            console.log(`Job completed: ${job.id}`);
-        });
-
-        this.videoRenderingQueue.on("failed", (job, err) => {
-            console.log(`Job failed: ${job.id}`, err);
-        });
-
-        this.videoRenderingQueue.on("error", (err) => {
-            console.log("A queue error occurred:", err);
-        });
-
-        this.videoRenderingQueue.on("active", (job) => {
-            console.log(`Job started: ${job.id}`);
-        });
-        await this.videoRenderingQueue.add("render-video", {
-            userId,
-            video,
-        });
-    }
-
     async renderVideo(userId: string, video: IVideo) {
-        console.log("renderVideo");
-
         const thumbnailFolder = FileSystem.getTempFolderPath("thumbnails");
         const finalVoiceTempFolder = FileSystem.getTempFolderPath("final-voice-generation");
         const speechFilePath = `${finalVoiceTempFolder.tempFolderPath}/speech.mp3`;
@@ -75,13 +45,15 @@ export class VideoProcessingService {
         if (canGenerateScript) {
             await this.notifyClient(userId, video, VideoStatus.GeneratingScript);
 
+            this.scriptService.init(video);
+
             script = await this.scriptService.generateScript(speechFilePath);
         }
 
         if (canGenerateTemplate) {
             await this.notifyClient(userId, video, VideoStatus.GeneratingTemplate);
 
-            this.templateService.prepareTemplate(script, speechFilePath);
+            this.templateService.prepareTemplate(script, speechFilePath, video);
 
             template = await this.templateService.createTemplate();
 

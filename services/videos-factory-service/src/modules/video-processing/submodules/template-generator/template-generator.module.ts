@@ -1,29 +1,9 @@
-import { Module, Scope } from "@nestjs/common";
-import { ConfigService } from "@nestjs/config";
-import { REQUEST } from "@nestjs/core";
-import { Request } from "express";
-import S3StorageManager from "src/common/storage/strategies/s3-storage-manager";
+import { Module } from "@nestjs/common";
 
-import {
-    TEMPLATE_GENERATOR_SERVICE_TOKEN,
-    TemplateGeneratorService,
-} from "./template-generator.service";
-
-const templateGeneratorService = {
-    provide: TEMPLATE_GENERATOR_SERVICE_TOKEN,
-    useFactory: async (request: Request) => {
-        const s3Storage = new S3StorageManager(new ConfigService());
-
-        s3Storage.init();
-
-        return new TemplateGeneratorService(s3Storage, request.videoData);
-    },
-    inject: [REQUEST],
-    scope: Scope.REQUEST,
-};
+import { TemplateGeneratorService } from "./template-generator.service";
 
 @Module({
-    providers: [templateGeneratorService],
-    exports: [templateGeneratorService],
+    providers: [TemplateGeneratorService],
+    exports: [TemplateGeneratorService],
 })
 export class TemplateGeneratorModule {}

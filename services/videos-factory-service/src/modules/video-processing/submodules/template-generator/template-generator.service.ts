@@ -1,4 +1,4 @@
-import { Inject, Injectable, Scope } from "@nestjs/common";
+import { Injectable } from "@nestjs/common";
 import OpenAI from "openai";
 import { OpenAIModule } from "src/common/OpenAI";
 import { InjectStorageConfig, StorageConfig } from "src/config/storage-config.module";
@@ -24,11 +24,7 @@ export type MappedFetchedAsset = {
 
 export type TemplateAIElement = SourceableElementConfig;
 
-export const TEMPLATE_GENERATOR_SERVICE_TOKEN = "TemplateGeneratorService";
-
-export const InjectTemplateGenerator = () => Inject(TEMPLATE_GENERATOR_SERVICE_TOKEN);
-
-@Injectable({ scope: Scope.REQUEST })
+@Injectable()
 export class TemplateGeneratorService<T extends BaseTemplateData = BaseTemplateData> {
     speechFilePath: string | undefined;
 
@@ -42,10 +38,9 @@ export class TemplateGeneratorService<T extends BaseTemplateData = BaseTemplateD
 
     data?: T;
 
-    constructor(
-        @InjectStorageConfig() private storageConfig: StorageConfig,
-        private readonly video: IVideo
-    ) {
+    video: IVideo;
+
+    constructor(@InjectStorageConfig() private storageConfig: StorageConfig) {
         this.openAi = OpenAIModule.getModule();
         this.templatePromptBuilder = new TemplatePromptBuilder();
     }
@@ -62,9 +57,10 @@ export class TemplateGeneratorService<T extends BaseTemplateData = BaseTemplateD
         return template;
     }
 
-    prepareTemplate(script: Script, speechFilePath: string) {
+    prepareTemplate(script: Script, speechFilePath: string, video: IVideo) {
         this.data = { script } as T;
         this.speechFilePath = speechFilePath;
+        this.video = video;
     }
 
     private async fetchAvailableAssets() {

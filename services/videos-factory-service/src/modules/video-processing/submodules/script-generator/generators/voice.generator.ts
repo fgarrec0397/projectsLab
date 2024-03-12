@@ -1,21 +1,17 @@
-import { Injectable } from "@nestjs/common";
 import OpenAI from "openai";
 import { FileSystem } from "src/common/FileSystem";
 import { OpenAIModule } from "src/common/OpenAI";
-import { IVideo } from "src/modules/videos/videos.types";
 
-import { VideoUtils } from "../../../../../../common/utils/video.utils";
-import { VoiceGeneratorStrategy } from "./VoiceGeneratorStrategy";
+import { VideoUtils } from "../../../../../common/utils/video.utils";
 
-@Injectable()
-export class OpenAIVoiceGeneratorStrategy implements VoiceGeneratorStrategy {
+export class VoiceGenerator {
     tempVoiceFilePath: string = FileSystem.getAssetsPath("speech-temp.mp3");
 
     openai: OpenAI;
 
     audio: Buffer | undefined;
 
-    constructor(private readonly video: IVideo) {
+    constructor() {
         this.openai = OpenAIModule.getModule();
     }
 

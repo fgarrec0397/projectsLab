@@ -1,4 +1,4 @@
-import { Process, Processor } from "@nestjs/bull";
+import { OnGlobalQueueError, OnQueueError, Process, Processor } from "@nestjs/bull";
 import { Job } from "bull";
 
 import { IVideo } from "../../videos/videos.types";
@@ -14,6 +14,16 @@ export const VIDEO_RENDERING_PROCESS = "video-rendering";
 @Processor(VIDEO_RENDERING_PROCESS)
 export class VideoProcessingProcessor {
     constructor(private videoProcessingService: VideoProcessingService) {}
+
+    @OnQueueError()
+    onError(err: any) {
+        console.log(err, "error");
+    }
+
+    @OnGlobalQueueError()
+    onGlobalError(err: any) {
+        console.log(err, "error");
+    }
 
     @Process("render-video")
     async handleVideoRenderingJob(job: Job<VideoRenderingJobData>) {

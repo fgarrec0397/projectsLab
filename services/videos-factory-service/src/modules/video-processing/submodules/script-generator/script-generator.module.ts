@@ -1,45 +1,9 @@
-import { Module, Scope } from "@nestjs/common";
-import { REQUEST } from "@nestjs/core";
-import { Request } from "express";
-import {
-    TEXT_GENERATOR_STRATEGY_TOKEN,
-    TIMESTAMPS_GENERATOR_STRATEGY_TOKEN,
-    VOICE_GENERATOR_STRATEGY_TOKEN,
-} from "src/common/dependencies_tokens";
+import { Module } from "@nestjs/common";
 
 import { ScriptGeneratorService } from "./script-generator.service";
-import { OpenAITextGeneratorStrategy } from "./strategies/TextGeneratorStrategy/OpenAITextGeneratorStrategy";
-import { DeepgramTimestampsGeneratorStrategy } from "./strategies/TimestampsGeneratorStrategy/DeepgramTimestampsGeneratorStrategy";
-import { OpenAIVoiceGeneratorStrategy } from "./strategies/VoiceGeneratorStrategy/OpenAIVoiceGeneratorStrategy";
 
 @Module({
-    providers: [
-        ScriptGeneratorService,
-        {
-            provide: TEXT_GENERATOR_STRATEGY_TOKEN,
-            useFactory: async (request: Request) => {
-                return new OpenAITextGeneratorStrategy(request.videoData);
-            },
-            inject: [REQUEST],
-            scope: Scope.REQUEST,
-        },
-        {
-            provide: VOICE_GENERATOR_STRATEGY_TOKEN,
-            useFactory: async (request: Request) => {
-                return new OpenAIVoiceGeneratorStrategy(request.videoData);
-            },
-            inject: [REQUEST],
-            scope: Scope.REQUEST,
-        },
-        {
-            provide: TIMESTAMPS_GENERATOR_STRATEGY_TOKEN,
-            useFactory: async (request: Request) => {
-                return new DeepgramTimestampsGeneratorStrategy(request.videoData);
-            },
-            inject: [REQUEST],
-            scope: Scope.REQUEST,
-        },
-    ],
+    providers: [ScriptGeneratorService],
     exports: [ScriptGeneratorService],
 })
 export class ScriptGeneratorModule {}

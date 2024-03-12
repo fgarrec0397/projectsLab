@@ -1,13 +1,9 @@
-import { Injectable, Scope } from "@nestjs/common";
 import { format, getRandomNumber } from "@projectslab/helpers";
 import OpenAI from "openai";
 import { OpenAIModule } from "src/common/OpenAI";
 import { IVideo } from "src/modules/videos/videos.types";
 
-import { TextGeneratorStrategy } from "./TextGeneratorStrategy";
-
-@Injectable({ scope: Scope.REQUEST })
-export class OpenAITextGeneratorStrategy implements TextGeneratorStrategy {
+export class TextGenerator {
     openAi: OpenAI;
 
     constructor(private readonly video: IVideo) {

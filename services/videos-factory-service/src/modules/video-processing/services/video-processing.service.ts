@@ -1,4 +1,6 @@
+import { InjectQueue } from "@nestjs/bull";
 import { HttpException, HttpStatus, Injectable } from "@nestjs/common";
+import { Queue } from "bull";
 import { CacheService } from "src/common/cache/cache.service";
 import { FileSystem } from "src/common/FileSystem";
 import { VideoUtils } from "src/common/utils/video.utils";
@@ -26,6 +28,7 @@ const canRenderVideo = true;
 @Injectable()
 export class VideoProcessingService {
     constructor(
+        @InjectQueue("video-rendering") private videoRenderingQueue: Queue,
         private readonly scriptService: ScriptGeneratorService,
         @InjectTemplateGenerator() private readonly templateService: TemplateGeneratorService,
         private readonly eventsGateway: VideoEventsGateway,
@@ -33,6 +36,17 @@ export class VideoProcessingService {
         @InjectStorageConfig() private readonly storage: StorageConfig,
         private readonly cacheService: CacheService
     ) {}
+
+    async test(userId: string, video: IVideo) {
+        console.log({ userId, video }, "test");
+
+        const job = await this.videoRenderingQueue.add("render-video", {
+            userId,
+            video,
+        });
+
+        console.log(job, "job");
+    }
 
     async renderVideo(userId: string, video: IVideo) {
         const thumbnailFolder = FileSystem.getTempFolderPath("thumbnails");

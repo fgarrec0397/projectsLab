@@ -16,6 +16,8 @@ export enum VideoStatus {
     "Rendered" = "rendered",
     "Publishing" = "publishing",
     "Published" = "published",
+    "Queued" = "Queued",
+    "Failed" = "failed",
 }
 
 export type IVideo = {
@@ -40,6 +42,7 @@ export type IVideo = {
     videoUrl?: string;
     createdAt: number;
     updatedAt: number;
+    failedReason?: string;
 };
 
 export type IVideoDraft = Omit<Partial<IVideo>, "id"> & {

@@ -1,10 +1,9 @@
-import { HttpException, HttpStatus, Injectable } from "@nestjs/common";
+import { Injectable } from "@nestjs/common";
 import { CacheService } from "src/common/cache/cache.service";
 import { FileSystem } from "src/common/FileSystem";
 import { VideoUtils } from "src/common/utils/video.utils";
 import { DatabaseConfig, InjectDatabase } from "src/config/database-config.module";
 import { InjectStorageConfig, StorageConfig } from "src/config/storage-config.module";
-import { JobsService } from "src/jobs/services/jobs.service";
 
 import { getVideoByIdCacheKey, getVideosCacheKey } from "../../videos/utils/videos.utils";
 import { IVideo, VideoStatus } from "../../videos/videos.types";
@@ -24,14 +23,12 @@ const canRenderVideo = true;
 @Injectable()
 export class VideoProcessingService {
     constructor(
-        // @InjectQueue("render-video") private videoRenderingQueue: Queue,
         private readonly scriptService: ScriptGeneratorService,
         private readonly templateService: TemplateGeneratorService,
         private readonly eventsGateway: VideoEventsGateway,
         @InjectDatabase() private readonly database: DatabaseConfig,
         @InjectStorageConfig() private readonly storage: StorageConfig,
-        private readonly cacheService: CacheService,
-        private readonly jobsService: JobsService
+        private readonly cacheService: CacheService
     ) {}
 
     async renderVideo(userId: string, video: IVideo) {
@@ -58,10 +55,13 @@ export class VideoProcessingService {
             template = await this.templateService.createTemplate();
 
             if (!template) {
-                throw new HttpException(
-                    "An issue happened and the template was not generated",
-                    HttpStatus.INTERNAL_SERVER_ERROR
-                );
+                const failedVideo: IVideo = {
+                    ...video,
+                    failedReason: "An issue happened and the template was not generated",
+                };
+                await this.notifyClient(userId, failedVideo, VideoStatus.Failed);
+
+                return;
             }
         }
 
@@ -106,10 +106,14 @@ export class VideoProcessingService {
                             VideoStatus.Rendered
                         );
                     } catch (error) {
-                        throw new HttpException(
-                            "The generate video was not uploaded successfully to the storage provider",
-                            HttpStatus.INTERNAL_SERVER_ERROR
-                        );
+                        const failedVideo: IVideo = {
+                            ...video,
+                            failedReason:
+                                "The generate video was not uploaded successfully to the storage provider",
+                        };
+                        await this.notifyClient(userId, failedVideo, VideoStatus.Failed);
+
+                        return;
                     }
                 });
 
@@ -119,12 +123,19 @@ export class VideoProcessingService {
                 return { result: "Video created" };
             }
 
-            throw new HttpException(
-                "An issue happened and the video was not generated",
-                HttpStatus.INTERNAL_SERVER_ERROR
-            );
+            const failedVideo: IVideo = {
+                ...video,
+                failedReason: "An issue happened and the video was not generated",
+            };
+            await this.notifyClient(userId, failedVideo, VideoStatus.Failed);
+
+            return;
         } catch (error) {
-            throw new HttpException(error as Record<string, any>, HttpStatus.INTERNAL_SERVER_ERROR);
+            const failedVideo: IVideo = {
+                ...video,
+                failedReason: "An unknow error occured.",
+            };
+            await this.notifyClient(userId, failedVideo, VideoStatus.Failed);
         }
     }
 
@@ -134,8 +145,6 @@ export class VideoProcessingService {
             ...video,
             status,
         };
-
-        console.log({ status }, "notifyClient");
 
         await this.database.update(videoCollectionPath, video.id, newVideo);
 

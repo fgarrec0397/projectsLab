@@ -97,10 +97,11 @@ export class VideosService {
 
         const updatedDocument = await this.database.createOrUpdate(videoCollectionPath, {
             ...video,
+            status: VideoStatus.Queued,
             updatedAt: new Date().getTime(),
         });
 
-        await this.jobsService.startRendering({ userId, video });
+        await this.jobsService.renderVideo({ userId, video });
 
         return updatedDocument;
     }

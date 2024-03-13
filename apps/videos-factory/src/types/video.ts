@@ -8,6 +8,8 @@ export enum VideoStatus {
     "Rendered" = "rendered",
     "Publishing" = "publishing",
     "Published" = "published",
+    "Queued" = "queued",
+    "Failed" = "failed",
 }
 
 export type IVideo = {
@@ -32,6 +34,7 @@ export type IVideo = {
     thumbnail?: string;
     createdAt: number;
     updatedAt: number;
+    failedReason?: string;
 };
 
 export type IVideoDraft = Partial<IVideo>;

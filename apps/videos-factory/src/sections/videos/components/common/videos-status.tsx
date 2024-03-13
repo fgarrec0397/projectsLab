@@ -20,6 +20,8 @@ export default function VideosStatus({ status = VideoStatus.Draft, size }: Props
             rendered: "success",
             publishing: "warning",
             published: "primary",
+            queued: "info",
+            failed: "error",
         }),
         []
     );

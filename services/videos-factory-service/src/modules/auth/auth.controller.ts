@@ -20,7 +20,6 @@ export class AuthController {
 
         try {
             const firebaseUser = await this.authService.verifyIdToken(idToken);
-            console.log(firebaseUser, "firebaseUser");
 
             (req.session as any).uid = firebaseUser.uid;
 

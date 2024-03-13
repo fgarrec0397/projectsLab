@@ -1,8 +1,7 @@
 import { BullModule } from "@nestjs/bull";
-import { forwardRef, Global, Module } from "@nestjs/common";
-import { VideoProcessingModule } from "src/modules/video-processing/video-processing.module";
+import { Global, Module } from "@nestjs/common";
 
-import { VideoProcessingProcessor } from "./processors/video-processing.processor";
+import { VideoProcessingModule } from "../modules/video-processing/video-processing.module";
 import { JobsService } from "./services/jobs.service";
 
 @Global()
@@ -14,12 +13,9 @@ import { JobsService } from "./services/jobs.service";
                 port: 6379,
             },
         }),
-        BullModule.registerQueue({
-            name: "render-video",
-        }),
-        forwardRef(() => VideoProcessingModule),
+        VideoProcessingModule,
     ],
-    providers: [JobsService, VideoProcessingProcessor],
-    exports: [JobsService, VideoProcessingProcessor],
+    providers: [JobsService],
+    exports: [JobsService],
 })
 export class JobsModule {}

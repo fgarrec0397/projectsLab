@@ -49,6 +49,11 @@ export default function VideosDetailsView({ videoId }: Props) {
             backLink={paths.dashboard.videos.root}
             isLoading={isVideoLoading}
             titleItem={<VideosStatus status={video?.status} size="medium" />}
+            subContent={
+                video?.failedReason !== undefined && (
+                    <Typography color="error">{video.failedReason}</Typography>
+                )
+            }
         >
             <Grid container spacing={3}>
                 <Grid xs={12} md={8}>

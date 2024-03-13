@@ -1,13 +1,12 @@
 import { Injectable } from "@nestjs/common";
-import { CacheService } from "src/common/cache/cache.service";
 import { FileSystem } from "src/common/FileSystem";
 import { VideoUtils } from "src/common/utils/video.utils";
 import { DatabaseConfig, InjectDatabase } from "src/config/database-config.module";
 import { InjectStorageConfig, StorageConfig } from "src/config/storage-config.module";
+import { NotificationsService } from "src/modules/notifications/services/notifications.service";
 
 import { getVideoByIdCacheKey, getVideosCacheKey } from "../../videos/utils/videos.utils";
 import { IVideo, VideoStatus } from "../../videos/videos.types";
-import { VideoEventsGateway } from "../gateways/video-events.gateway";
 import {
     Script,
     ScriptGeneratorService,
@@ -25,19 +24,24 @@ export class VideoProcessingService {
     constructor(
         private readonly scriptService: ScriptGeneratorService,
         private readonly templateService: TemplateGeneratorService,
-        private readonly eventsGateway: VideoEventsGateway,
+        private readonly notificationService: NotificationsService,
         @InjectDatabase() private readonly database: DatabaseConfig,
-        @InjectStorageConfig() private readonly storage: StorageConfig,
-        private readonly cacheService: CacheService
+        @InjectStorageConfig() private readonly storage: StorageConfig
     ) {}
 
     async renderVideo(userId: string, video: IVideo) {
         const thumbnailFolder = FileSystem.getTempFolderPath("thumbnails");
         const finalVoiceTempFolder = FileSystem.getTempFolderPath("final-voice-generation");
         const speechFilePath = `${finalVoiceTempFolder.tempFolderPath}/speech.mp3`;
-
+        const hasError = false;
         let script: Script = {};
         let template: Template | undefined = undefined;
+
+        if (hasError) {
+            throw new Error(
+                "An issue happened and the template was not generated. Please contact us pasting this error message"
+            );
+        }
 
         if (canGenerateScript) {
             await this.notifyClient(userId, video, VideoStatus.GeneratingScript);
@@ -55,13 +59,9 @@ export class VideoProcessingService {
             template = await this.templateService.createTemplate();
 
             if (!template) {
-                const failedVideo: IVideo = {
-                    ...video,
-                    failedReason: "An issue happened and the template was not generated",
-                };
-                await this.notifyClient(userId, failedVideo, VideoStatus.Failed);
-
-                return;
+                throw new Error(
+                    "An issue happened and the template was not generated. Please contact us pasting this error message"
+                );
             }
         }
 
@@ -105,15 +105,10 @@ export class VideoProcessingService {
                             },
                             VideoStatus.Rendered
                         );
-                    } catch (error) {
-                        const failedVideo: IVideo = {
-                            ...video,
-                            failedReason:
-                                "The generate video was not uploaded successfully to the storage provider",
-                        };
-                        await this.notifyClient(userId, failedVideo, VideoStatus.Failed);
-
-                        return;
+                    } catch {
+                        throw new Error(
+                            "The generated video was not uploaded successfully to the storage provider. Please contact us pasting this error message"
+                        );
                     }
                 });
 
@@ -123,19 +118,13 @@ export class VideoProcessingService {
                 return { result: "Video created" };
             }
 
-            const failedVideo: IVideo = {
-                ...video,
-                failedReason: "An issue happened and the video was not generated",
-            };
-            await this.notifyClient(userId, failedVideo, VideoStatus.Failed);
-
-            return;
-        } catch (error) {
-            const failedVideo: IVideo = {
-                ...video,
-                failedReason: "An unknow error occured.",
-            };
-            await this.notifyClient(userId, failedVideo, VideoStatus.Failed);
+            throw new Error(
+                "An issue happened and the video was not generated. Please contact us pasting this error message"
+            );
+        } catch {
+            throw new Error(
+                "An unknow error occured. Please contact us pasting this error message"
+            );
         }
     }
 
@@ -146,12 +135,13 @@ export class VideoProcessingService {
             status,
         };
 
-        await this.database.update(videoCollectionPath, video.id, newVideo);
+        await this.database.createOrUpdate(videoCollectionPath, newVideo);
 
-        this.cacheService.invalidate(getVideosCacheKey(userId), video);
-        this.cacheService.invalidate(getVideoByIdCacheKey(video.id), video);
-
-        this.eventsGateway.notifyVideoProcessStep(newVideo);
+        this.notificationService.notifyClient(userId, {
+            event: "videoUpdate",
+            data: newVideo,
+            cacheKey: [getVideosCacheKey(userId), getVideoByIdCacheKey(video.id)],
+        });
     }
 
     private async processingThumnail(

@@ -7,6 +7,7 @@ import { VideosController } from "./videos.controller";
 @Module({
     controllers: [VideosController],
     providers: [VideosService],
+    exports: [VideosService],
 })
 export class VideosModule {
     configure(consumer: MiddlewareConsumer) {

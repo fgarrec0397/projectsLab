@@ -2,7 +2,7 @@ import { Injectable } from "@nestjs/common";
 import { uidGenerator } from "@projectslab/helpers";
 import { DatabaseConfig, InjectDatabase } from "src/config/database-config.module";
 import { InjectStorageConfig, StorageConfig } from "src/config/storage-config.module";
-import { JobsService } from "src/jobs/services/jobs.service";
+import { JobsService } from "src/modules/jobs/services/jobs.service";
 
 import { IVideo, IVideoDraft, VideoStatus } from "../videos.types";
 
@@ -80,6 +80,17 @@ export class VideosService {
 
         const updatedDocument = await this.database.createOrUpdate(videoCollectionPath, {
             ...videoDraft,
+            updatedAt: new Date().getTime(),
+        });
+
+        return updatedDocument;
+    }
+
+    async updateVideo(userId: string, video: IVideo) {
+        const videoCollectionPath = `users/${userId}/videos`;
+
+        const updatedDocument = await this.database.createOrUpdate(videoCollectionPath, {
+            ...video,
             updatedAt: new Date().getTime(),
         });
 

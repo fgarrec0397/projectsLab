@@ -4,9 +4,10 @@ import { ConfigModule as EnvConfigModule } from "@nestjs/config";
 import { CacheModule } from "./common/cache/cache.module";
 import { BaseWebSocketModule } from "./common/websocket/base-websocket.module";
 import { ConfigModule } from "./config.module";
-import { JobsModule } from "./jobs/jobs.module";
 import { AuthModule } from "./modules/auth/auth.module";
 import { FilesModule } from "./modules/files/files.module";
+import { JobsModule } from "./modules/jobs/jobs.module";
+import { NotificationsModule } from "./modules/notifications/notifications.module";
 import { VideoProcessingModule } from "./modules/video-processing/video-processing.module";
 import { VideosModule } from "./modules/videos/videos.module";
 
@@ -14,9 +15,10 @@ import { VideosModule } from "./modules/videos/videos.module";
     imports: [
         EnvConfigModule.forRoot({ isGlobal: true }),
         ConfigModule,
-        JobsModule,
-        BaseWebSocketModule,
         CacheModule,
+        JobsModule,
+        NotificationsModule,
+        BaseWebSocketModule,
         AuthModule,
         VideoProcessingModule,
         VideosModule,

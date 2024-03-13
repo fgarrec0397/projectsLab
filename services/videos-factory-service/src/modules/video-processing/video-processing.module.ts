@@ -1,13 +1,13 @@
 import { Module } from "@nestjs/common";
 
-import { VideoEventsGateway } from "./gateways/video-events.gateway";
+import { NotificationsModule } from "../notifications/notifications.module";
 import { VideoProcessingService } from "./services/video-processing.service";
 import { ScriptGeneratorModule } from "./submodules/script-generator/script-generator.module";
 import { TemplateGeneratorModule } from "./submodules/template-generator/template-generator.module";
 
 @Module({
-    imports: [ScriptGeneratorModule, TemplateGeneratorModule],
-    providers: [VideoProcessingService, VideoEventsGateway],
+    imports: [NotificationsModule, ScriptGeneratorModule, TemplateGeneratorModule],
+    providers: [VideoProcessingService],
     exports: [VideoProcessingService],
 })
 export class VideoProcessingModule {}

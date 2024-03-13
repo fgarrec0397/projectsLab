@@ -1,10 +1,12 @@
 import { useEffect, useState } from "react";
 
+import { useAuthContext } from "@/auth/hooks";
 import { useSocket } from "@/services/socket/SocketContext";
 import { IVideo } from "@/types/video";
 
 export const useOnVideoUpdate = (callback?: (value: IVideo) => void) => {
     const socket = useSocket();
+    const auth = useAuthContext();
     const [video, setVideo] = useState<IVideo>();
 
     useEffect(() => {
@@ -18,7 +20,9 @@ export const useOnVideoUpdate = (callback?: (value: IVideo) => void) => {
         return () => {
             socket.off("videoUpdate", onVideoUpdate);
         };
-    }, [callback, socket]);
+    }, [auth.user?.id, callback, socket]);
+
+    console.log(video?.status, "video?.status");
 
     return video;
 };

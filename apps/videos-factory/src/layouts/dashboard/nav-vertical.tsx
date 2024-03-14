@@ -7,8 +7,10 @@ import { useAuthContext } from "@/auth/hooks";
 import Logo from "@/components/logo";
 import { NavSectionVertical } from "@/components/nav-section";
 import Scrollbar from "@/components/scrollbar";
+import { useSettingsContext } from "@/components/settings";
 import { useResponsive } from "@/hooks/use-responsive";
 import { usePathname } from "@/routes/hooks";
+import { pxToRem } from "@/theme/typography";
 
 import NavToggleButton from "../common/nav-toggle-button";
 import NavUpgrade from "../common/nav-upgrade";
@@ -25,11 +27,17 @@ type Props = {
 export default function NavVertical({ openNav, onCloseNav }: Props) {
     const { user } = useAuthContext();
 
+    const settings = useSettingsContext();
+
     const pathname = usePathname();
 
     const lgUp = useResponsive("up", "lg");
 
     const navData = useNavData();
+
+    const isNavMini = settings.themeLayout === "mini";
+
+    console.log(settings.themeLayout, "settings.themeLayout");
 
     const showNavUpgrade = false;
 
@@ -51,13 +59,14 @@ export default function NavVertical({ openNav, onCloseNav }: Props) {
                 },
             }}
         >
-            <Logo sx={{ mt: 3, ml: 4, mb: 1 }} />
+            <Logo sx={{ mt: 3, ml: 3, mb: 1 }} showSingleLogo={isNavMini} />
 
             <NavSectionVertical
                 data={navData}
                 slotProps={{
                     currentRole: user?.role,
                 }}
+                sx={{ marginTop: pxToRem(24) }}
             />
 
             <Box sx={{ flexGrow: 1 }} />

@@ -22,7 +22,5 @@ export const useOnVideoUpdate = (callback?: (value: IVideo) => void) => {
         };
     }, [auth.user?.id, callback, socket]);
 
-    console.log(video?.status, "video?.status");
-
     return video;
 };

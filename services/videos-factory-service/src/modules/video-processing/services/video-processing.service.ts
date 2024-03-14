@@ -30,8 +30,8 @@ export class VideoProcessingService {
     ) {}
 
     async renderVideo(userId: string, video: IVideo) {
-        const thumbnailFolder = FileSystem.getTempFolderPath("thumbnails");
-        const finalVoiceTempFolder = FileSystem.getTempFolderPath("final-voice-generation");
+        const thumbnailFolder = FileSystem.getTempFolderPath("thumbnails", userId);
+        const finalVoiceTempFolder = FileSystem.getTempFolderPath("final-voice-generation", userId);
         const speechFilePath = `${finalVoiceTempFolder.tempFolderPath}/speech.mp3`;
         const hasError = false;
         let script: Script = {};

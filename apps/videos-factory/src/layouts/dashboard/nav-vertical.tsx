@@ -37,8 +37,6 @@ export default function NavVertical({ openNav, onCloseNav }: Props) {
 
     const isNavMini = settings.themeLayout === "mini";
 
-    console.log(settings.themeLayout, "settings.themeLayout");
-
     const showNavUpgrade = false;
 
     useEffect(() => {

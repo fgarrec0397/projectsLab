@@ -21,9 +21,10 @@ export class FileSystem {
         return FileSystem.getPath("./assets/poc", assetPath || ""); // TODO - config - "./assets/poc"
     }
 
-    static getTempFolderPath(subFolder: string): TempFolder {
+    static getTempFolderPath(subFolder: string, key?: string): TempFolder {
         const date = new Date();
-        const id = `${date.getTime()}-${uidGenerator()}`;
+        const keyId = key ? key : uidGenerator();
+        const id = `${keyId}-${date.getTime()}`;
 
         let folderPath = `temp/${subFolder}`;
 

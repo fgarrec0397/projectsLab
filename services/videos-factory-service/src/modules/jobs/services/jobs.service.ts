@@ -31,6 +31,7 @@ export class JobsService {
             userQueue = new Bull(queueName, {
                 defaultJobOptions: {
                     attempts: 10,
+                    attempts: 3,
                     backoff: {
                         type: "exponential",
                         delay: 3 * 1000,

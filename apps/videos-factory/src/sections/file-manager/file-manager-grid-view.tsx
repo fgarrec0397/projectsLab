@@ -27,6 +27,8 @@ type Props = {
     onDeleteItem: (id: string) => void;
 };
 
+export const showFoldersSection = false;
+
 export default function FileManagerGridView({
     table,
     dataFiltered,
@@ -64,48 +66,51 @@ export default function FileManagerGridView({
     return (
         <>
             <Box ref={containerRef}>
-                <FileManagerPanel
-                    title="Folders"
-                    subTitle={`${
-                        dataFiltered.filter((item) => item.type === "folder").length
-                    } folders`}
-                    onOpen={newFolder.onTrue}
-                    collapse={folders.value}
-                    onCollapse={folders.onToggle}
-                />
+                {showFoldersSection && (
+                    <>
+                        <FileManagerPanel
+                            title="Folders"
+                            subTitle={`${
+                                dataFiltered.filter((item) => item.type === "folder").length
+                            } folders`}
+                            onOpen={newFolder.onTrue}
+                            collapse={folders.value}
+                            onCollapse={folders.onToggle}
+                        />
+                        <Collapse in={!folders.value} unmountOnExit>
+                            <Box
+                                gap={3}
+                                display="grid"
+                                gridTemplateColumns={{
+                                    xs: "repeat(1, 1fr)",
+                                    sm: "repeat(2, 1fr)",
+                                    md: "repeat(3, 1fr)",
+                                    lg: "repeat(4, 1fr)",
+                                }}
+                            >
+                                {dataFiltered
+                                    .filter((i) => i.type === "folder")
+                                    .map((folder) => (
+                                        <FileManagerFolderItem
+                                            key={folder.id}
+                                            folder={folder as IFolderManager}
+                                            selected={selected.includes(folder.id)}
+                                            onSelect={(event) =>
+                                                onSelectItem(
+                                                    event as React.MouseEvent<HTMLElement>,
+                                                    folder.id
+                                                )
+                                            }
+                                            onDelete={() => onDeleteItem(folder.id)}
+                                            sx={{ maxWidth: "auto" }}
+                                        />
+                                    ))}
+                            </Box>
+                        </Collapse>
 
-                <Collapse in={!folders.value} unmountOnExit>
-                    <Box
-                        gap={3}
-                        display="grid"
-                        gridTemplateColumns={{
-                            xs: "repeat(1, 1fr)",
-                            sm: "repeat(2, 1fr)",
-                            md: "repeat(3, 1fr)",
-                            lg: "repeat(4, 1fr)",
-                        }}
-                    >
-                        {dataFiltered
-                            .filter((i) => i.type === "folder")
-                            .map((folder) => (
-                                <FileManagerFolderItem
-                                    key={folder.id}
-                                    folder={folder as IFolderManager}
-                                    selected={selected.includes(folder.id)}
-                                    onSelect={(event) =>
-                                        onSelectItem(
-                                            event as React.MouseEvent<HTMLElement>,
-                                            folder.id
-                                        )
-                                    }
-                                    onDelete={() => onDeleteItem(folder.id)}
-                                    sx={{ maxWidth: "auto" }}
-                                />
-                            ))}
-                    </Box>
-                </Collapse>
-
-                <Divider sx={{ my: 5, borderStyle: "dashed" }} />
+                        <Divider sx={{ my: 5, borderStyle: "dashed" }} />
+                    </>
+                )}
 
                 <FileManagerPanel
                     title="Files"

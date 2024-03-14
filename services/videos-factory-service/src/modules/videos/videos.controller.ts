@@ -13,7 +13,7 @@ export class VideosController {
     constructor(private readonly videosService: VideosService) {}
 
     @Get()
-    // @UseCache(useVideosCacheKey, MONTH_IN_SECONDS)
+    @UseCache(useVideosCacheKey, MONTH_IN_SECONDS)
     async getVideos(@Req() request: Request) {
         return this.videosService.getVideos(request.userId);
     }

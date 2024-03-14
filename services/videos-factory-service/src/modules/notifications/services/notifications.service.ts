@@ -26,9 +26,6 @@ export class NotificationsService {
             this.cacheService.invalidate(cacheKey, data);
         }
 
-        console.log(userId, "userId");
-        console.log(typeof userId, "typeof userId");
-
         this.eventsGateway.broadcastRoom(event, userId, data);
     }
 }

@@ -27,7 +27,7 @@ import { isAfter, isBetween } from "@/utils/format-time";
 
 import FileManagerFilters from "../file-manager-filters";
 import FileManagerFiltersResult from "../file-manager-filters-result";
-import FileManagerGridView from "../file-manager-grid-view";
+import FileManagerGridView, { showFoldersSection } from "../file-manager-grid-view";
 import FileManagerNewFolderDialog from "../file-manager-new-folder-dialog";
 import FileManagerTable from "../file-manager-table";
 import { useFolderBreadcrumbs } from "../hooks/use-folder-breadcrumbs";
@@ -190,13 +190,17 @@ export default function FileManagerView() {
         <>
             <PageWrapper
                 title={
-                    <CustomBreadcrumbs
-                        heading="Files Manager"
-                        links={breadcrumbsLinks}
-                        sx={{
-                            marginTop: pxToRem(-5),
-                        }}
-                    />
+                    showFoldersSection ? (
+                        <CustomBreadcrumbs
+                            heading="Files Manager"
+                            links={breadcrumbsLinks}
+                            sx={{
+                                marginTop: pxToRem(-5),
+                            }}
+                        />
+                    ) : (
+                        "Files Manager"
+                    )
                 }
                 titleItem={
                     <Button

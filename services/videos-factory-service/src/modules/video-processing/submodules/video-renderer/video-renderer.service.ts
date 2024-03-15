@@ -1,5 +1,4 @@
 import ffmpeg, { FfmpegCommand } from "fluent-ffmpeg";
-import { FileSystem } from "src/common/FileSystem";
 import { CanvasRendererService } from "src/modules/canvas-renderer/canvas-renderer.service";
 
 import { ComplexFilterBuilder } from "./builders/video-complexfilter.builder";
@@ -25,7 +24,7 @@ export type TemplateSize = {
 export class VideoRendererService {
     cleanUpTempFolder: () => Promise<void>;
 
-    tempFolder: string;
+    folderPath: string;
 
     outputPath: string;
 
@@ -59,7 +58,7 @@ export class VideoRendererService {
 
     shouldProcessFragments?: boolean;
 
-    constructor(template: Template) {
+    constructor(template: Template, folderPath: string) {
         this.tempFfmpegCommand = ffmpeg();
         this.textFfmpegCommand = ffmpeg();
         this.finalFfmpegCommand = ffmpeg();
@@ -87,63 +86,10 @@ export class VideoRendererService {
 
         this.shouldProcessFragments = this.fragmentableElements.length > 0;
 
-        const initContructor = async () => {
-            const { tempFolderPath, cleanUp } = FileSystem.getTempFolderPath("video-rendering");
-
-            await FileSystem.createDirectory(tempFolderPath);
-
-            this.tempFolder = tempFolderPath;
-            this.cleanUpTempFolder = cleanUp;
-            this.outputPath = `${this.tempFolder}/video.mp4`;
-
-            this.tempOutputPath = `${this.tempFolder}/temp-video.mov`;
-        };
-
-        initContructor();
+        this.folderPath = folderPath;
+        this.outputPath = `${this.folderPath}/video.mp4`;
+        this.tempOutputPath = `${this.folderPath}/temp-video.mov`;
     }
-
-    // public init(template: Template) {
-    //     this.tempFfmpegCommand = ffmpeg();
-    //     this.textFfmpegCommand = ffmpeg();
-    //     this.finalFfmpegCommand = ffmpeg();
-
-    //     this.complexFilterBuilder = new ComplexFilterBuilder();
-
-    //     this.template = template;
-    //     this.canvasRenderer = new CanvasRendererService({
-    //         width: this.template.width,
-    //         height: this.template.height,
-    //     });
-    //     this.complexFilterBuilder = new ComplexFilterBuilder();
-    //     this.elementsFactory = new ElementComponentFactory(
-    //         this.complexFilterBuilder,
-    //         this.canvasRenderer
-    //     );
-    //     this.templateMapper = new VideoTemplateMapper(this.template, this.elementsFactory);
-
-    //     this.size = {
-    //         width: this.template.width,
-    //         height: this.template.height,
-    //     };
-
-    //     this.mapTemplate();
-
-    //     this.shouldProcessFragments = this.fragmentableElements.length > 0;
-
-    //     const initContructor = async () => {
-    //         const { tempFolderPath, cleanUp } = FileSystem.getTempFolderPath("video-rendering");
-
-    //         await FileSystem.createDirectory(tempFolderPath);
-
-    //         this.tempFolder = tempFolderPath;
-    //         this.cleanUpTempFolder = cleanUp;
-    //         this.outputPath = `${this.tempFolder}/video.mp4`;
-
-    //         this.tempOutputPath = `${this.tempFolder}/temp-video.mov`;
-    //     };
-
-    //     initContructor();
-    // }
 
     public async initRender(afterRender?: (filePath: string) => Promise<void>) {
         await this.processElements();
@@ -167,8 +113,6 @@ export class VideoRendererService {
         if (afterRender) {
             await afterRender(this.outputPath);
         }
-
-        await this.cleanUpDirectories();
     }
 
     private async processElements() {
@@ -199,7 +143,7 @@ export class VideoRendererService {
 
                 for (let i = 0; i < fragments.length; i += batchSize) {
                     const batch: string[] = fragments.slice(i, i + batchSize);
-                    this.tempOutputPath = `${this.tempFolder}/intermediate_${i}.mov`;
+                    this.tempOutputPath = `${this.folderPath}/intermediate_${i}.mov`;
 
                     this.complexFilterBuilder.setCrop(this.size);
 
@@ -322,9 +266,5 @@ export class VideoRendererService {
 
         this.elements = this.templateMapper.mapTemplateToElements();
         this.fragmentableElements = this.templateMapper.mapTemplateToFragmentableElements();
-    }
-
-    private async cleanUpDirectories() {
-        this.cleanUpTempFolder();
     }
 }

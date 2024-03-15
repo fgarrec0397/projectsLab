@@ -30,10 +30,12 @@ export class VideoProcessingService {
     ) {}
 
     async renderVideo(userId: string, video: IVideo) {
+        const videoRenderingTempFolder = FileSystem.getTempFolderPath("video-rendering", userId);
         const thumbnailFolder = FileSystem.getTempFolderPath("thumbnails", userId);
         const finalVoiceTempFolder = FileSystem.getTempFolderPath("final-voice-generation", userId);
         const speechFilePath = `${finalVoiceTempFolder.tempFolderPath}/speech.mp3`;
         const hasError = false;
+
         let script: Script = {};
         let template: Template | undefined = undefined;
 
@@ -42,6 +44,8 @@ export class VideoProcessingService {
                 "An issue happened and the template was not generated. Please contact us pasting this error message"
             );
         }
+
+        await FileSystem.createDirectory(videoRenderingTempFolder.tempFolderPath);
 
         if (canGenerateScript) {
             await this.notifyClient(userId, video, VideoStatus.GeneratingScript);
@@ -73,7 +77,10 @@ export class VideoProcessingService {
             if (template) {
                 await this.notifyClient(userId, video, VideoStatus.Rendering);
 
-                const videoRenderer = new VideoRendererService(template);
+                const videoRenderer = new VideoRendererService(
+                    template,
+                    videoRenderingTempFolder.tempFolderPath
+                );
 
                 await videoRenderer.initRender(async (videoPath) => {
                     try {
@@ -114,6 +121,7 @@ export class VideoProcessingService {
 
                 await finalVoiceTempFolder.cleanUp();
                 await thumbnailFolder.cleanUp();
+                await videoRenderingTempFolder.cleanUp();
 
                 return { result: "Video created" };
             }

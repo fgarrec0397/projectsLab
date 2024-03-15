@@ -1,5 +1,7 @@
 import { Injectable } from "@nestjs/common";
-import { FileSystem } from "src/common/FileSystem";
+import { FileSystemService } from "src/common/files-system/services/file-system.service";
+import { TempFoldersService } from "src/common/files-system/services/temp-folders.service";
+// import { FileSystem } from "src/common/FileSystem";
 import { VideoUtils } from "src/common/utils/video.utils";
 import { DatabaseConfig, InjectDatabase } from "src/config/database-config.module";
 import { InjectStorageConfig, StorageConfig } from "src/config/storage-config.module";
@@ -25,27 +27,36 @@ export class VideoProcessingService {
         private readonly scriptService: ScriptGeneratorService,
         private readonly templateService: TemplateGeneratorService,
         private readonly notificationService: NotificationsService,
+        private readonly tempFoldersService: TempFoldersService,
+        private readonly fileSystem: FileSystemService,
         @InjectDatabase() private readonly database: DatabaseConfig,
         @InjectStorageConfig() private readonly storage: StorageConfig
     ) {}
 
     async renderVideo(userId: string, video: IVideo) {
-        const videoRenderingTempFolder = FileSystem.getTempFolderPath("video-rendering", userId);
-        const thumbnailFolder = FileSystem.getTempFolderPath("thumbnails", userId);
-        const finalVoiceTempFolder = FileSystem.getTempFolderPath("final-voice-generation", userId);
+        const videoRenderingTempFolder = this.tempFoldersService.getTempFolderPath(
+            "video-rendering",
+            userId
+        );
+        const thumbnailFolder = this.tempFoldersService.getTempFolderPath("thumbnails", userId);
+        const finalVoiceTempFolder = this.tempFoldersService.getTempFolderPath(
+            "final-voice-generation",
+            userId
+        );
         const speechFilePath = `${finalVoiceTempFolder.tempFolderPath}/speech.mp3`;
         const hasError = false;
 
         let script: Script = {};
         let template: Template | undefined = undefined;
 
+        // TODO - remove this when temp folders not removing issue is done
         if (hasError) {
             throw new Error(
                 "An issue happened and the template was not generated. Please contact us pasting this error message"
             );
         }
 
-        await FileSystem.createDirectory(videoRenderingTempFolder.tempFolderPath);
+        await this.fileSystem.createDirectory(videoRenderingTempFolder.tempFolderPath);
 
         if (canGenerateScript) {
             await this.notifyClient(userId, video, VideoStatus.GeneratingScript);
@@ -88,7 +99,7 @@ export class VideoProcessingService {
                         const thumbnailFileName = `system/${userId}/thumbnails/${video.name}.jpg`;
                         const thumbnailPath = `${thumbnailFolder.tempFolderPath}/${video.name}.jpg`;
 
-                        await FileSystem.createDirectory(thumbnailFolder.tempFolderPath);
+                        await this.fileSystem.createDirectory(thumbnailFolder.tempFolderPath);
 
                         await this.processingThumnail(
                             videoPath,
@@ -119,9 +130,9 @@ export class VideoProcessingService {
                     }
                 });
 
-                await finalVoiceTempFolder.cleanUp();
-                await thumbnailFolder.cleanUp();
-                await videoRenderingTempFolder.cleanUp();
+                // await finalVoiceTempFolder.cleanUp();
+                // await thumbnailFolder.cleanUp();
+                // await videoRenderingTempFolder.cleanUp();
 
                 return { result: "Video created" };
             }

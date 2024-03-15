@@ -2,6 +2,7 @@ import { NestFactory } from "@nestjs/core";
 import session from "express-session";
 
 import { AppModule } from "./app.module";
+import { TempFoldersService } from "./common/files-system/services/temp-folders.service";
 
 const secret = process.env.SECRET || "";
 const port = process.env.PORT || "3002";
@@ -25,6 +26,9 @@ async function bootstrap() {
             credentials: true,
         });
     }
+
+    const tempFoldersService = app.get(TempFoldersService);
+    await tempFoldersService.cleanUpAll();
 
     await app.listen(port);
 

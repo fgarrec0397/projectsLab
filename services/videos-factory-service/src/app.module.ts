@@ -2,6 +2,7 @@ import { Module } from "@nestjs/common";
 import { ConfigModule as EnvConfigModule } from "@nestjs/config";
 
 import { CacheModule } from "./common/cache/cache.module";
+import { FileSystemModule } from "./common/files-system/file-system.module";
 import { BaseWebSocketModule } from "./common/websocket/base-websocket.module";
 import { ConfigModule } from "./config.module";
 import { AuthModule } from "./modules/auth/auth.module";
@@ -16,6 +17,7 @@ import { VideosModule } from "./modules/videos/videos.module";
         EnvConfigModule.forRoot({ isGlobal: true }),
         ConfigModule,
         CacheModule,
+        FileSystemModule,
         JobsModule,
         NotificationsModule,
         BaseWebSocketModule,

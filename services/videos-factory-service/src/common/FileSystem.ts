@@ -43,6 +43,23 @@ export class FileSystem {
         return path.resolve(...filePath);
     }
 
+    static async getFolders(directoryPath: string) {
+        if (!FileSystem.isPathExistSync(directoryPath)) {
+            return [];
+        }
+
+        try {
+            const files = await promises.readdir(directoryPath, { withFileTypes: true });
+            const directories = files.filter((x) => x.isDirectory());
+
+            console.log("Folders:", directories);
+
+            return directories || [];
+        } catch (err) {
+            return [];
+        }
+    }
+
     static async ensureDirectoryExists(filePath: string): Promise<void> {
         const directoryPath = path.dirname(filePath);
 

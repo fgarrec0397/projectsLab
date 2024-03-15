@@ -1,7 +1,6 @@
 import { Injectable } from "@nestjs/common";
 import { FileSystemService } from "src/common/files-system/services/file-system.service";
 import { TempFoldersService } from "src/common/files-system/services/temp-folders.service";
-// import { FileSystem } from "src/common/FileSystem";
 import { VideoUtils } from "src/common/utils/video.utils";
 import { DatabaseConfig, InjectDatabase } from "src/config/database-config.module";
 import { InjectStorageConfig, StorageConfig } from "src/config/storage-config.module";
@@ -34,16 +33,19 @@ export class VideoProcessingService {
     ) {}
 
     async renderVideo(userId: string, video: IVideo) {
-        const videoRenderingTempFolder = this.tempFoldersService.getTempFolderPath(
-            "video-rendering",
+        const videoRenderingFolder = this.tempFoldersService.getTempFolderPath(
+            this.tempFoldersService.videoRenderingFolder,
             userId
         );
-        const thumbnailFolder = this.tempFoldersService.getTempFolderPath("thumbnails", userId);
-        const finalVoiceTempFolder = this.tempFoldersService.getTempFolderPath(
-            "final-voice-generation",
+        const thumbnailFolder = this.tempFoldersService.getTempFolderPath(
+            this.tempFoldersService.thumbnailFolder,
             userId
         );
-        const speechFilePath = `${finalVoiceTempFolder.tempFolderPath}/speech.mp3`;
+        const finalVoiceFolder = this.tempFoldersService.getTempFolderPath(
+            this.tempFoldersService.finalVoiceGenerationFolder,
+            userId
+        );
+        const speechFilePath = `${finalVoiceFolder.tempFolderPath}/speech.mp3`;
         const hasError = false;
 
         let script: Script = {};
@@ -56,7 +58,7 @@ export class VideoProcessingService {
             );
         }
 
-        await this.fileSystem.createDirectory(videoRenderingTempFolder.tempFolderPath);
+        await this.fileSystem.createDirectory(videoRenderingFolder.tempFolderPath);
 
         if (canGenerateScript) {
             await this.notifyClient(userId, video, VideoStatus.GeneratingScript);
@@ -90,7 +92,7 @@ export class VideoProcessingService {
 
                 const videoRenderer = new VideoRendererService(
                     template,
-                    videoRenderingTempFolder.tempFolderPath
+                    videoRenderingFolder.tempFolderPath
                 );
 
                 await videoRenderer.initRender(async (videoPath) => {
@@ -130,9 +132,9 @@ export class VideoProcessingService {
                     }
                 });
 
-                // await finalVoiceTempFolder.cleanUp();
-                // await thumbnailFolder.cleanUp();
-                // await videoRenderingTempFolder.cleanUp();
+                await finalVoiceFolder.cleanUp();
+                await thumbnailFolder.cleanUp();
+                await videoRenderingFolder.cleanUp();
 
                 return { result: "Video created" };
             }

@@ -22,10 +22,6 @@ export type TemplateSize = {
 };
 
 export class VideoRendererService {
-    cleanUpTempFolder: () => Promise<void>;
-
-    folderPath: string;
-
     outputPath: string;
 
     tempOutputPath: string;
@@ -52,13 +48,14 @@ export class VideoRendererService {
 
     durationPerVideo?: number;
 
-    template?: Template;
-
     size?: TemplateSize;
 
     shouldProcessFragments?: boolean;
 
-    constructor(template: Template, folderPath: string) {
+    constructor(
+        private readonly template: Template,
+        private readonly folderPath: string
+    ) {
         this.tempFfmpegCommand = ffmpeg();
         this.textFfmpegCommand = ffmpeg();
         this.finalFfmpegCommand = ffmpeg();
@@ -73,7 +70,8 @@ export class VideoRendererService {
         this.complexFilterBuilder = new ComplexFilterBuilder();
         this.elementsFactory = new ElementComponentFactory(
             this.complexFilterBuilder,
-            this.canvasRenderer
+            this.canvasRenderer,
+            { videoOutputPath: this.folderPath }
         );
         this.templateMapper = new VideoTemplateMapper(this.template, this.elementsFactory);
 

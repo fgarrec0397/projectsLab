@@ -1,5 +1,5 @@
 import { Injectable } from "@nestjs/common";
-import { FileSystem } from "src/common/FileSystem";
+import { FileSystemService } from "src/common/files-system/services/file-system.service";
 import { IVideo } from "src/modules/videos/videos.types";
 
 import { TimedSentence, TimedText } from "../video-renderer/video-renderer.types";
@@ -31,6 +31,8 @@ export class ScriptGeneratorService {
 
     private speechFilePath: string | undefined;
 
+    constructor(private readonly fileSystem: FileSystemService) {}
+
     init(video: IVideo) {
         this.textGenerator = new TextGenerator(video);
         this.voiceGenerator = new VoiceGenerator();
@@ -56,11 +58,11 @@ export class ScriptGeneratorService {
             return;
         }
 
-        await FileSystem.createFile(this.speechFilePath);
+        await this.fileSystem.createFile(this.speechFilePath);
 
         this.voiceBuffer = await this.voiceGenerator.generateVoice(this.text, this.speechFilePath);
 
-        await FileSystem.createFile(this.speechFilePath, this.voiceBuffer);
+        await this.fileSystem.createFile(this.speechFilePath, this.voiceBuffer);
     }
 
     private async generateTimestampsBasedOnAudio() {

@@ -4,7 +4,7 @@ import AWS, { config } from "aws-sdk";
 import { CommonPrefix } from "aws-sdk/clients/s3";
 import fs from "fs";
 import path from "path";
-import { FileSystem } from "src/common/FileSystem";
+import { FileSystemService } from "src/common/files-system/services/file-system.service";
 
 import { StorageStrategy } from "../storage-manager";
 
@@ -25,7 +25,10 @@ export class S3StorageManager implements StorageStrategy<S3StorageManagerTypes> 
 
     private bucketName: string;
 
-    constructor(private readonly configService: ConfigService) {}
+    constructor(
+        private readonly configService: ConfigService,
+        private readonly fileSystem: FileSystemService
+    ) {}
 
     init() {
         config.update({
@@ -153,7 +156,7 @@ export class S3StorageManager implements StorageStrategy<S3StorageManagerTypes> 
         let fileToUpload: { buffer: Buffer; mimetype: string };
 
         if (typeof file === "string") {
-            const buffer = await FileSystem.convertFileToBuffer(file);
+            const buffer = await this.fileSystem.convertFileToBuffer(file);
             fileToUpload = {
                 buffer,
                 mimetype: "",

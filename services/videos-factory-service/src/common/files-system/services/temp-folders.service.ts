@@ -12,6 +12,20 @@ export type TempFolder = {
 
 @Injectable()
 export class TempFoldersService {
+    finalVoiceGenerationFolder = "final-voice-generation";
+
+    tempVoiceGenerationFolder = "temp-voice-generation";
+
+    subtitlesFolder = "subtitles";
+
+    thumbnailFolder = "thumbnails";
+
+    videoRenderingFolder = "video-rendering";
+
+    filesUploadProcessingFolder = "files-upload-processing";
+
+    expirationTime = HOUR_IN_SECONDS * 1000;
+
     tempFolder = this.fileSystem.getAssetsPath("temp");
 
     constructor(private readonly fileSystem: FileSystemService) {}
@@ -24,7 +38,7 @@ export class TempFoldersService {
         let tempFolderPath = path.join(this.tempFolder, subFolder);
 
         if (id) {
-            tempFolderPath = path.join(this.tempFolder, id);
+            tempFolderPath = path.join(tempFolderPath, id);
         }
 
         const cleanUp = () => this.fileSystem.removeFile(tempFolderPath);
@@ -36,7 +50,7 @@ export class TempFoldersService {
         return this.fileSystem.getFolders(this.fileSystem.getAssetsPath(`temp/${name}`));
     }
 
-    async cleanUpByUser(subFolderName: string, userId: string) {
+    async cleanUserTempFolders(subFolderName: string, userId: string) {
         const folders = await this.getTempFolders(subFolderName);
 
         for (const folder of folders) {
@@ -44,10 +58,10 @@ export class TempFoldersService {
 
             if (id === userId) {
                 const now = Date.now();
-                const oneHourAgo = now - HOUR_IN_SECONDS * 1000;
-                const isOlderThanOneHour = Number(timestamp) < oneHourAgo;
+                const expiredTime = now - this.expirationTime;
+                const isExpired = Number(timestamp) < expiredTime;
 
-                if (isOlderThanOneHour) {
+                if (isExpired) {
                     await this.fileSystem.removeFile(path.join(folder.path, folder.name));
                 }
             }

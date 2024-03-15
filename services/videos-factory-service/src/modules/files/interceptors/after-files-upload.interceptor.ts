@@ -1,14 +1,19 @@
 import { CallHandler, ExecutionContext, Injectable, NestInterceptor } from "@nestjs/common";
 import { Observable, of } from "rxjs";
 import { tap } from "rxjs/operators";
-import { FileSystem } from "src/common/FileSystem";
+import { FileSystemService } from "src/common/files-system/services/file-system.service";
+import { TempFoldersService } from "src/common/files-system/services/temp-folders.service";
 import { InjectStorageConfig, StorageConfig } from "src/config/storage-config.module";
 
 import { VideoUtils } from "../../../common/utils/video.utils";
 
 @Injectable()
 export class AfterFilesUploadInterceptor implements NestInterceptor {
-    constructor(@InjectStorageConfig() private readonly storageConfig: StorageConfig) {}
+    constructor(
+        @InjectStorageConfig() private readonly storageConfig: StorageConfig,
+        private readonly tempFoldersService: TempFoldersService,
+        private readonly fileSystem: FileSystemService
+    ) {}
 
     intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
         return next.handle().pipe(
@@ -33,27 +38,31 @@ export class AfterFilesUploadInterceptor implements NestInterceptor {
     private async processFilesInBackground(fileIds: string[]): Promise<void> {
         try {
             for (const fileId of fileIds) {
-                const { tempFolderPath, cleanUp } =
-                    await FileSystem.getTempFolderPath("files-upload-processing");
+                const filesUploadingFolder = this.tempFoldersService.getTempFolderPath(
+                    this.tempFoldersService.filesUploadProcessingFolder
+                );
 
-                await FileSystem.createDirectory(tempFolderPath);
+                await this.fileSystem.createDirectory(filesUploadingFolder.tempFolderPath);
 
-                const inputFilePath = await this.storageConfig.downloadFile(fileId, tempFolderPath);
+                const inputFilePath = await this.storageConfig.downloadFile(
+                    fileId,
+                    filesUploadingFolder.tempFolderPath
+                );
 
                 const hasFileAudio = await VideoUtils.hasAudioStream(inputFilePath);
 
                 if (!hasFileAudio) {
-                    const tempFolderOutput = `${tempFolderPath}/output`;
+                    const tempFolderOutput = `${filesUploadingFolder.tempFolderPath}/output`;
                     const outputFilePath = `${tempFolderOutput}/${this.storageConfig.getFileName(
                         fileId
                     )}`;
 
-                    await FileSystem.createDirectory(tempFolderOutput);
+                    await this.fileSystem.createDirectory(tempFolderOutput);
                     await VideoUtils.addSilentAudioToVideo(inputFilePath, outputFilePath);
                     await this.storageConfig.uploadFile(outputFilePath, fileId);
                 }
 
-                await cleanUp();
+                await filesUploadingFolder.cleanUp();
             }
         } catch (error) {
             console.error("Error processing files in background", error);

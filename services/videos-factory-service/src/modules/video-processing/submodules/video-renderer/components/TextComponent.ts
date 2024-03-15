@@ -1,25 +1,31 @@
 import ffmpeg from "fluent-ffmpeg";
-import { FileSystem } from "src/common/FileSystem";
+import path from "path";
+import { FileSystemService } from "src/common/files-system/services/file-system.service";
 import { CanvasRendererService } from "src/modules/canvas-renderer/canvas-renderer.service";
 
-import { Text } from "../entities/Text";
 import { ComplexFilterBuilder } from "../builders/video-complexfilter.builder";
+import { Text } from "../entities/Text";
+import { ComponentConfig } from "../factories/video-element-component.factory";
 import { TimedText } from "../video-renderer.types";
 import { FragmentableComponent, IFragmentableComponent } from "./FragmentableComponent";
+
+export type TextComponentConfig = ComponentConfig;
 
 export class TextComponent
     extends FragmentableComponent<Text>
     implements IFragmentableComponent<Text["value"]>
 {
-    canvasRenderer: CanvasRendererService;
+    fileSystem: FileSystemService;
 
     constructor(
         element: Text,
         complexFilterBuilder: ComplexFilterBuilder,
-        canvasRenderer: CanvasRendererService
+        private readonly canvasRenderer: CanvasRendererService,
+        private readonly config: TextComponentConfig
     ) {
         super(element, complexFilterBuilder);
         this.canvasRenderer = canvasRenderer;
+        this.fileSystem = new FileSystemService();
     }
 
     async process(ffmpegCommand: ffmpeg.FfmpegCommand): Promise<void> {
@@ -98,11 +104,14 @@ export class TextComponent
             return;
         }
 
-        const outputFolderPath = FileSystem.getAssetsPath(`tmp/output`);
-        const outputFilePath = FileSystem.getAssetsPath(`tmp/output/text-${options.id}.png`);
+        const outputFilePath = path.join(
+            this.config.videoOutputPath,
+            "subtitles",
+            `text-${options.id}.png`
+        );
 
-        if (!FileSystem.isPathExistSync(outputFolderPath)) {
-            FileSystem.createDirectory(outputFolderPath);
+        if (!this.fileSystem.isPathExistSync(this.config.videoOutputPath)) {
+            this.fileSystem.createDirectory(this.config.videoOutputPath);
         }
 
         await this.canvasRenderer.createTextImage(

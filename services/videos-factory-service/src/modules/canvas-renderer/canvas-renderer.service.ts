@@ -1,5 +1,5 @@
 import { Canvas, CanvasRenderingContext2D, createCanvas } from "canvas";
-import { FileSystem } from "src/common/FileSystem";
+import { FileSystemService } from "src/common/files-system/services/file-system.service";
 
 export type TextStylesProperties = {
     font?: string;
@@ -31,10 +31,13 @@ export class CanvasRendererService {
 
     config: CanvasRendererConfig;
 
+    fileSystem: FileSystemService;
+
     constructor(config: CanvasRendererConfig) {
         this.canvas = createCanvas(config.width, config.height);
         this.context = this.canvas.getContext("2d");
         this.config = config;
+        this.fileSystem = new FileSystemService();
     }
 
     async createTextImage(text: string, filename: string, styles?: TextStylesProperties) {
@@ -59,6 +62,6 @@ export class CanvasRendererService {
 
         const buffer = canvas.toBuffer("image/png");
 
-        await FileSystem.createFile(filename, buffer);
+        await this.fileSystem.createFile(filename, buffer);
     }
 }

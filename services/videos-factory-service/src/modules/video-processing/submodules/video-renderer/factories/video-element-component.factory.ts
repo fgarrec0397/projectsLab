@@ -12,12 +12,16 @@ import { Composition } from "../entities/Composition";
 import { Text } from "../entities/Text";
 import { Video } from "../entities/Video";
 
+export type ComponentConfig = {
+    videoOutputPath: string;
+};
+
 export class ElementComponentFactory {
-    canvasRenderer: CanvasRendererService;
-
-    complexFilterBuilder: ComplexFilterBuilder;
-
-    constructor(complexFilterBuilder: ComplexFilterBuilder, canvasRenderer: CanvasRendererService) {
+    constructor(
+        private readonly complexFilterBuilder: ComplexFilterBuilder,
+        private readonly canvasRenderer: CanvasRendererService,
+        private readonly config: ComponentConfig
+    ) {
         this.complexFilterBuilder = complexFilterBuilder;
         this.canvasRenderer = canvasRenderer;
     }
@@ -51,7 +55,12 @@ export class ElementComponentFactory {
         if (element.type === "text") {
             const text = element as Text;
 
-            return new TextComponent(text, this.complexFilterBuilder, this.canvasRenderer);
+            return new TextComponent(
+                text,
+                this.complexFilterBuilder,
+                this.canvasRenderer,
+                this.config
+            );
         }
 
         throw new Error("Element not found");
@@ -61,7 +70,12 @@ export class ElementComponentFactory {
         if (element instanceof Text) {
             const text = element as Text;
 
-            return new TextComponent(text, this.complexFilterBuilder, this.canvasRenderer);
+            return new TextComponent(
+                text,
+                this.complexFilterBuilder,
+                this.canvasRenderer,
+                this.config
+            );
         }
     }
 }

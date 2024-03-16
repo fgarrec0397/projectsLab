@@ -23,7 +23,11 @@ type S3StorageManagerTypes = {
 export class S3StorageManager implements StorageStrategy<S3StorageManagerTypes> {
     private s3: AWS.S3;
 
+    private signer: AWS.CloudFront.Signer;
+
     private bucketName: string;
+
+    private distributionName: string;
 
     constructor(
         private readonly configService: ConfigService,
@@ -31,6 +35,7 @@ export class S3StorageManager implements StorageStrategy<S3StorageManagerTypes> 
     ) {}
 
     init() {
+        // signer
         config.update({
             accessKeyId: this.configService.get<string>("AWS_ACCESS_KEY_ID"),
             secretAccessKey: this.configService.get<string>("AWS_SECRET_ACCESS_KEY"),
@@ -39,10 +44,21 @@ export class S3StorageManager implements StorageStrategy<S3StorageManagerTypes> 
 
         this.s3 = new AWS.S3();
         this.bucketName = this.configService.get<string>("AWS_BUCKET_NAME", "");
+
+        const privateKey = this.fileSystem.loadFile<string>(
+            "../../../../credentials/aws-cloufront-key.txt"
+        );
+
+        this.signer = new AWS.CloudFront.Signer(
+            this.configService.get<string>("AWS_CLOUDFRONT_KEY_PAIR_ID"),
+            privateKey
+        );
+
+        this.distributionName = this.configService.get<string>("AWS_CLOUDFRONT_DISTRIBUTION_NAME");
     }
 
     getBaseUrl() {
-        return `https://${this.bucketName}.s3.amazonaws.com`;
+        return `https://${this.distributionName}`;
     }
 
     getFileName(key: string | undefined) {
@@ -72,17 +88,17 @@ export class S3StorageManager implements StorageStrategy<S3StorageManagerTypes> 
         return extensionMatch ? extensionMatch[0] : null;
     }
 
-    getFileUrl(key: string | undefined, method = "getObject", expirySeconds = 3600) {
+    getFileUrl(key: string | undefined, expirySeconds = 3600) {
         if (!key) {
             return;
         }
 
-        const params = {
-            Bucket: this.bucketName,
-            Key: key,
-            Expires: expirySeconds,
+        const options = {
+            url: `${this.getBaseUrl()}/${key}`,
+            expires: expirySeconds,
         };
-        return this.s3.getSignedUrl(method, params);
+
+        return this.signer.getSignedUrl(options);
     }
 
     async getFile(key: string): Promise<AWS.S3.GetObjectOutput> {

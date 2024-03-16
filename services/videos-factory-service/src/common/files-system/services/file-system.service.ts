@@ -99,7 +99,7 @@ export class FileSystemService {
         });
     }
 
-    loadJson<TValue>(jsonPath: string) {
+    loadFile<TValue>(jsonPath: string) {
         try {
             const rawData = readFileSync(jsonPath, "utf8");
 

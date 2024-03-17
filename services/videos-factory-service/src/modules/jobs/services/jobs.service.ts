@@ -1,6 +1,6 @@
-import { Injectable } from "@nestjs/common";
+import { Injectable, OnModuleInit } from "@nestjs/common";
 import Bull, { Queue } from "bull";
-import { MINUTE_IN_SECONDS } from "src/common/constants";
+import { Redis } from "ioredis";
 import { TempFoldersService } from "src/common/files-system/services/temp-folders.service";
 import { DatabaseConfig, InjectDatabase } from "src/config/database-config.module";
 import { NotificationsService } from "src/modules/notifications/services/notifications.service";
@@ -14,15 +14,61 @@ export type VideoRenderingJobData = {
 };
 
 @Injectable()
-export class JobsService {
+export class JobsService implements OnModuleInit {
     private queues = new Map<string, Queue<VideoRenderingJobData>>();
+
+    private redis: Redis;
 
     constructor(
         private readonly videoProcessingService: VideoProcessingService,
         private readonly notificationService: NotificationsService,
         private readonly tempFoldersService: TempFoldersService,
         @InjectDatabase() private readonly database: DatabaseConfig
-    ) {}
+    ) {
+        this.redis = new Redis();
+    }
+
+    async onModuleInit() {
+        console.log("JobsService init");
+        let userQueue: Queue;
+
+        const queuesNames = await this.findAllQueues("render-video-user");
+        console.log(queuesNames, "queuesNames");
+
+        for (const name of queuesNames) {
+            const userId = name.split("-").pop();
+            console.log(userId, "userId");
+
+            userQueue = new Bull(name, {
+                redis: {
+                    host: "localhost",
+                    port: 6379,
+                },
+                defaultJobOptions: {
+                    attempts: 3,
+                    backoff: {
+                        type: "exponential",
+                        delay: 3 * 1000,
+                    },
+                    removeOnComplete: true,
+                    removeOnFail: true,
+                },
+            });
+
+            const jobs = await userQueue.getJobs(["waiting", "paused", "delayed", "failed"]);
+            console.log(jobs);
+            for (const job of jobs) {
+                const state = await job.getState();
+                console.log(state, "state");
+            }
+            userQueue.process(async (job) => {
+                console.log(`Processing job ${job.id}`);
+                await this.processVideoRenderingJob(job);
+            });
+
+            this.queues.set(userId, userQueue);
+        }
+    }
 
     async renderVideo(data: VideoRenderingJobData) {
         const maxAttempts = 3;
@@ -54,6 +100,10 @@ export class JobsService {
             const queueName = `render-video-user-${data.userId}`;
 
             userQueue = new Bull(queueName, {
+                redis: {
+                    host: "localhost",
+                    port: 6379,
+                },
                 defaultJobOptions: {
                     attempts: 3,
                     backoff: {
@@ -65,8 +115,9 @@ export class JobsService {
                 },
             });
 
-            userQueue.process(async (job) => {
+            userQueue.process(async (job, done) => {
                 await this.processVideoRenderingJob(job);
+                done();
             });
 
             this.queues.set(data.userId, userQueue);
@@ -112,6 +163,19 @@ export class JobsService {
         if (job) {
             await job.remove();
         }
+    }
+
+    async findAllQueues(prefix: string) {
+        const keys = await this.redis.keys(`bull:${prefix}-*:*`);
+
+        const queueNames = keys
+            .map((key) => {
+                const parts = key.split(":");
+                return parts[1];
+            })
+            .filter((value, index, self) => self.indexOf(value) === index);
+
+        return queueNames;
     }
 
     private async processVideoRenderingJob(job: Bull.Job<VideoRenderingJobData>) {

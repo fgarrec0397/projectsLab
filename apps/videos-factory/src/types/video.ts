@@ -32,6 +32,7 @@ export type IVideo = {
     videoKey?: string;
     videoUrl?: string;
     thumbnail?: string;
+    thumbnailUrl?: string;
     createdAt: number;
     updatedAt: number;
     failedReason?: string;

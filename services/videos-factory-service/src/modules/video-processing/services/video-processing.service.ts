@@ -95,42 +95,50 @@ export class VideoProcessingService {
                     videoRenderingFolder.tempFolderPath
                 );
 
-                await videoRenderer.initRender(async (videoPath) => {
-                    try {
-                        const videoFileName = `system/${userId}/videos/${video.name}.mp4`;
-                        const thumbnailFileName = `system/${userId}/thumbnails/${video.name}.jpg`;
-                        const thumbnailPath = `${thumbnailFolder.tempFolderPath}/${video.name}.jpg`;
+                try {
+                    await videoRenderer.initRender(async (videoPath) => {
+                        const time = new Date().getTime();
 
-                        await this.fileSystem.createDirectory(thumbnailFolder.tempFolderPath);
+                        try {
+                            const videoFileName = `system/${userId}/videos/${video.name}-${time}.mp4`;
+                            const thumbnailFileName = `system/${userId}/thumbnails/${video.name}-${time}.jpg`;
+                            const thumbnailPath = `${thumbnailFolder.tempFolderPath}/${video.name}.jpg`;
 
-                        await this.processingThumnail(
-                            videoPath,
-                            thumbnailFolder.tempFolderPath,
-                            `${video.name}.jpg`,
-                            [135, 240]
-                        );
+                            await this.fileSystem.createDirectory(thumbnailFolder.tempFolderPath);
 
-                        const duration = await VideoUtils.getVideoDuration(videoPath);
+                            await this.processingThumnail(
+                                videoPath,
+                                thumbnailFolder.tempFolderPath,
+                                `${video.name}.jpg`,
+                                [135, 240]
+                            );
 
-                        await this.storage.uploadFile(thumbnailPath, thumbnailFileName);
-                        await this.storage.uploadFile(videoPath, videoFileName);
+                            const duration = await VideoUtils.getVideoDuration(videoPath);
 
-                        await this.notifyClient(
-                            userId,
-                            {
-                                ...video,
-                                videoKey: videoFileName,
-                                thumbnail: thumbnailFileName,
-                                duration,
-                            },
-                            VideoStatus.Rendered
-                        );
-                    } catch {
-                        throw new Error(
-                            "The generated video was not uploaded successfully to the storage provider. Please contact us pasting this error message"
-                        );
-                    }
-                });
+                            await this.storage.uploadFile(thumbnailPath, thumbnailFileName);
+                            await this.storage.uploadFile(videoPath, videoFileName);
+
+                            await this.notifyClient(
+                                userId,
+                                {
+                                    ...video,
+                                    videoKey: videoFileName,
+                                    thumbnail: thumbnailFileName,
+                                    duration,
+                                },
+                                VideoStatus.Rendered
+                            );
+                        } catch (error) {
+                            console.log(error, "error");
+
+                            throw new Error(
+                                "The generated video was not uploaded successfully to the storage provider. Please contact us pasting this error message"
+                            );
+                        }
+                    });
+                } catch (error) {
+                    console.log(error, "yoyo error 2");
+                }
 
                 await finalVoiceFolder.cleanUp();
                 await thumbnailFolder.cleanUp();
@@ -142,7 +150,9 @@ export class VideoProcessingService {
             throw new Error(
                 "An issue happened and the video was not generated. Please contact us pasting this error message"
             );
-        } catch {
+        } catch (error) {
+            console.log(error, "yoyo error 1");
+
             throw new Error(
                 "An unknow error occured. Please contact us pasting this error message"
             );

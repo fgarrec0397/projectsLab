@@ -4,6 +4,7 @@ import { DatabaseConfig, InjectDatabase } from "src/config/database-config.modul
 import { InjectStorageConfig, StorageConfig } from "src/config/storage-config.module";
 import { JobsService } from "src/modules/jobs/services/jobs.service";
 
+import { VIDEOS_CACHE_DURATION } from "../videos.constants";
 import { IVideo, IVideoDraft, VideoStatus } from "../videos.types";
 
 @Injectable()
@@ -14,14 +15,23 @@ export class VideosService {
         private readonly jobsService: JobsService
     ) {}
 
-    async getVideos(userId: string) {
+    async getVideos(userId: string, withThumbnails?: boolean) {
         const videoCollectionPath = `users/${userId}/videos`;
         const videos = await this.database.findWithQuery<IVideo>(videoCollectionPath, {
             orderByField: "createdAt",
             orderByDirection: "desc",
         });
 
-        return videos;
+        if (!withThumbnails) {
+            return videos;
+        }
+
+        const videosWithThumbnail = videos.map((x) => ({
+            ...x,
+            thumbnailUrl: this.storage.getFileUrl(x.thumbnail, VIDEOS_CACHE_DURATION),
+        }));
+
+        return videosWithThumbnail;
     }
 
     async getVideoById(userId: string, videoId: string) {
@@ -99,6 +109,10 @@ export class VideosService {
 
     async deleteVideo(userId: string, videoId: string) {
         const videoCollectionPath = `users/${userId}/videos`;
+
+        // const video = await this.getVideoById(userId, videoId);
+
+        // this.jobsService.removeJobFromQueue(userId, video.jobId);
 
         return this.database.delete(videoCollectionPath, videoId);
     }

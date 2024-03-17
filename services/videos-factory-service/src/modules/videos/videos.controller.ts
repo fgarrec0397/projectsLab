@@ -1,11 +1,11 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post, Req } from "@nestjs/common";
+import { Body, Controller, Delete, Get, Param, Patch, Post, Query, Req } from "@nestjs/common";
 import { Request } from "express";
 import { UseCache } from "src/common/cache/decorators/use-cache.decorator";
 import { UseInvalidateCache } from "src/common/cache/decorators/use-invalidate-cache.decorator";
-import { MONTH_IN_SECONDS } from "src/common/constants";
 
 import { VideosService } from "./services/videos.service";
 import { useVideoByIdCacheKey, useVideosCacheKey } from "./utils/videos.utils";
+import { VIDEOS_CACHE_DURATION } from "./videos.constants";
 import { IVideo, IVideoDraft } from "./videos.types";
 
 @Controller("videos")
@@ -13,13 +13,13 @@ export class VideosController {
     constructor(private readonly videosService: VideosService) {}
 
     @Get()
-    @UseCache(useVideosCacheKey, MONTH_IN_SECONDS)
-    async getVideos(@Req() request: Request) {
-        return this.videosService.getVideos(request.userId);
+    @UseCache(useVideosCacheKey, VIDEOS_CACHE_DURATION)
+    async getVideos(@Req() request: Request, @Query("withThumbnails") withThumbnails: boolean) {
+        return this.videosService.getVideos(request.userId, withThumbnails);
     }
 
     @Get("/:videoId")
-    @UseCache(useVideoByIdCacheKey, MONTH_IN_SECONDS)
+    @UseCache(useVideoByIdCacheKey, VIDEOS_CACHE_DURATION)
     async getVideoById(@Req() request: Request, @Param("videoId") videoId: string) {
         return this.videosService.getVideoById(request.userId, videoId);
     }

@@ -55,7 +55,7 @@ export default function VideosListVideoCard({ video }: Props) {
                     {thumbnail ? (
                         <Image
                             alt={video.name}
-                            src={video.thumbnail || "https://placehold.co/135x240"}
+                            src={video.thumbnailUrl || "https://placehold.co/135x240"}
                             ratio="9/16"
                         />
                     ) : (

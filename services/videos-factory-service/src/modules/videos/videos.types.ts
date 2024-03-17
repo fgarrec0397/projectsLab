@@ -38,11 +38,13 @@ export type IVideo = {
     status: VideoStatus;
     duration?: number;
     thumbnail?: string;
+    thumbnailUrl?: string;
     videoKey?: string;
     videoUrl?: string;
     createdAt: number;
     updatedAt: number;
     failedReason?: string;
+    jobId?: string;
 };
 
 export type IVideoDraft = Omit<Partial<IVideo>, "id"> & {

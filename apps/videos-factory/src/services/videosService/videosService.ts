@@ -3,7 +3,7 @@ import { IVideo, IVideoDraft } from "@/types/video";
 import axiosInstance from "@/utils/axios";
 
 export const getVideos = async (accessToken: string | undefined) => {
-    const url = `${endpoints.videos.get}`;
+    const url = `${endpoints.videos.get}?withThumbnails=true`;
 
     const response = await axiosInstance.get<IVideo[]>(url, {
         headers: {

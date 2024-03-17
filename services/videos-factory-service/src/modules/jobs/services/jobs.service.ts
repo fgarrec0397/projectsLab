@@ -1,5 +1,6 @@
 import { Injectable } from "@nestjs/common";
 import Bull, { Queue } from "bull";
+import { MINUTE_IN_SECONDS } from "src/common/constants";
 import { TempFoldersService } from "src/common/files-system/services/temp-folders.service";
 import { DatabaseConfig, InjectDatabase } from "src/config/database-config.module";
 import { NotificationsService } from "src/modules/notifications/services/notifications.service";
@@ -44,6 +45,11 @@ export class JobsService {
             data.userId
         );
 
+        console.log(userQueue, "userQueue");
+        // if (userQueue) {
+        //     userQueue.clean(MINUTE_IN_SECONDS, "paused");
+        // }
+
         if (!userQueue) {
             const queueName = `render-video-user-${data.userId}`;
 
@@ -54,6 +60,8 @@ export class JobsService {
                         type: "exponential",
                         delay: 3 * 1000,
                     },
+                    removeOnComplete: true,
+                    removeOnFail: true,
                 },
             });
 
@@ -67,6 +75,8 @@ export class JobsService {
         await userQueue.add(data);
 
         userQueue.on("failed", async (job) => {
+            console.log(job.failedReason, "job failed");
+
             if (job.attemptsMade === maxAttempts) {
                 const videoCollectionPath = `users/${data.userId}/videos`;
 
@@ -89,6 +99,19 @@ export class JobsService {
                 });
             }
         });
+    }
+
+    getQueueByUserId(userId: string): Queue<VideoRenderingJobData> | undefined {
+        return this.queues.get(userId);
+    }
+
+    async removeJobFromQueue(userId: string, jobId: string | number) {
+        const queue = this.getQueueByUserId(userId);
+        const job = await queue.getJob(jobId);
+
+        if (job) {
+            await job.remove();
+        }
     }
 
     private async processVideoRenderingJob(job: Bull.Job<VideoRenderingJobData>) {

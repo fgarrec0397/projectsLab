@@ -131,7 +131,7 @@ export class VideoRendererService {
             throw new Error("VideoRender.init was not called");
         }
 
-        const batchSize = 125;
+        const batchSize = 75;
 
         for (const element of this.fragmentableElements) {
             const fragments = element.getFragment();

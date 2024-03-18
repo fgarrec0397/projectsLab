@@ -110,12 +110,6 @@ export class VideosService {
     async deleteVideo(userId: string, videoId: string) {
         const videoCollectionPath = `users/${userId}/videos`;
 
-        // try {
-        //     await this.jobsService.removeJobFromQueue(userId, videoId);
-        // } catch (error) {
-        //     console.log(error, "error deleteVideo");
-        // }
-
         return this.database.delete(videoCollectionPath, videoId);
     }
 

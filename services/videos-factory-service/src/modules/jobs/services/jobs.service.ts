@@ -98,22 +98,7 @@ export class JobsService implements OnModuleInit {
             this.queues.set(data.userId, userQueue);
         }
 
-        const testJob = await userQueue.add(data);
-
-        console.log(testJob.id, "testJob.id");
-
-        // setTimeout(async () => {
-        //     console.log("remove");
-
-        //     await testJob.moveToFailed({ message: "cancel job" }, true);
-        //     // await testJob.discard();
-        //     // await testJob.remove();
-        // }, 5000);
-
         userQueue.on("failed", async (job) => {
-            console.log("failed");
-            console.log(job.failedReason, "job.failedReason");
-
             if (job.attemptsMade === maxAttempts) {
                 const videoCollectionPath = `users/${data.userId}/videos`;
 
@@ -136,48 +121,41 @@ export class JobsService implements OnModuleInit {
                 });
             }
         });
-
-        userQueue.on("paused", () => {
-            console.log("paused");
-        });
-
-        userQueue.on("error", () => {
-            console.log("error");
-        });
     }
 
     getQueueByUserId(userId: string): Queue<VideoRenderingJobData> | undefined {
         return this.queues.get(userId);
     }
 
-    async removeJobFromQueue(userId: string, videoId: string) {
-        const queue = this.queues.get(userId);
-        if (!queue) {
-            console.error(`Queue not found for user: ${userId}`);
-            return;
-        }
+    // TODO - make sure it can delete a running job
+    // async removeJobFromQueue(userId: string, videoId: string) {
+    //     const queue = this.queues.get(userId);
+    //     if (!queue) {
+    //         console.error(`Queue not found for user: ${userId}`);
+    //         return;
+    //     }
 
-        const jobs = await queue.getJobs(["waiting", "active", "delayed", "completed", "failed"]);
-        await queue.pause(true, true);
-        for (const job of jobs) {
-            if (job.data.video?.id === videoId) {
-                console.log(`Removing job ${job.id}`);
-                try {
-                    // queue.removeJobs(job.id)
-                    // await job.releaseLock();
-                    // // Consider additional checks here for job state if necessary
-                    // // await job.moveToCompleted("Video deleted", true);
-                    // await job.moveToFailed({ message: "cancel job" }, true);
-                    // await job.discard();
-                    // await job.remove();
-                    console.log(`Successfully removed job ${job?.id}`);
-                } catch (error) {
-                    console.error(`Error removing job ${job.id}: ${error}`);
-                }
-            }
-        }
-        await queue.resume(true);
-    }
+    //     const jobs = await queue.getJobs(["waiting", "active", "delayed", "completed", "failed"]);
+    //     await queue.pause(true, true);
+    //     for (const job of jobs) {
+    //         if (job.data.video?.id === videoId) {
+    //             console.log(`Removing job ${job.id}`);
+    //             try {
+    //                 // queue.removeJobs(job.id)
+    //                 // await job.releaseLock();
+    //                 // // Consider additional checks here for job state if necessary
+    //                 // // await job.moveToCompleted("Video deleted", true);
+    //                 // await job.moveToFailed({ message: "cancel job" }, true);
+    //                 // await job.discard();
+    //                 // await job.remove();
+    //                 console.log(`Successfully removed job ${job?.id}`);
+    //             } catch (error) {
+    //                 console.error(`Error removing job ${job.id}: ${error}`);
+    //             }
+    //         }
+    //     }
+    //     await queue.resume(true);
+    // }
 
     async findAllQueues(prefix: string) {
         const keys = await this.redis.keys(`bull:${prefix}-*:*`);

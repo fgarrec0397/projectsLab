@@ -19,6 +19,24 @@ export class JobsService implements OnModuleInit {
 
     private redis: Redis;
 
+    private videoQueueName = "render-video-user";
+
+    private queueOptions: Bull.QueueOptions = {
+        redis: {
+            host: "localhost",
+            port: 6379,
+        },
+        defaultJobOptions: {
+            attempts: 1,
+            backoff: {
+                type: "exponential",
+                delay: 3 * 1000,
+            },
+            removeOnComplete: true,
+            removeOnFail: true,
+        },
+    };
+
     constructor(
         private readonly videoProcessingService: VideoProcessingService,
         private readonly notificationService: NotificationsService,
@@ -29,40 +47,16 @@ export class JobsService implements OnModuleInit {
     }
 
     async onModuleInit() {
-        console.log("JobsService init");
         let userQueue: Queue;
 
-        const queuesNames = await this.findAllQueues("render-video-user");
-        console.log(queuesNames, "queuesNames");
+        const queuesNames = await this.findAllQueues(this.videoQueueName);
 
         for (const name of queuesNames) {
             const userId = name.split("-").pop();
-            console.log(userId, "userId");
 
-            userQueue = new Bull(name, {
-                redis: {
-                    host: "localhost",
-                    port: 6379,
-                },
-                defaultJobOptions: {
-                    attempts: 3,
-                    backoff: {
-                        type: "exponential",
-                        delay: 3 * 1000,
-                    },
-                    removeOnComplete: true,
-                    removeOnFail: true,
-                },
-            });
+            userQueue = new Bull(name, this.queueOptions);
 
-            const jobs = await userQueue.getJobs(["waiting", "paused", "delayed", "failed"]);
-            console.log(jobs);
-            for (const job of jobs) {
-                const state = await job.getState();
-                console.log(state, "state");
-            }
             userQueue.process(async (job) => {
-                console.log(`Processing job ${job.id}`);
                 await this.processVideoRenderingJob(job);
             });
 
@@ -91,29 +85,10 @@ export class JobsService implements OnModuleInit {
             data.userId
         );
 
-        console.log(userQueue, "userQueue");
-        // if (userQueue) {
-        //     userQueue.clean(MINUTE_IN_SECONDS, "paused");
-        // }
-
         if (!userQueue) {
-            const queueName = `render-video-user-${data.userId}`;
+            const queueName = `${this.videoQueueName}-${data.userId}`;
 
-            userQueue = new Bull(queueName, {
-                redis: {
-                    host: "localhost",
-                    port: 6379,
-                },
-                defaultJobOptions: {
-                    attempts: 3,
-                    backoff: {
-                        type: "exponential",
-                        delay: 3 * 1000,
-                    },
-                    removeOnComplete: true,
-                    removeOnFail: true,
-                },
-            });
+            userQueue = new Bull(queueName, this.queueOptions);
 
             userQueue.process(async (job, done) => {
                 await this.processVideoRenderingJob(job);
@@ -123,10 +98,21 @@ export class JobsService implements OnModuleInit {
             this.queues.set(data.userId, userQueue);
         }
 
-        await userQueue.add(data);
+        const testJob = await userQueue.add(data);
+
+        console.log(testJob.id, "testJob.id");
+
+        // setTimeout(async () => {
+        //     console.log("remove");
+
+        //     await testJob.moveToFailed({ message: "cancel job" }, true);
+        //     // await testJob.discard();
+        //     // await testJob.remove();
+        // }, 5000);
 
         userQueue.on("failed", async (job) => {
-            console.log(job.failedReason, "job failed");
+            console.log("failed");
+            console.log(job.failedReason, "job.failedReason");
 
             if (job.attemptsMade === maxAttempts) {
                 const videoCollectionPath = `users/${data.userId}/videos`;
@@ -150,19 +136,47 @@ export class JobsService implements OnModuleInit {
                 });
             }
         });
+
+        userQueue.on("paused", () => {
+            console.log("paused");
+        });
+
+        userQueue.on("error", () => {
+            console.log("error");
+        });
     }
 
     getQueueByUserId(userId: string): Queue<VideoRenderingJobData> | undefined {
         return this.queues.get(userId);
     }
 
-    async removeJobFromQueue(userId: string, jobId: string | number) {
-        const queue = this.getQueueByUserId(userId);
-        const job = await queue.getJob(jobId);
-
-        if (job) {
-            await job.remove();
+    async removeJobFromQueue(userId: string, videoId: string) {
+        const queue = this.queues.get(userId);
+        if (!queue) {
+            console.error(`Queue not found for user: ${userId}`);
+            return;
         }
+
+        const jobs = await queue.getJobs(["waiting", "active", "delayed", "completed", "failed"]);
+        await queue.pause(true, true);
+        for (const job of jobs) {
+            if (job.data.video?.id === videoId) {
+                console.log(`Removing job ${job.id}`);
+                try {
+                    // queue.removeJobs(job.id)
+                    // await job.releaseLock();
+                    // // Consider additional checks here for job state if necessary
+                    // // await job.moveToCompleted("Video deleted", true);
+                    // await job.moveToFailed({ message: "cancel job" }, true);
+                    // await job.discard();
+                    // await job.remove();
+                    console.log(`Successfully removed job ${job?.id}`);
+                } catch (error) {
+                    console.error(`Error removing job ${job.id}: ${error}`);
+                }
+            }
+        }
+        await queue.resume(true);
     }
 
     async findAllQueues(prefix: string) {

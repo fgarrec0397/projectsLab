@@ -166,7 +166,13 @@ export class VideoProcessingService {
             status,
         };
 
-        await this.database.createOrUpdate(videoCollectionPath, newVideo);
+        try {
+            await this.database.update(videoCollectionPath, newVideo.id, newVideo);
+        } catch {
+            throw new Error(
+                "An unknow error occured. Please contact us pasting this error message"
+            );
+        }
 
         this.notificationService.notifyClient(userId, {
             event: "videoUpdate",

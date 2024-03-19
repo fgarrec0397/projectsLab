@@ -98,6 +98,8 @@ export class JobsService implements OnModuleInit {
             this.queues.set(data.userId, userQueue);
         }
 
+        await userQueue.add(data);
+
         userQueue.on("failed", async (job) => {
             if (job.attemptsMade === maxAttempts) {
                 const videoCollectionPath = `users/${data.userId}/videos`;

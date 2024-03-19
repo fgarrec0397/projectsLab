@@ -15,8 +15,6 @@ export class TextGenerator {
         const seed = this.generateSeed();
         const date = format(new Date(), "PPPP p");
 
-        console.log(promptOptions, "promptOptions");
-
         const result = await this.openAi.chat.completions.create({
             messages: [
                 {

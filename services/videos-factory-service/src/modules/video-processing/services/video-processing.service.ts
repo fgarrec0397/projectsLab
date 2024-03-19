@@ -46,17 +46,9 @@ export class VideoProcessingService {
             userId
         );
         const speechFilePath = `${finalVoiceFolder.tempFolderPath}/speech.mp3`;
-        const hasError = false;
 
         let script: Script = {};
         let template: Template | undefined = undefined;
-
-        // TODO - remove this when temp folders not removing issue is done
-        if (hasError) {
-            throw new Error(
-                "An issue happened and the template was not generated. Please contact us pasting this error message"
-            );
-        }
 
         await this.fileSystem.createDirectory(videoRenderingFolder.tempFolderPath);
 

@@ -35,7 +35,6 @@ export class VoiceGenerator {
         const tempAudio = Buffer.from(await mp3.arrayBuffer());
         await this.fileSystem.createFile(tempFilePath, tempAudio);
 
-        console.log("Resample the audio");
         await VideoUtils.resampleAudio(tempFilePath, voiceFilePath);
 
         const resampledAudio = await this.fileSystem.convertFileToBuffer(voiceFilePath);

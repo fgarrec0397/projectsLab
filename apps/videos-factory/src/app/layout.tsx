@@ -23,9 +23,8 @@ export const viewport = {
 
 // TODO - change metadata
 export const metadata = {
-    title: "Minimal UI Kit",
-    description:
-        "The starting point for your next project with Minimal UI Kit, built on the newest version of Material-UI ©, ready to be customized to your style",
+    title: "Createify",
+    description: "Automatically create videos while you focus on leveraging your business",
     keywords: "react,material,kit,application,dashboard,admin,template",
     manifest: "/manifest.json",
     icons: [

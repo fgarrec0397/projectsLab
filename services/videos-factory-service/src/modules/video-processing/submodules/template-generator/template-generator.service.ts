@@ -46,12 +46,11 @@ export class TemplateGeneratorService<T extends BaseTemplateData = BaseTemplateD
     }
 
     async createTemplate() {
-        console.log(this.video, "this.video in template generator");
         await this.fetchAvailableAssets();
         await this.generateTemplateByAI();
 
         const template = this.mapAITemplateElementsToTemplateElements();
-
+        console.log(this.data.script.duration, "duration in template");
         console.log(JSON.stringify(template), "Created template");
 
         return template;
@@ -71,7 +70,6 @@ export class TemplateGeneratorService<T extends BaseTemplateData = BaseTemplateD
             url: this.storageConfig.getFileUrl(x),
         }));
 
-        console.log(JSON.stringify(this.video.files), "TemplateGenerator filesList");
         console.log(this.mappedFetchedAssets, "this.mappedFetchedAssets");
     }
 
@@ -92,17 +90,25 @@ export class TemplateGeneratorService<T extends BaseTemplateData = BaseTemplateD
                             "name": "video_name.mp4",
                             "sourcePath": "the/aws/s3/url/path/video_name.mp4?additionalparam1=paramvalues1&additionalparam2=paramvalues2",
                             "start": 0,
-                            "end": 10
+                            "end": 9.763
+                        },
+                        {
+                            "type": "video2",
+                            "name": "video2_name.mp4",
+                            "sourcePath": "the/aws/s3/url/path/video_name.mp4?additionalparam1=paramvalues1&additionalparam2=paramvalues2",
+                            "start": 9.763,
+                            "end": 12.56
                         },
                         {
                             "type": "audio",
                             "name": "audio_name.mp3",
                             "sourcePath": "the/aws/s3/url/path/audio_name.mp3?additionalparam1=paramvalues1&additionalparam2=paramvalues2",
                             "start": 0,
-                            "end": 10
+                            "end": 12.56
                         }
                     ]
-                }
+                } 
+                The "start" properties of each videos should match the "end" properties of the video before as shown in the example. 
                 If you decide to put a video, the type should be "video", "audio", when it is an audio file. The name should
                 be the corresponding name of the video or audio you decided to put in the video.
                 You will also be provided by a duration that match the duration of the whole video. You can put
@@ -193,8 +199,6 @@ export class TemplateGeneratorService<T extends BaseTemplateData = BaseTemplateD
 
             assetsArray.push(`name: ${x.name}, url: ${x.url}`);
         });
-
-        console.log(assetsArray.join(" | "), "printed assets");
 
         return assetsArray.join(" | ");
     }

@@ -15,6 +15,8 @@ export type VideoRenderingJobData = {
 
 @Injectable()
 export class JobsService implements OnModuleInit {
+    private maxAttempts = 1;
+
     private queues = new Map<string, Queue<VideoRenderingJobData>>();
 
     private redis: Redis;
@@ -27,7 +29,7 @@ export class JobsService implements OnModuleInit {
             port: 6379,
         },
         defaultJobOptions: {
-            attempts: 1,
+            attempts: this.maxAttempts,
             backoff: {
                 type: "exponential",
                 delay: 3 * 1000,
@@ -65,7 +67,6 @@ export class JobsService implements OnModuleInit {
     }
 
     async renderVideo(data: VideoRenderingJobData) {
-        const maxAttempts = 3;
         let userQueue = this.queues.get(data.userId);
 
         await this.tempFoldersService.cleanUserTempFolders(
@@ -101,7 +102,7 @@ export class JobsService implements OnModuleInit {
         await userQueue.add(data);
 
         userQueue.on("failed", async (job) => {
-            if (job.attemptsMade === maxAttempts) {
+            if (job.attemptsMade === this.maxAttempts) {
                 const videoCollectionPath = `users/${data.userId}/videos`;
 
                 const failedVideo: IVideo = {

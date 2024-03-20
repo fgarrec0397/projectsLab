@@ -1,7 +1,7 @@
 import ffmpeg from "fluent-ffmpeg";
 
-import { Audio } from "../entities/Audio";
 import { VideoUtils } from "../../../../../common/utils/video.utils";
+import { Audio } from "../entities/Audio";
 import { BaseComponent, IElementComponent } from "./BaseComponent";
 
 export class AudioComponent extends BaseComponent<Audio> implements IElementComponent {

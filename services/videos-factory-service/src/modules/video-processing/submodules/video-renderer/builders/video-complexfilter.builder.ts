@@ -3,11 +3,15 @@ type SizeParam = {
     height: number;
 };
 
+type AudioOption = {
+    adjustedName?: string;
+    volume?: number;
+};
+
 type Overlay = { index: number; start?: number; end?: number };
 
 type OverlayParam = Omit<Overlay, "index">;
 
-// TODO - Check to implement a decorator that would manage the chaning of output name on each function that needs it
 export class ComplexFilterBuilder {
     private audioCount: number = 0;
 
@@ -21,7 +25,7 @@ export class ComplexFilterBuilder {
 
     private videoOutputName = "";
 
-    private audioComplexFilter: string[] = [];
+    private audioComplexFilter: AudioOption[] = [];
 
     private videoComplexFilter: string[] = [];
 
@@ -50,8 +54,11 @@ export class ComplexFilterBuilder {
         return this;
     }
 
-    addAudio() {
-        this.audioComplexFilter.push(`[${this.audioCount}:a:0]`);
+    addAudio(volume?: number) {
+        this.audioComplexFilter.push({
+            adjustedName: volume && `aAdjustedVolume${this.audioCount}`,
+            volume,
+        });
         this.incrementAudioCount();
 
         return this;
@@ -157,13 +164,24 @@ export class ComplexFilterBuilder {
             return;
         }
 
-        const adjustedAudioComplexFilter = this.audioComplexFilter.map(
-            (_, index) => `[${index + this.videoWithAudioCount}:a]`
+        const adjustedAudioComplexFilter = this.audioComplexFilter.map((audio, index) =>
+            audio.adjustedName
+                ? `[${audio.adjustedName}]`
+                : `[${index + this.videoWithAudioCount}:a]`
         );
 
-        const audioConcatFilter = `[a]${adjustedAudioComplexFilter.join("")}amix=inputs=${
-            adjustedAudioComplexFilter.length + 1
-        }[${this.audioOutputName}]`;
+        const volumeModifiers = this.audioComplexFilter
+            .map((audio, index) =>
+                audio.adjustedName
+                    ? `[${index + this.videoWithAudioCount}]volume=0.5[${audio.adjustedName}]`
+                    : undefined
+            )
+            .filter((x) => x !== undefined)
+            .join(";");
+
+        const audioConcatFilter = `${volumeModifiers}[a]${adjustedAudioComplexFilter.join(
+            ""
+        )}amix=inputs=${adjustedAudioComplexFilter.length + 1}[${this.audioOutputName}]`;
 
         this.finalComplexFilter.push(audioConcatFilter);
     }

@@ -86,31 +86,34 @@ export class TemplateGeneratorService<T extends BaseTemplateData = BaseTemplateD
                 {
                     "elements": [
                         {
-                            "type": "video",
-                            "name": "video_name.mp4",
+                            "type": "video1",
+                            "name": "video1_name.mp4",
                             "sourcePath": "the/aws/s3/url/path/video_name.mp4?additionalparam1=paramvalues1&additionalparam2=paramvalues2",
                             "start": 0,
-                            "end": 9.763
+                            "end": 10
                         },
                         {
                             "type": "video2",
                             "name": "video2_name.mp4",
                             "sourcePath": "the/aws/s3/url/path/video_name.mp4?additionalparam1=paramvalues1&additionalparam2=paramvalues2",
-                            "start": 9.763,
-                            "end": 12.56
+                            "start": 10,
+                            "end": 13
                         },
                         {
                             "type": "audio",
                             "name": "audio_name.mp3",
                             "sourcePath": "the/aws/s3/url/path/audio_name.mp3?additionalparam1=paramvalues1&additionalparam2=paramvalues2",
+                            "volume": 0.1,
                             "start": 0,
-                            "end": 12.56
+                            "end": 13
                         }
                     ]
-                } 
-                The "start" properties of each videos should match the "end" properties of the video before as shown in the example. 
-                If you decide to put a video, the type should be "video", "audio", when it is an audio file. The name should
-                be the corresponding name of the video or audio you decided to put in the video.
+                }
+                The "end" property of each videos should match the "start" property of the video before as shown in the example. "start" of video1 matches "end" of video2
+                End and start properties should not contain milliseconds. The "end" property of the last item of type video should be equal to ${this.data?.script?.duration}.
+                If you decide to put a video, the type should be "video", "audio", when it is an audio file. The name should be the corresponding name of the video or audio you
+                decided to put in the video.
+                Audio assets should have a volume of 0.1
                 You will also be provided by a duration that match the duration of the whole video. You can put
                 as many videos or audios as you want, but it should have at least one video playing for the whole video. So the
                 addition of the duration of each video should match the given duration of the final video.

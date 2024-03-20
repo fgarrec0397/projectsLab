@@ -116,6 +116,7 @@ export class VideoProcessingService {
                                     ...video,
                                     videoKey: videoFileName,
                                     thumbnail: thumbnailFileName,
+                                    thumbnailUrl: this.storage.getFileUrl(thumbnailFileName),
                                     duration,
                                 },
                                 VideoStatus.Rendered

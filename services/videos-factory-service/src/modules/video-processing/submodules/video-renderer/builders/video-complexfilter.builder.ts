@@ -56,7 +56,7 @@ export class ComplexFilterBuilder {
 
     addAudio(volume?: number) {
         this.audioComplexFilter.push({
-            adjustedName: volume && `aAdjustedVolume${this.audioCount}`,
+            adjustedName: volume ? `aAdjustedVolume${this.audioCount}` : undefined,
             volume,
         });
         this.incrementAudioCount();
@@ -171,13 +171,17 @@ export class ComplexFilterBuilder {
         );
 
         const volumeModifiers = this.audioComplexFilter
-            .map((audio, index) =>
-                audio.adjustedName
-                    ? `[${index + this.videoWithAudioCount}]volume=0.5[${audio.adjustedName}]`
-                    : undefined
-            )
-            .filter((x) => x !== undefined)
-            .join(";");
+            ? this.audioComplexFilter
+                  .map((audio, index) =>
+                      audio.adjustedName
+                          ? `[${index + this.videoWithAudioCount}:a]volume=${audio.volume}[${
+                                audio.adjustedName
+                            }]`
+                          : undefined
+                  )
+                  .filter((x) => x !== undefined)
+                  .join(";") + ";"
+            : "";
 
         const audioConcatFilter = `${volumeModifiers}[a]${adjustedAudioComplexFilter.join(
             ""

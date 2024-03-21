@@ -106,6 +106,7 @@ export class VideoProcessingService {
                             );
 
                             const duration = await VideoUtils.getVideoDuration(videoPath);
+                            const thumbnailUrl = this.storage.getFileUrl(thumbnailFileName);
 
                             await this.storage.uploadFile(thumbnailPath, thumbnailFileName);
                             await this.storage.uploadFile(videoPath, videoFileName);
@@ -116,7 +117,7 @@ export class VideoProcessingService {
                                     ...video,
                                     videoKey: videoFileName,
                                     thumbnail: thumbnailFileName,
-                                    thumbnailUrl: this.storage.getFileUrl(thumbnailFileName),
+                                    thumbnailUrl,
                                     duration,
                                 },
                                 VideoStatus.Rendered

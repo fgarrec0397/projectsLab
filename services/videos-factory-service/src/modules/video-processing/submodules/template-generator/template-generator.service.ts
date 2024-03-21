@@ -50,7 +50,6 @@ export class TemplateGeneratorService<T extends BaseTemplateData = BaseTemplateD
         await this.generateTemplateByAI();
 
         const template = this.mapAITemplateElementsToTemplateElements();
-        console.log(this.data.script.duration, "duration in template");
         console.log(JSON.stringify(template), "Created template");
 
         return template;
@@ -103,7 +102,7 @@ export class TemplateGeneratorService<T extends BaseTemplateData = BaseTemplateD
                             "type": "audio",
                             "name": "audio_name.mp3",
                             "sourcePath": "the/aws/s3/url/path/audio_name.mp3?additionalparam1=paramvalues1&additionalparam2=paramvalues2",
-                            "volume": 0.1,
+                            "volume": 0.03,
                             "start": 0,
                             "end": 13
                         }
@@ -113,7 +112,7 @@ export class TemplateGeneratorService<T extends BaseTemplateData = BaseTemplateD
                 End and start properties should not contain milliseconds. The "end" property of the last item of type video should be equal to ${this.data?.script?.duration}.
                 If you decide to put a video, the type should be "video", "audio", when it is an audio file. The name should be the corresponding name of the video or audio you
                 decided to put in the video.
-                Audio assets should have a volume of 0.1
+                Audio assets should have a volume of 0.03
                 You will also be provided by a duration that match the duration of the whole video. You can put
                 as many videos or audios as you want, but it should have at least one video playing for the whole video. So the
                 addition of the duration of each video should match the given duration of the final video.
@@ -174,6 +173,7 @@ export class TemplateGeneratorService<T extends BaseTemplateData = BaseTemplateD
                 name: "audio1",
                 sourcePath: this.speechFilePath,
                 isVideoLengthHandler: true,
+                volume: 1.2,
             }),
             new VideoEntities.Text({
                 name: "text",

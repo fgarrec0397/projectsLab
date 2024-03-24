@@ -116,7 +116,7 @@ export class VideoProcessingService {
                                 {
                                     ...video,
                                     videoKey: videoFileName,
-                                    thumbnail: thumbnailFileName,
+                                    thumbnailKey: thumbnailFileName,
                                     thumbnailUrl,
                                     duration,
                                 },

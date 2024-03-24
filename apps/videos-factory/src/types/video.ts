@@ -26,12 +26,12 @@ export type IVideo = {
     structureType: string;
     pace: string;
     moreSpecificities?: string;
-    files: string[];
+    files?: string[];
     status: VideoStatus;
     duration?: number;
     videoKey?: string;
     videoUrl?: string;
-    thumbnail?: string;
+    thumbnailKey?: string;
     thumbnailUrl?: string;
     createdAt: number;
     updatedAt: number;

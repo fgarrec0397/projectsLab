@@ -33,7 +33,7 @@ export default function VideosListVideoCard({ video }: Props) {
     const popover = usePopover();
     const router = useRouter();
     const deleteVideo = useDeleteVideo();
-    const thumbnail = video.thumbnail || "https://placehold.co/135x240";
+    const thumbnail = video.thumbnailKey || "https://placehold.co/135x240";
 
     const handleDeleteVideo = async () => {
         await deleteVideo(video.id);

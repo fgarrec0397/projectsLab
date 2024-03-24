@@ -31,7 +31,7 @@ export default function VideosDetailsView({ videoId }: Props) {
     const theme = useTheme();
 
     const files = useMemo(
-        () => allFiles.filter((x) => video?.files.includes(x.id)),
+        () => allFiles.filter((x) => video?.files?.includes(x.id)),
         [video, allFiles]
     );
 

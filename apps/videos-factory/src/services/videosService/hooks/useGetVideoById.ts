@@ -12,7 +12,7 @@ import { useOnVideoUpdate } from "./useOnVideoUpdate";
 export const useGetVideoById = (videoId?: string) => {
     const auth = useAuthContext();
 
-    const { data, isLoading, error, isValidating, mutate } = useSWR<IVideo>(
+    const { data, isLoading, error, isValidating, mutate } = useSWR<IVideo | string>(
         [auth.user?.accessToken, videoId, "video"],
         () => getVideoById(auth.user?.accessToken, videoId),
         {
@@ -36,7 +36,7 @@ export const useGetVideoById = (videoId?: string) => {
 
     const memoizedResponse = useMemo(
         () => ({
-            video: data,
+            video: typeof data === "string" ? undefined : data,
             isVideoLoading: isLoading,
             videoError: error,
             isVideoValidating: isValidating,

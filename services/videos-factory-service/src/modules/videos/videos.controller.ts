@@ -1,4 +1,16 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post, Query, Req } from "@nestjs/common";
+import {
+    Body,
+    Controller,
+    Delete,
+    Get,
+    HttpException,
+    HttpStatus,
+    Param,
+    Patch,
+    Post,
+    Query,
+    Req,
+} from "@nestjs/common";
 import { Request } from "express";
 import { UseCache } from "src/common/cache/decorators/use-cache.decorator";
 import { UseInvalidateCache } from "src/common/cache/decorators/use-invalidate-cache.decorator";
@@ -21,7 +33,13 @@ export class VideosController {
     @Get("/:videoId")
     @UseCache(useVideoByIdCacheKey, VIDEOS_CACHE_DURATION)
     async getVideoById(@Req() request: Request, @Param("videoId") videoId: string) {
-        return this.videosService.getVideoById(request.userId, videoId);
+        try {
+            const video = await this.videosService.getVideoById(request.userId, videoId);
+
+            return video;
+        } catch (error) {
+            return new HttpException("Video not found", HttpStatus.NOT_FOUND);
+        }
     }
 
     @Get("/videoUrl/:videoId")

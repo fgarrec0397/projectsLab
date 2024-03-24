@@ -37,7 +37,7 @@ export type IVideo = {
     files: string[];
     status: VideoStatus;
     duration?: number;
-    thumbnail?: string;
+    thumbnailKey?: string;
     thumbnailUrl?: string;
     videoKey?: string;
     videoUrl?: string;

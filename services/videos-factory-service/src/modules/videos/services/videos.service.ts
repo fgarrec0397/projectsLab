@@ -28,21 +28,30 @@ export class VideosService {
 
         const videosWithThumbnail = videos.map((x) => ({
             ...x,
-            thumbnailUrl: this.storage.getFileUrl(x.thumbnail, VIDEOS_CACHE_DURATION),
+            thumbnailUrl: this.storage.getFileUrl(x.thumbnailKey, VIDEOS_CACHE_DURATION),
         }));
 
         return videosWithThumbnail;
     }
 
-    async getVideoById(userId: string, videoId: string) {
+    async getVideoById(userId: string, videoId: string): Promise<IVideo | undefined> {
         const videoCollectionPath = `users/${userId}/videos`;
-        const video = await this.database.findOne<IVideo>(videoCollectionPath, videoId);
 
-        return video;
+        try {
+            const video = await this.database.findOne<IVideo>(videoCollectionPath, videoId);
+
+            return video;
+        } catch (error) {
+            throw new Error("Video not found");
+        }
     }
 
     async getVideoUrlById(userId: string, videoId: string) {
         const video = await this.getVideoById(userId, videoId);
+
+        if (!video) {
+            return;
+        }
 
         return this.storage.getFileUrl(video.videoKey);
     }
@@ -109,8 +118,13 @@ export class VideosService {
 
     async deleteVideo(userId: string, videoId: string) {
         const videoCollectionPath = `users/${userId}/videos`;
+        const video = await this.getVideoById(userId, videoId);
 
-        return this.database.delete(videoCollectionPath, videoId);
+        await this.storage.deleteFiles([video.thumbnailKey, video.videoKey]);
+
+        const deleteResult = await this.database.delete(videoCollectionPath, videoId);
+
+        return deleteResult;
     }
 
     async startRendering(userId: string, video: IVideo) {

@@ -14,13 +14,14 @@ export class CacheService {
 
     async set<TValue>(key: string, value: TValue, httpResponse?: Response, ttl?: number) {
         const lastModified = new Date().toUTCString();
-        const etag = createHash("sha1").update(JSON.stringify(value)).digest("hex");
+        const cachedValue = value || {};
+        const etag = createHash("sha1").update(JSON.stringify(cachedValue)).digest("hex");
 
         httpResponse.setHeader("X-Cache", "MISS");
         httpResponse.setHeader("Cache-Control", "no-cache");
         httpResponse?.setHeader("ETag", etag);
         httpResponse?.setHeader("Last-Modified", lastModified);
-        await this.cacheManager.set(key, { data: value, lastModified, etag }, ttl);
+        await this.cacheManager.set(key, { data: cachedValue, lastModified, etag }, ttl);
     }
 
     async invalidate(key: string, data: any, httpResponse?: Response) {

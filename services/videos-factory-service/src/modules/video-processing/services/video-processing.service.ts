@@ -131,7 +131,9 @@ export class VideoProcessingService {
                         }
                     });
                 } catch (error) {
-                    console.log(error, "yoyo error 2");
+                    throw new Error(
+                        "An issue happened while rendering the video. Please contact us pasting this error message"
+                    );
                 }
 
                 await finalVoiceFolder.cleanUp();

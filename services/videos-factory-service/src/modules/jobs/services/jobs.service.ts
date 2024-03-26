@@ -102,27 +102,26 @@ export class JobsService implements OnModuleInit {
         await userQueue.add(data);
 
         userQueue.on("failed", async (job) => {
-            if (job.attemptsMade === this.maxAttempts) {
-                const videoCollectionPath = `users/${data.userId}/videos`;
+            console.log("failed");
+            const videoCollectionPath = `users/${data.userId}/videos`;
 
-                const failedVideo: IVideo = {
+            const failedVideo: IVideo = {
+                ...data.video,
+                status: VideoStatus.Failed,
+                failedReason: job.failedReason,
+            };
+
+            await this.database.createOrUpdate(videoCollectionPath, failedVideo);
+
+            this.notificationService.notifyClient(data.userId, {
+                event: "videoUpdate",
+                data: {
                     ...data.video,
                     status: VideoStatus.Failed,
                     failedReason: job.failedReason,
-                };
-
-                await this.database.createOrUpdate(videoCollectionPath, failedVideo);
-
-                this.notificationService.notifyClient(data.userId, {
-                    event: "videoUpdate",
-                    data: {
-                        ...data.video,
-                        status: VideoStatus.Failed,
-                        failedReason: job.failedReason,
-                    },
-                    cacheKey: [getVideosCacheKey(data.userId), getVideoByIdCacheKey(data.video.id)],
-                });
-            }
+                },
+                cacheKey: [getVideosCacheKey(data.userId), getVideoByIdCacheKey(data.video.id)],
+            });
         });
     }
 

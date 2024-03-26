@@ -270,12 +270,14 @@ export class S3StorageManager implements StorageStrategy<S3StorageManagerTypes> 
     async deleteFiles(fileIds: string[]): Promise<void> {
         try {
             for (const fileId of fileIds)
-                await this.s3
-                    .deleteObject({
-                        Bucket: this.bucketName,
-                        Key: fileId,
-                    })
-                    .promise();
+                if (fileId) {
+                    await this.s3
+                        .deleteObject({
+                            Bucket: this.bucketName,
+                            Key: fileId,
+                        })
+                        .promise();
+                }
         } catch (error) {
             throw error;
         }

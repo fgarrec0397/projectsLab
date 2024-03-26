@@ -14,7 +14,7 @@ import path from "path";
 @Injectable()
 export class FileSystemService {
     getAssetsPath(assetPath?: string) {
-        return this.getPath("./assets/poc", assetPath || ""); // TODO - config - "./assets/poc"
+        return this.getPath("./assets", assetPath || ""); // TODO - config - "./assets"
     }
 
     getPath(...filePath: string[]) {
@@ -29,8 +29,6 @@ export class FileSystemService {
         try {
             const files = await promises.readdir(directoryPath, { withFileTypes: true });
             const directories = files.filter((x) => x.isDirectory());
-
-            console.log("Folders:", directories);
 
             return directories || [];
         } catch (err) {

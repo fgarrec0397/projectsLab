@@ -170,7 +170,7 @@ export class ComplexFilterBuilder {
                 : `[${index + this.videoWithAudioCount}:a]`
         );
 
-        const volumeModifiers = this.audioComplexFilter
+        let volumeModifiers = this.audioComplexFilter
             ? this.audioComplexFilter
                   .map((audio, index) =>
                       audio.adjustedName
@@ -180,8 +180,12 @@ export class ComplexFilterBuilder {
                           : undefined
                   )
                   .filter((x) => x !== undefined)
-                  .join(";") + ";"
+                  .join(";")
             : "";
+
+        if (volumeModifiers !== "") {
+            volumeModifiers += ";";
+        }
 
         const audioConcatFilter = `${volumeModifiers}[a]${adjustedAudioComplexFilter.join(
             ""

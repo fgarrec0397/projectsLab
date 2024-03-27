@@ -30,10 +30,6 @@ export const paths = {
             byId: (id: string) => `${ROOTS.DASHBOARD}/videos/${id}`,
         },
         fileManager: `${ROOTS.DASHBOARD}/file-manager`,
-        group: {
-            root: `${ROOTS.DASHBOARD}/group`,
-            five: `${ROOTS.DASHBOARD}/group/five`,
-            six: `${ROOTS.DASHBOARD}/group/six`,
-        },
+        billing: `${ROOTS.DASHBOARD}/billing`,
     },
 };

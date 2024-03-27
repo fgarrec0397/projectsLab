@@ -33,6 +33,11 @@ export function useNavData() {
                         path: paths.dashboard.fileManager,
                         icon: ICONS.file,
                     },
+                    {
+                        title: "billing",
+                        path: paths.dashboard.billing,
+                        icon: ICONS.invoice,
+                    },
                 ],
             },
         ],

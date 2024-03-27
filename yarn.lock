@@ -3289,6 +3289,11 @@
   resolved "https://registry.yarnpkg.com/@juggle/resize-observer/-/resize-observer-3.4.0.tgz#08d6c5e20cf7e4cc02fd181c4b0c225cd31dbb60"
   integrity sha512-dfLbk+PwWvFzSxwk3n5ySL0hfBog779o8h68wK/7/APo/7cgyWp5jcXockbxdk5kFRkbeXWm4Fbi9FrdN381sA==
 
+"@lemonsqueezy/lemonsqueezy.js@^2.2.0":
+  version "2.2.0"
+  resolved "https://registry.yarnpkg.com/@lemonsqueezy/lemonsqueezy.js/-/lemonsqueezy.js-2.2.0.tgz#1bd7a50092426223024fe9cd54cd97eb1e08b286"
+  integrity sha512-DsZTeowehSLTESUZ6xxoYPDhoE8BYepWsj3TCqibG7FvB8X1HERPXQlc6E/IeGj22SOfIM997b7GfFkeLWY8pA==
+
 "@ljharb/through@^2.3.11":
   version "2.3.12"
   resolved "https://registry.yarnpkg.com/@ljharb/through/-/through-2.3.12.tgz#c418c43060eee193adce48b15c2206096a28e9ea"

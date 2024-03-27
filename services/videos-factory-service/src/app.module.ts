@@ -3,9 +3,11 @@ import { ConfigModule as EnvConfigModule } from "@nestjs/config";
 
 import { CacheModule } from "./common/cache/cache.module";
 import { FileSystemModule } from "./common/files-system/file-system.module";
+import { PaymentModule } from "./common/payment/payment.module";
 import { BaseWebSocketModule } from "./common/websocket/base-websocket.module";
 import { ConfigModule } from "./config.module";
 import { AuthModule } from "./modules/auth/auth.module";
+import { BillingModule } from "./modules/billing/billing.module";
 import { FilesModule } from "./modules/files/files.module";
 import { JobsModule } from "./modules/jobs/jobs.module";
 import { NotificationsModule } from "./modules/notifications/notifications.module";
@@ -19,12 +21,14 @@ import { VideosModule } from "./modules/videos/videos.module";
         CacheModule,
         FileSystemModule,
         JobsModule,
+        PaymentModule,
         NotificationsModule,
         BaseWebSocketModule,
         AuthModule,
         VideoProcessingModule,
         VideosModule,
         FilesModule,
+        BillingModule,
     ],
 })
 export class AppModule {}

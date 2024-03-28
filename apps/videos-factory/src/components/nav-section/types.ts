@@ -29,7 +29,7 @@ export type NavItemBaseProps = {
     caption?: string;
     disabled?: boolean;
     roles?: string[];
-    children?: any;
+    children?: NavItemBaseProps[];
 };
 
 export type NavItemProps = ListItemButtonProps &

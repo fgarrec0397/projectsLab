@@ -72,6 +72,7 @@ export class PaymentService implements OnModuleInit {
             filter: { storeId: process.env.LEMONSQUEEZY_STORE_ID },
             include: ["variants"],
         });
+        console.log(JSON.stringify(products), "products");
 
         // Loop through all the variants.
         const allVariants = products.data?.included as Variant["data"][] | undefined;
@@ -125,7 +126,7 @@ export class PaymentService implements OnModuleInit {
                 }
 
                 await addVariant({
-                    id: v.id,
+                    id: variant.id,
                     name: variant.name,
                     description: variant.description,
                     price: priceString,

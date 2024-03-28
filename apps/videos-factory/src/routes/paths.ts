@@ -25,11 +25,11 @@ export const paths = {
             create: `${ROOTS.DASHBOARD}/channels/create`,
         },
         videos: {
-            root: `${ROOTS.DASHBOARD}/videos`,
+            root: `${ROOTS.DASHBOARD}`,
             create: `${ROOTS.DASHBOARD}/videos/create`,
             byId: (id: string) => `${ROOTS.DASHBOARD}/videos/${id}`,
         },
         fileManager: `${ROOTS.DASHBOARD}/file-manager`,
-        billing: `${ROOTS.DASHBOARD}/billing`,
+        subscription: `${ROOTS.DASHBOARD}/subscription`,
     },
 };

@@ -6,6 +6,11 @@ import { BillingService } from "./billing.service";
 export class BillingController {
     constructor(private readonly billingService: BillingService) {}
 
+    @Get("plans/sync")
+    syncPlans() {
+        this.billingService.syncPlans();
+    }
+
     @Get("plans")
     getPlans() {
         return this.billingService.getPlans();

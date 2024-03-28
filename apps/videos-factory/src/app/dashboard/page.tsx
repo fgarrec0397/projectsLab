@@ -1,11 +1,11 @@
-import HomeView from "@/sections/home/view";
+import VideosListView from "@/sections/videos/view/videos-list-view";
 
 // ----------------------------------------------------------------------
 
 export const metadata = {
-    title: "Overview | Createify",
+    title: "Videos | Createify",
 };
 
 export default function Page() {
-    return <HomeView />;
+    return <VideosListView />;
 }

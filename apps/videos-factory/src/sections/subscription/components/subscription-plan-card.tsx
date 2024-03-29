@@ -9,13 +9,14 @@ import FreePlanIcon from "@/assets/icons/free-plan-icon";
 import { PrimaryButton } from "@/components/button";
 import Iconify from "@/components/iconify";
 import Label from "@/components/label";
-import { IPlan } from "@/types/billing";
+import { IPlanVariant } from "@/types/billing";
 
 // ----------------------------------------------------------------------
 
 type Props = CardProps & {
-    plan: IPlan;
+    plan: IPlanVariant;
     index: number;
+    isYearly: boolean;
 };
 
 const planDataMapping = {
@@ -30,7 +31,9 @@ const planDataMapping = {
     },
 };
 
-export default function SubscriptionPlanCard({ plan, sx, ...other }: Props) {
+export default function SubscriptionPlanCard({ plan, isYearly, sx, ...other }: Props) {
+    console.log(plan, "plan");
+
     const lists = ["item 1", "item 2", "item 3", "item 4", "item 5"];
     const renderIcon = (
         <Stack direction="row" alignItems="center" justifyContent="space-between">
@@ -54,9 +57,7 @@ export default function SubscriptionPlanCard({ plan, sx, ...other }: Props) {
     const renderPrice = (
         <Stack direction="row">
             <Typography variant="h4">$</Typography>
-
-            <Typography variant="h2">200</Typography>
-
+            <Typography variant="h2">{Number(plan.price) / 100}</Typography>
             <Typography
                 component="span"
                 sx={{
@@ -66,7 +67,7 @@ export default function SubscriptionPlanCard({ plan, sx, ...other }: Props) {
                     typography: "body2",
                 }}
             >
-                / mo
+                / {isYearly ? "year" : "month"}
             </Typography>
         </Stack>
     );

@@ -1,4 +1,4 @@
-export type IPlan = {
+export type IPlanVariant = {
     id: string;
     productId: number;
     productName: string;
@@ -12,4 +12,10 @@ export type IPlan = {
     trialInterval: string;
     trialIntervalCount: number;
     sort: number;
+};
+
+export type IPlan = {
+    id: number;
+    name: string;
+    variants: IPlanVariant[];
 };

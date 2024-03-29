@@ -5,6 +5,7 @@ import Stack from "@mui/material/Stack";
 import Switch from "@mui/material/Switch";
 import Typography from "@mui/material/Typography";
 import Grid from "@mui/system/Unstable_Grid";
+import { ChangeEvent, useState } from "react";
 
 import { IPlan } from "@/types/billing";
 
@@ -32,7 +33,11 @@ const arrow = (
 );
 
 export default function SubscriptionPricinPlans({ plans }: Props) {
-    console.log(plans, "SubscriptionPricinPlans plans");
+    const [isYearly, setIsYearly] = useState(false);
+
+    const handleSwitchChange = (event: ChangeEvent, checked: boolean) => {
+        setIsYearly(checked);
+    };
 
     return (
         <>
@@ -40,7 +45,7 @@ export default function SubscriptionPricinPlans({ plans }: Props) {
                 <Stack direction="row" alignItems="center">
                     <Typography variant="overline">MONTHLY</Typography>
 
-                    <Switch sx={{ mx: 1 }} />
+                    <Switch onChange={handleSwitchChange} sx={{ mx: 1 }} />
 
                     <Box sx={{ position: "relative" }}>
                         <Stack direction="row" sx={{ position: "absolute", left: 12, bottom: 12 }}>
@@ -62,11 +67,14 @@ export default function SubscriptionPricinPlans({ plans }: Props) {
                 </Stack>
             </Box>
             <Grid container spacing={3}>
-                {plans.map((plan, index) => (
-                    <Grid key={plan.id} xs={12} sm={4}>
-                        <PricingCard plan={plan} index={index} />
-                    </Grid>
-                ))}
+                {plans.map((x, index) => {
+                    const plan = isYearly ? x.variants[1] : x.variants[0];
+                    return (
+                        <Grid key={plan.id} xs={12} sm={4}>
+                            <PricingCard plan={plan} isYearly={isYearly} index={index} />
+                        </Grid>
+                    );
+                })}
             </Grid>
         </>
     );

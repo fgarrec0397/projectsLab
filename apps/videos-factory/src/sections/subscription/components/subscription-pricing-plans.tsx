@@ -5,9 +5,10 @@ import Stack from "@mui/material/Stack";
 import Switch from "@mui/material/Switch";
 import Typography from "@mui/material/Typography";
 import Grid from "@mui/system/Unstable_Grid";
-import { ChangeEvent, useState } from "react";
+import { ChangeEvent, useEffect, useState } from "react";
 
 import { IPlan } from "@/types/billing";
+import { configureLemonSqueezy } from "@/utils/lemon-squeezy";
 
 import PricingCard from "./subscription-plan-card";
 
@@ -34,6 +35,10 @@ const arrow = (
 
 export default function SubscriptionPricinPlans({ plans }: Props) {
     const [isYearly, setIsYearly] = useState(false);
+
+    useEffect(() => {
+        configureLemonSqueezy();
+    }, []);
 
     const handleSwitchChange = (event: ChangeEvent, checked: boolean) => {
         setIsYearly(checked);

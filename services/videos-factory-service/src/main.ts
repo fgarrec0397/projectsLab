@@ -20,10 +20,11 @@ async function bootstrap() {
         })
     );
 
-    if (process.env.CORS_ORIGIN_ENABLED) {
+    if (process.env.STORE_FRONT_URL) {
         app.enableCors({
-            origin: process.env.CORS_ORIGIN_ENABLED,
-            credentials: true,
+            origin: "*",
+            // origin: process.env.STORE_FRONT_URL,
+            // credentials: true,
         });
     }
 

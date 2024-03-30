@@ -29,5 +29,8 @@ export const endpoints = {
         plans: {
             get: `${baseURL}/billing/plans`,
         },
+        checkout: {
+            get: `${baseURL}/billing/checkout`,
+        },
     },
 };

@@ -9,6 +9,7 @@ export const getVideos = async (accessToken: string | undefined) => {
         headers: {
             Accept: "application/json",
             Authorization: `Bearer ${accessToken}`,
+            "ngrok-skip-browser-warning": "asd",
         },
     });
 

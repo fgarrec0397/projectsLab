@@ -16,6 +16,12 @@ export const FIREBASE_API = {
     measurementId: process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID,
 };
 
+export const LEMONSQUEEZY_API = {
+    apiKey: process.env.NEXT_PUBLIC_LEMONSQUEEZY_API_KEY,
+    storeId: process.env.NEXT_PUBLIC_LEMONSQUEEZY_STORE_ID,
+    webhookSecret: process.env.NEXT_PUBLIC_LEMONSQUEEZY_WEBHOOK_SECRET,
+};
+
 export const AMPLIFY_API = {
     userPoolId: process.env.NEXT_PUBLIC_AWS_AMPLIFY_USER_POOL_ID,
     userPoolWebClientId: process.env.NEXT_PUBLIC_AWS_AMPLIFY_USER_POOL_WEB_CLIENT_ID,

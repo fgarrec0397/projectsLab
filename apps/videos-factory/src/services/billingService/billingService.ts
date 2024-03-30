@@ -11,8 +11,28 @@ export const getPricingPlans = async (accessToken: string | undefined) => {
         headers: {
             Accept: "application/json",
             Authorization: `Bearer ${accessToken}`,
+            "ngrok-skip-browser-warning": "asd",
         },
     });
 
     return response.data || [];
+};
+
+export const getCheckoutURL = async (
+    accessToken: string | undefined,
+    email: string,
+    variantId: string
+) => {
+    const response = await axiosInstance.get<string>(
+        `${endpoints.billing.checkout.get}?email=${email}&variantId=${variantId}`,
+        {
+            headers: {
+                Accept: "application/json",
+                Authorization: `Bearer ${accessToken}`,
+                "ngrok-skip-browser-warning": "asd",
+            },
+        }
+    );
+
+    return response.data;
 };

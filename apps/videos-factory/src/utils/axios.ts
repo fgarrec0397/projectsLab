@@ -8,6 +8,8 @@ import { showSnackbar } from "./notistackManager";
 
 const axiosInstance = axios.create({ baseURL: HOST_API });
 
+// axiosInstance.interceptors.
+
 axiosInstance.interceptors.response.use(
     (res) => res,
     (error) => {

@@ -1,5 +1,7 @@
-import { Controller, Get } from "@nestjs/common";
+import { Body, Controller, Get, HttpException, Post, Query, Req } from "@nestjs/common";
+import { Request } from "express";
 
+import { Public } from "../auth/decorators/use-public.guard";
 import { BillingService } from "./billing.service";
 
 @Controller("billing")
@@ -14,5 +16,27 @@ export class BillingController {
     @Get("plans")
     getPlans() {
         return this.billingService.getPlans();
+    }
+
+    @Get("checkout")
+    getCheckoutURL(
+        @Req() request: Request,
+        @Query("variantId") variantId: string,
+        @Query("email") email: string
+    ) {
+        return this.billingService.getCheckoutURL(Number(variantId), {
+            userId: request.userId,
+            email,
+        });
+    }
+
+    @Post("webhook")
+    @Public()
+    async catchWebhook(@Req() request: Request, @Body() body: Body) {
+        console.log("webhook triggered");
+        console.log(body, "body");
+        console.log(request.headers, "request.headers");
+
+        // await this.billingService.handleWebhook(body);
     }
 }

@@ -11,6 +11,8 @@ import Iconify from "@/components/iconify";
 import Label from "@/components/label";
 import { IPlanVariant } from "@/types/billing";
 
+import SubscriptionPlanButton from "./subscription-plan-button";
+
 // ----------------------------------------------------------------------
 
 type Props = CardProps & {
@@ -48,9 +50,12 @@ export default function SubscriptionPlanCard({ plan, isYearly, sx, ...other }: P
     const renderSubscription = (
         <Stack spacing={1}>
             <Typography variant="h4" sx={{ textTransform: "capitalize" }}>
-                subscription
+                {plan.productName}
             </Typography>
-            <Typography variant="subtitle2">Caption</Typography>
+            <Typography
+                variant="subtitle2"
+                dangerouslySetInnerHTML={{ __html: plan.description }}
+            ></Typography>
         </Stack>
     );
 
@@ -123,15 +128,7 @@ export default function SubscriptionPlanCard({ plan, isYearly, sx, ...other }: P
 
                     {renderList}
 
-                    <PrimaryButton
-                        fullWidth
-                        size="large"
-                        variant="contained"
-                        // disabled={basic}
-                        // color={starter ? "primary" : "inherit"}
-                    >
-                        {"test"}
-                    </PrimaryButton>
+                    <SubscriptionPlanButton plan={plan} />
                 </Stack>
             </CardContent>
         </Card>

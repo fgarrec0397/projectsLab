@@ -1,6 +1,8 @@
 import "@/global.css";
 import "@/locales/i18n";
 
+import Script from "next/script";
+
 import { AuthProvider } from "@/auth/context/firebase";
 import { MotionLazy } from "@/components/animate/motion-lazy";
 import ProgressBar from "@/components/progress-bar";
@@ -69,6 +71,10 @@ export default function RootLayout({ children }: Props) {
                         </SettingsProvider>
                     </LocalizationProvider>
                 </AuthProvider>
+                <Script
+                    src="https://app.lemonsqueezy.com/js/lemon.js"
+                    strategy="lazyOnload"
+                ></Script>
             </body>
         </html>
     );

@@ -1,6 +1,6 @@
 import crypto from "node:crypto";
 
-import { Injectable } from "@nestjs/common";
+import { HttpException, HttpStatus, Injectable, RawBodyRequest } from "@nestjs/common";
 import { Request } from "express";
 import { Plan } from "src/common/payment/payment.type";
 import { PaymentService } from "src/common/payment/services/payment.service";
@@ -60,7 +60,7 @@ export class BillingService {
         return this.payment.getCheckoutURL(variantId, user);
     }
 
-    async handleWebhook(body: Body) {
+    async handleWebhook(request: RawBodyRequest<Request>) {
         if (!process.env.LEMONSQUEEZY_WEBHOOK_SECRET) {
             return new Response("Lemon Squeezy Webhook Secret not set in .env", {
                 status: 500,
@@ -68,18 +68,18 @@ export class BillingService {
         }
 
         // First, make sure the request is from Lemon Squeezy.
-        const rawBody = await body.text();
+        const rawBody = request.rawBody;
         const secret = process.env.LEMONSQUEEZY_WEBHOOK_SECRET;
 
         const hmac = crypto.createHmac("sha256", secret);
-        const digest = Buffer.from(hmac.update(rawBody).digest("hex"), "utf8");
-        const signature = Buffer.from((body as any).headers?.get("X-Signature") || "", "utf8");
+        const digest = Buffer.from(hmac.update(request.rawBody).digest("hex"), "utf8");
+        const signature = Buffer.from(request.get("X-Signature") || "", "utf8");
 
         if (!crypto.timingSafeEqual(digest, signature)) {
             throw new Error("Invalid signature.");
         }
 
-        const data = JSON.parse(rawBody) as unknown;
+        const data = JSON.parse(rawBody as any) as unknown;
 
         // Type guard to check if the object has a 'meta' property.
         if (this.webhookHasMeta(data)) {
@@ -88,13 +88,15 @@ export class BillingService {
                 data
             );
 
+            console.log(webhookEventId, "webhookEventId");
+
             // Non-blocking call to process the webhook event.
             void this.payment.processWebhookEvent(webhookEventId);
 
-            return new Response("OK", { status: 200 });
+            return { status: 200 };
         }
 
-        return new Response("Data invalid", { status: 400 });
+        throw new HttpException("Data invalid", HttpStatus.BAD_REQUEST);
     }
 
     private webhookHasMeta(data: any) {

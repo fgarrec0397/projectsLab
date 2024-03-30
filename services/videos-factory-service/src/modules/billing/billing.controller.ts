@@ -1,4 +1,13 @@
-import { Body, Controller, Get, HttpException, Post, Query, Req } from "@nestjs/common";
+import {
+    Body,
+    Controller,
+    Get,
+    HttpException,
+    Post,
+    Query,
+    RawBodyRequest,
+    Req,
+} from "@nestjs/common";
 import { Request } from "express";
 
 import { Public } from "../auth/decorators/use-public.guard";
@@ -32,11 +41,11 @@ export class BillingController {
 
     @Post("webhook")
     @Public()
-    async catchWebhook(@Req() request: Request, @Body() body: Body) {
+    async catchWebhook(@Req() request: RawBodyRequest<Request>, @Body() body: Body) {
         console.log("webhook triggered");
         console.log(body, "body");
         console.log(request.headers, "request.headers");
 
-        // await this.billingService.handleWebhook(body);
+        await this.billingService.handleWebhook(request);
     }
 }

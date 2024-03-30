@@ -139,19 +139,20 @@ export class PaymentService implements OnModuleInit {
         return productVariants;
     }
 
-    async getCheckoutURL(
-        variantId: number,
-        user: { userId?: string; email: string },
-        embed = false
-    ) {
+    async getCheckoutURL(variantId: number, user: { userId?: string; email: string }) {
         console.log(variantId, "variantId");
         console.log(process.env.STORE_FRONT_URL, "process.env.STORE_FRONT_URL");
 
         try {
             const checkout = await createCheckout(process.env.LEMONSQUEEZY_STORE_ID!, variantId, {
+                checkoutData: {
+                    email: user.email ?? undefined,
+                    custom: {
+                        user_id: user.userId,
+                    },
+                },
                 productOptions: {
                     enabledVariants: [variantId],
-                    // redirectUrl: `${process.env.STORE_FRONT_URL}/billing/`,
                     redirectUrl: `${process.env.STORE_FRONT_URL}/dashboard/`,
                     receiptButtonText: "Go to Dashboard",
                 },
@@ -165,8 +166,8 @@ export class PaymentService implements OnModuleInit {
         }
     }
 
-    async storeWebhookEvent(eventName: string, body: WebhookEvent["body"]) {
-        const id = crypto.randomInt(100000000, 1000000000);
+    async storeWebhookEvent(eventName: string, body: WebhookEvent["body"]): Promise<WebhookEvent> {
+        const id = uidGenerator();
 
         // Attempt to find an existing document
         const existingDoc = await this.database.findOne("webhookEvents", String(id));
@@ -179,36 +180,31 @@ export class PaymentService implements OnModuleInit {
 
         // If no existing document, insert the new document
         try {
-            await this.database.create("webhookEvents", {
+            const webhookEvent: WebhookEvent = {
                 id,
                 eventName,
                 processed: false,
                 body,
-            });
+                createdAt: new Date().getTime(),
+                processingError: "",
+            };
+            await this.database.createOrUpdate("webhookEvents", webhookEvent);
 
-            // Optional: If you need the document's data right after insertion, fetch it here
-            // This is an additional step, not a direct part of the insertion
-            const insertedDoc = await this.database.findOne<WebhookEvent>(
-                "webhookEvents",
-                String(id)
-            );
-            return insertedDoc;
+            return webhookEvent;
         } catch (error) {
             console.error(`Failed to insert webhook event: ${error}`);
             throw error; // Rethrow or handle as appropriate for your application
         }
-
-        // return returnedValue[0];
     }
 
     async processWebhookEvent(webhookEvent: WebhookEvent) {
-        const dbwebhookEvent = await this.database.findOne("webhookEvents", webhookEvent.id);
+        // const dbwebhookEvent = await this.database.findOne("webhookEvents", webhookEvent.id);
 
-        if (!process.env.WEBHOOK_URL) {
-            throw new Error(
-                "Missing required WEBHOOK_URL env variable. Please, set it in your .env file."
-            );
-        }
+        // if (!process.env.WEBHOOK_URL) {
+        //     throw new Error(
+        //         "Missing required WEBHOOK_URL env variable. Please, set it in your .env file."
+        //     );
+        // }
 
         let processingError = "";
         const eventBody = webhookEvent.body;

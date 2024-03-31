@@ -6,7 +6,9 @@ import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
 import { useMemo } from "react";
 
+import EssentialsPlanIcon from "@/assets/icons/essentials-plan-icon";
 import FreePlanIcon from "@/assets/icons/free-plan-icon";
+import GrowthPlanIcon from "@/assets/icons/growth-plan-icon";
 import Iconify from "@/components/iconify";
 import Label from "@/components/label";
 import { IPlanVariant } from "@/types/billing";
@@ -26,11 +28,11 @@ const planDataMapping = {
         icon: <FreePlanIcon />,
     },
     Essentials: {
-        icon: <FreePlanIcon />,
+        icon: <EssentialsPlanIcon />,
         isPopular: true,
     },
     Growth: {
-        icon: <FreePlanIcon />,
+        icon: <GrowthPlanIcon />,
         isAdvantaged: true,
     },
 };

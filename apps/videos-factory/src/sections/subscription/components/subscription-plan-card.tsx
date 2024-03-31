@@ -4,9 +4,9 @@ import Card, { CardProps } from "@mui/material/Card";
 import Divider from "@mui/material/Divider";
 import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
+import { useMemo } from "react";
 
 import FreePlanIcon from "@/assets/icons/free-plan-icon";
-import { PrimaryButton } from "@/components/button";
 import Iconify from "@/components/iconify";
 import Label from "@/components/label";
 import { IPlanVariant } from "@/types/billing";
@@ -27,23 +27,43 @@ const planDataMapping = {
     },
     Essentials: {
         icon: <FreePlanIcon />,
+        isPopular: true,
     },
     Growth: {
         icon: <FreePlanIcon />,
+        isAdvantaged: true,
     },
 };
 
 export default function SubscriptionPlanCard({ plan, isYearly, sx, ...other }: Props) {
-    console.log(plan, "plan");
+    console.log(plan.description, "plan.description");
 
-    const lists = ["item 1", "item 2", "item 3", "item 4", "item 5"];
+    const parsedDescription = useMemo(() => {
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(plan.description, "text/html");
+
+        // Get the first paragraph's text
+        const description = doc.querySelector("p")?.textContent?.trim() || "";
+
+        // Get all the featuresLists
+        const featuresLists = Array.from(doc.querySelectorAll("ul")).map((ul) =>
+            Array.from(ul.querySelectorAll("li p")).map((li) => li.textContent?.trim() || "")
+        );
+
+        return { description, featuresLists };
+    }, [plan.description]);
+
+    console.log(parsedDescription);
+
     const renderIcon = (
         <Stack direction="row" alignItems="center" justifyContent="space-between">
             <Box sx={{ width: 48, height: 48 }}>
                 {(planDataMapping as any)[plan.productName as any]?.icon}
             </Box>
 
-            {<Label color="info">POPULAR</Label>}
+            {(planDataMapping as any)[plan.productName as any]?.isPopular && (
+                <Label color="info">POPULAR</Label>
+            )}
         </Stack>
     );
 
@@ -52,10 +72,7 @@ export default function SubscriptionPlanCard({ plan, isYearly, sx, ...other }: P
             <Typography variant="h4" sx={{ textTransform: "capitalize" }}>
                 {plan.productName}
             </Typography>
-            <Typography
-                variant="subtitle2"
-                dangerouslySetInnerHTML={{ __html: plan.description }}
-            ></Typography>
+            <Typography variant="subtitle2">{parsedDescription.description}</Typography>
         </Stack>
     );
 
@@ -77,15 +94,15 @@ export default function SubscriptionPlanCard({ plan, isYearly, sx, ...other }: P
         </Stack>
     );
 
-    const renderList = (
-        <Stack spacing={2}>
+    const renderLists = parsedDescription.featuresLists.map((list, index) => (
+        <Stack key={index} spacing={2}>
             <Stack direction="row" alignItems="center" justifyContent="space-between">
                 <Box component="span" sx={{ typography: "overline" }}>
-                    Features
+                    {index > 0 ? "Plus" : "Features"}
                 </Box>
             </Stack>
 
-            {lists.map((item) => (
+            {list?.map((item) => (
                 <Stack
                     key={item}
                     spacing={1}
@@ -100,7 +117,7 @@ export default function SubscriptionPlanCard({ plan, isYearly, sx, ...other }: P
                 </Stack>
             ))}
         </Stack>
-    );
+    ));
 
     return (
         <Card>
@@ -126,7 +143,7 @@ export default function SubscriptionPlanCard({ plan, isYearly, sx, ...other }: P
 
                     <Divider sx={{ borderStyle: "dashed" }} />
 
-                    {renderList}
+                    {renderLists}
 
                     <SubscriptionPlanButton plan={plan} />
                 </Stack>

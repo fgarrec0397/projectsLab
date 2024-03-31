@@ -6,8 +6,6 @@ import { Plan } from "src/common/payment/payment.type";
 import { PaymentService } from "src/common/payment/services/payment.service";
 import { DatabaseConfig, InjectDatabase } from "src/config/database-config.module";
 
-// import { processWebhookEvent, storeWebhookEvent } from "@/app/actions";
-
 type MappedPlan = {
     id: number;
     name: string;
@@ -49,9 +47,6 @@ export class BillingService {
 
             mappedPlans[planIndex].variants.push(x);
         });
-
-        // console.log(JSON.stringify(plans), "plans");
-        // console.log(JSON.stringify(mappedPlans), "mappedPlans");
 
         return mappedPlans;
     }

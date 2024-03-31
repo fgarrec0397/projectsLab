@@ -1,5 +1,3 @@
-import crypto from "node:crypto";
-
 import {
     createCheckout,
     getPrice,
@@ -80,6 +78,7 @@ export class PaymentService implements OnModuleInit {
         const allVariants = products.data?.included as Variant["data"][] | undefined;
 
         if (allVariants) {
+            console.log(JSON.stringify(allVariants), "allVariants");
             for (const [index, v] of allVariants.entries()) {
                 const variant = v.attributes;
 
@@ -100,6 +99,7 @@ export class PaymentService implements OnModuleInit {
                 });
 
                 const currentPriceObj = variantPriceObject.data?.data.at(0);
+                console.log(currentPriceObj, "currentPriceObj");
                 const isUsageBased = currentPriceObj?.attributes.usage_aggregation !== null;
                 const interval = currentPriceObj?.attributes.renewal_interval_unit;
                 const intervalCount = currentPriceObj?.attributes.renewal_interval_quantity;
@@ -112,9 +112,11 @@ export class PaymentService implements OnModuleInit {
 
                 const priceString = price !== null ? price?.toString() ?? "" : "";
 
-                const isSubscription = currentPriceObj?.attributes.category === "subscription";
+                const isFreePlan = currentPriceObj?.attributes.category === "lead_magnet";
+                const canAddVariant =
+                    currentPriceObj?.attributes.category === "subscription" || isFreePlan;
 
-                if (!isSubscription) {
+                if (!canAddVariant) {
                     continue;
                 }
 
@@ -131,7 +133,7 @@ export class PaymentService implements OnModuleInit {
                     variantId: parseInt(v.id) as unknown as number,
                     trialInterval,
                     trialIntervalCount,
-                    sort: index,
+                    sort: isFreePlan ? 0 : index,
                 });
             }
         }

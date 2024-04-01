@@ -6,10 +6,9 @@ import Stack from "@mui/material/Stack";
 import Switch from "@mui/material/Switch";
 import Typography from "@mui/material/Typography";
 import Grid from "@mui/system/Unstable_Grid";
-import { ChangeEvent, useEffect, useState } from "react";
+import { ChangeEvent, useState } from "react";
 
 import { IPlan } from "@/types/billing";
-import { configureLemonSqueezy } from "@/utils/lemon-squeezy";
 
 import PricingCard from "./subscription-plan-card";
 
@@ -35,13 +34,9 @@ const arrow = (
 );
 
 export default function SubscriptionPricinPlans({ plans }: Props) {
-    const [isYearly, setIsYearly] = useState(false);
+    const [isYearly, setIsYearly] = useState(true);
     const theme = useTheme();
     const isDesktop = useMediaQuery(theme.breakpoints.up("md"));
-
-    useEffect(() => {
-        configureLemonSqueezy();
-    }, []);
 
     const handleSwitchChange = (event: ChangeEvent, checked: boolean) => {
         setIsYearly(checked);
@@ -53,7 +48,7 @@ export default function SubscriptionPricinPlans({ plans }: Props) {
                 <Stack direction="row" alignItems="center">
                     <Typography variant="overline">MONTHLY</Typography>
 
-                    <Switch onChange={handleSwitchChange} sx={{ mx: 1 }} />
+                    <Switch checked={isYearly} onChange={handleSwitchChange} sx={{ mx: 1 }} />
 
                     <Box sx={{ position: "relative" }}>
                         <Stack direction="row" sx={{ position: "absolute", left: 12, bottom: 12 }}>
@@ -66,7 +61,7 @@ export default function SubscriptionPricinPlans({ plans }: Props) {
                                     typography: "overline",
                                 }}
                             >
-                                save 10%
+                                save 20%
                             </Box>
                         </Stack>
 

@@ -1,7 +1,6 @@
 import { CardActions, CardContent, useMediaQuery, useTheme } from "@mui/material";
 import Box from "@mui/material/Box";
 import Card from "@mui/material/Card";
-import Divider from "@mui/material/Divider";
 import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
 import { visuallyHidden } from "@mui/utils";
@@ -11,10 +10,12 @@ import EssentialsPlanIcon from "@/assets/icons/essentials-plan-icon";
 import FreePlanIcon from "@/assets/icons/free-plan-icon";
 import GrowthPlanIcon from "@/assets/icons/growth-plan-icon";
 import Iconify from "@/components/iconify";
-import Label from "@/components/label";
+import { pxToRem } from "@/theme/typography";
 import { IPlanVariant } from "@/types/billing";
+import { getPrice } from "@/utils/lemon-squeezy";
 
 import SubscriptionPlanButton from "./subscription-plan-button";
+import SubscriptionPlanLabel from "./subscription-plan-label";
 
 // ----------------------------------------------------------------------
 
@@ -34,13 +35,16 @@ const planDataMapping = {
     },
     Growth: {
         icon: <GrowthPlanIcon />,
-        isAdvantaged: true,
+        isBestDeal: true,
     },
 };
 
 export default function SubscriptionPlanCard({ plan, isYearly }: Props) {
     const theme = useTheme();
     const isTablet = useMediaQuery(theme.breakpoints.between("sm", "md"));
+    const mappedPlanData = (planDataMapping as any)[plan.productName as any];
+    const isPopular = mappedPlanData?.isPopular;
+    const isBestDeal = mappedPlanData?.isBestDeal;
 
     const parsedDescription = useMemo(() => {
         const parser = new DOMParser();
@@ -55,13 +59,30 @@ export default function SubscriptionPlanCard({ plan, isYearly }: Props) {
         return { description, featuresLists };
     }, [plan.description]);
 
+    const renderPopularLabel = (isTopRight?: boolean) => (
+        <SubscriptionPlanLabel
+            text="POPULAR"
+            icon="medal-ribbon-star"
+            color="success"
+            isTopRight={isTopRight}
+        />
+    );
+
+    const renderBestDealLabel = (isTopRight?: boolean) => (
+        <SubscriptionPlanLabel
+            text="BEST DEAL"
+            icon="crown-star"
+            color="secondary"
+            isTopRight={isTopRight}
+        />
+    );
+
     const renderIcon = (
         <Stack direction="row" alignItems="center" justifyContent="space-between">
-            <Box sx={{ height: 48 }}>{(planDataMapping as any)[plan.productName as any]?.icon}</Box>
+            <Box sx={{ height: 48 }}>{mappedPlanData?.icon}</Box>
 
-            {(planDataMapping as any)[plan.productName as any]?.isPopular && (
-                <Label color="info">POPULAR</Label>
-            )}
+            {isPopular && !isTablet && renderPopularLabel()}
+            {isBestDeal && !isTablet && renderBestDealLabel()}
         </Stack>
     );
 
@@ -70,14 +91,22 @@ export default function SubscriptionPlanCard({ plan, isYearly }: Props) {
             <Typography variant="h4" sx={{ textTransform: "capitalize", ...visuallyHidden }}>
                 {plan.productName}
             </Typography>
-            <Typography variant="subtitle2">{parsedDescription.description}</Typography>
+            <Typography
+                variant="subtitle2"
+                minHeight={44}
+                sx={{ my: 2, display: "flex", alignItems: "center" }}
+            >
+                {parsedDescription.description}
+            </Typography>
         </Stack>
     );
 
     const renderPrice = (
-        <Stack direction="row">
+        <Stack direction="row" flexWrap="wrap" alignItems="center" minHeight={78}>
             <Typography variant="h4">$</Typography>
-            <Typography variant="h2">{Number(plan.price) / 100}</Typography>
+            <Typography variant="h2">
+                {isYearly ? getPrice(plan.price) / 12 : getPrice(plan.price)}
+            </Typography>
             <Typography
                 component="span"
                 sx={{
@@ -87,8 +116,22 @@ export default function SubscriptionPlanCard({ plan, isYearly }: Props) {
                     typography: "body2",
                 }}
             >
-                / {isYearly ? "year" : "month"}
+                / month
             </Typography>
+            {isYearly && (
+                <Typography
+                    component="span"
+                    sx={{
+                        alignSelf: "center",
+                        color: "text.disabled",
+                        typography: "body2",
+                        ml: 2,
+                        fontSize: pxToRem(12),
+                    }}
+                >
+                    Billed annually
+                </Typography>
+            )}
         </Stack>
     );
 
@@ -126,9 +169,13 @@ export default function SubscriptionPlanCard({ plan, isYearly }: Props) {
                 height: "100%",
             }}
         >
-            <CardContent sx={{ p: 4, pb: 2 }}>
-                <Stack spacing={4} flexDirection={isTablet ? "row" : "column"}>
-                    <Stack spacing={4}>
+            <CardContent sx={{ p: { xs: 2, md: 4 }, pb: 2 }}>
+                <Stack
+                    spacing={4}
+                    flexDirection={isTablet ? "row" : "column"}
+                    sx={{ position: "relative" }}
+                >
+                    <Stack>
                         {renderIcon}
 
                         {renderSubscription}
@@ -136,9 +183,11 @@ export default function SubscriptionPlanCard({ plan, isYearly }: Props) {
                         {renderPrice}
                     </Stack>
 
-                    <Divider sx={{ borderStyle: "dashed" }} />
+                    {/* <Divider sx={{ borderStyle: "dashed" }} /> */}
 
                     {renderLists}
+                    {isPopular && isTablet && renderPopularLabel(true)}
+                    {isBestDeal && isTablet && renderBestDealLabel(true)}
                 </Stack>
             </CardContent>
             <CardActions sx={{ p: 4 }}>

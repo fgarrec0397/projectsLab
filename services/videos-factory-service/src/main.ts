@@ -24,8 +24,8 @@ async function bootstrap() {
 
     if (process.env.STORE_FRONT_URL) {
         app.enableCors({
-            origin: "*",
-            // origin: process.env.STORE_FRONT_URL,
+            // origin: "*",
+            origin: process.env.STORE_FRONT_URL,
             // credentials: true,
         });
     }

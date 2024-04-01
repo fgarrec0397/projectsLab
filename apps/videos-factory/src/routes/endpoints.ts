@@ -25,12 +25,12 @@ export const endpoints = {
             save: `${baseURL}/videos/draft/save`,
         },
     },
-    billing: {
-        plans: {
-            get: `${baseURL}/billing/plans`,
-        },
+    subscriptions: {
         checkout: {
             get: `${baseURL}/billing/checkout`,
         },
+    },
+    plans: {
+        get: `${baseURL}/plans`,
     },
 };

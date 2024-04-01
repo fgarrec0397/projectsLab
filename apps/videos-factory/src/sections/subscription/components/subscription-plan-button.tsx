@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 
 import { useAuthContext } from "@/auth/hooks";
 import { PrimaryButton } from "@/components/button";
-import { getCheckoutURL } from "@/services/billingService/billingService";
+import { getCheckoutURL } from "@/services/subscriptionsService/subscriptionsService";
 import { IPlanVariant } from "@/types/billing";
 
 // ----------------------------------------------------------------------

@@ -3,7 +3,7 @@
 import { Typography } from "@mui/material";
 
 import PageWrapper from "@/components/page-wrapper/page-wrapper";
-import { useGetPricingPlans } from "@/services/billingService/hooks/useGetPricingPlans";
+import { useGetPricingPlans } from "@/services/plansService/hooks/useGetPricingPlans";
 
 import SubscriptionPricinPlans from "../components/subscription-pricing-plans";
 

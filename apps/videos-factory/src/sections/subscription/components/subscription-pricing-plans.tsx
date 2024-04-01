@@ -1,5 +1,6 @@
 "use client";
 
+import { useMediaQuery, useTheme } from "@mui/material";
 import Box from "@mui/material/Box";
 import Stack from "@mui/material/Stack";
 import Switch from "@mui/material/Switch";
@@ -35,6 +36,8 @@ const arrow = (
 
 export default function SubscriptionPricinPlans({ plans }: Props) {
     const [isYearly, setIsYearly] = useState(false);
+    const theme = useTheme();
+    const isDesktop = useMediaQuery(theme.breakpoints.up("md"));
 
     useEffect(() => {
         configureLemonSqueezy();
@@ -71,11 +74,15 @@ export default function SubscriptionPricinPlans({ plans }: Props) {
                     </Box>
                 </Stack>
             </Box>
-            <Grid container spacing={3}>
+            <Grid
+                container
+                spacing={{ xs: 2, sm: 3, md: 4, xl: 6 }}
+                direction={isDesktop ? "row" : "column-reverse"}
+            >
                 {plans.map((x, index) => {
                     const plan = isYearly ? x.variants[1] : x.variants[0];
                     return (
-                        <Grid key={plan.id} xs={12} sm={4}>
+                        <Grid key={plan.id} xs={12} md={4}>
                             <PricingCard plan={plan} isYearly={isYearly} index={index} />
                         </Grid>
                     );

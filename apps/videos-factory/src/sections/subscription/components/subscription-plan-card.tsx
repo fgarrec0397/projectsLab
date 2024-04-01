@@ -1,9 +1,10 @@
-import { CardContent } from "@mui/material";
+import { CardActions, CardContent, useMediaQuery, useTheme } from "@mui/material";
 import Box from "@mui/material/Box";
-import Card, { CardProps } from "@mui/material/Card";
+import Card from "@mui/material/Card";
 import Divider from "@mui/material/Divider";
 import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
+import { visuallyHidden } from "@mui/utils";
 import { useMemo } from "react";
 
 import EssentialsPlanIcon from "@/assets/icons/essentials-plan-icon";
@@ -17,7 +18,7 @@ import SubscriptionPlanButton from "./subscription-plan-button";
 
 // ----------------------------------------------------------------------
 
-type Props = CardProps & {
+type Props = {
     plan: IPlanVariant;
     index: number;
     isYearly: boolean;
@@ -37,17 +38,16 @@ const planDataMapping = {
     },
 };
 
-export default function SubscriptionPlanCard({ plan, isYearly, sx, ...other }: Props) {
-    console.log(plan.description, "plan.description");
+export default function SubscriptionPlanCard({ plan, isYearly }: Props) {
+    const theme = useTheme();
+    const isTablet = useMediaQuery(theme.breakpoints.between("sm", "md"));
 
     const parsedDescription = useMemo(() => {
         const parser = new DOMParser();
         const doc = parser.parseFromString(plan.description, "text/html");
 
-        // Get the first paragraph's text
         const description = doc.querySelector("p")?.textContent?.trim() || "";
 
-        // Get all the featuresLists
         const featuresLists = Array.from(doc.querySelectorAll("ul")).map((ul) =>
             Array.from(ul.querySelectorAll("li p")).map((li) => li.textContent?.trim() || "")
         );
@@ -55,13 +55,9 @@ export default function SubscriptionPlanCard({ plan, isYearly, sx, ...other }: P
         return { description, featuresLists };
     }, [plan.description]);
 
-    console.log(parsedDescription);
-
     const renderIcon = (
         <Stack direction="row" alignItems="center" justifyContent="space-between">
-            <Box sx={{ width: 48, height: 48 }}>
-                {(planDataMapping as any)[plan.productName as any]?.icon}
-            </Box>
+            <Box sx={{ height: 48 }}>{(planDataMapping as any)[plan.productName as any]?.icon}</Box>
 
             {(planDataMapping as any)[plan.productName as any]?.isPopular && (
                 <Label color="info">POPULAR</Label>
@@ -71,7 +67,7 @@ export default function SubscriptionPlanCard({ plan, isYearly, sx, ...other }: P
 
     const renderSubscription = (
         <Stack spacing={1}>
-            <Typography variant="h4" sx={{ textTransform: "capitalize" }}>
+            <Typography variant="h4" sx={{ textTransform: "capitalize", ...visuallyHidden }}>
                 {plan.productName}
             </Typography>
             <Typography variant="subtitle2">{parsedDescription.description}</Typography>
@@ -122,34 +118,32 @@ export default function SubscriptionPlanCard({ plan, isYearly, sx, ...other }: P
     ));
 
     return (
-        <Card>
-            <CardContent>
-                <Stack
-                    spacing={5}
-                    sx={{
-                        p: 5,
-                        borderRadius: 2,
-                        boxShadow: (theme) => ({
-                            xs: theme.customShadows.card,
-                            md: "none",
-                        }),
-                        ...sx,
-                    }}
-                    {...other}
-                >
-                    {renderIcon}
+        <Card
+            sx={{
+                display: "flex",
+                flexDirection: "column",
+                justifyContent: "space-between",
+                height: "100%",
+            }}
+        >
+            <CardContent sx={{ p: 4, pb: 2 }}>
+                <Stack spacing={4} flexDirection={isTablet ? "row" : "column"}>
+                    <Stack spacing={4}>
+                        {renderIcon}
 
-                    {renderSubscription}
+                        {renderSubscription}
 
-                    {renderPrice}
+                        {renderPrice}
+                    </Stack>
 
                     <Divider sx={{ borderStyle: "dashed" }} />
 
                     {renderLists}
-
-                    <SubscriptionPlanButton plan={plan} />
                 </Stack>
             </CardContent>
+            <CardActions sx={{ p: 4 }}>
+                <SubscriptionPlanButton plan={plan} />
+            </CardActions>
         </Card>
     );
 }

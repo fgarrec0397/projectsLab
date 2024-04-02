@@ -27,7 +27,7 @@ export const endpoints = {
     },
     subscriptions: {
         checkout: {
-            get: `${baseURL}/billing/checkout`,
+            get: `${baseURL}/subscriptions/checkout`,
         },
     },
     plans: {

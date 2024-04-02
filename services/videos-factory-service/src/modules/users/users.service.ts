@@ -7,5 +7,9 @@ import { User } from "./users.types";
 export class UsersService {
     constructor(@InjectDatabase() private readonly database: DatabaseConfig) {}
 
-    async updateUser(userId: string, user: Partial<User>) {}
+    async updateUser(userId: string, user: Partial<User>) {
+        const usersCollectionPath = `users`;
+
+        await this.database.update(usersCollectionPath, userId, user);
+    }
 }

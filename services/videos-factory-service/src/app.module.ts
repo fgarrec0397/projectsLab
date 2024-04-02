@@ -11,7 +11,8 @@ import { FilesModule } from "./modules/files/files.module";
 import { JobsModule } from "./modules/jobs/jobs.module";
 import { NotificationsModule } from "./modules/notifications/notifications.module";
 import { PlansModule } from "./modules/plans/plans.module";
-import { BillingModule } from "./modules/subscriptions/subscriptions.module";
+import { SubscriptionsModule } from "./modules/subscriptions/subscriptions.module";
+import { UsersModule } from "./modules/users/users.module";
 import { VideoProcessingModule } from "./modules/video-processing/video-processing.module";
 import { VideosModule } from "./modules/videos/videos.module";
 
@@ -26,10 +27,11 @@ import { VideosModule } from "./modules/videos/videos.module";
         NotificationsModule,
         BaseWebSocketModule,
         AuthModule,
+        UsersModule,
         VideoProcessingModule,
         VideosModule,
         FilesModule,
-        BillingModule,
+        SubscriptionsModule,
         PlansModule,
     ],
 })

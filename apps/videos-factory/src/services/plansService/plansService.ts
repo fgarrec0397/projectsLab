@@ -6,6 +6,7 @@ export const getPricingPlans = async () => {
     const response = await axiosInstance.get<IPlan[]>(endpoints.plans.get, {
         headers: {
             Accept: "application/json",
+            "ngrok-skip-browser-warning": "asd",
         },
     });
 

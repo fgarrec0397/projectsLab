@@ -8,12 +8,14 @@ import { Plan } from "src/common/payment/payment.type";
 import { PaymentService } from "src/common/payment/services/payment.service";
 import { DatabaseConfig, InjectDatabase } from "src/config/database-config.module";
 
+import { UsersService } from "../users/users.service";
 import { Subscription, WebhookEvent } from "./subscriptions.types";
 
 @Injectable()
 export class SubscriptionsService {
     constructor(
         private readonly payment: PaymentService,
+        private readonly usersService: UsersService,
         @InjectDatabase() private readonly database: DatabaseConfig
     ) {}
 
@@ -51,6 +53,9 @@ export class SubscriptionsService {
 
         try {
             await this.database.createOrUpdate(subscriptionCollectionPath, subscription);
+            await this.usersService.updateUser(userId, {
+                currentPlanId: subscription.planId,
+            });
 
             return subscription;
         } catch (error) {

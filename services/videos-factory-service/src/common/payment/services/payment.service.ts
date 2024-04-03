@@ -67,7 +67,11 @@ export class PaymentService implements OnModuleInit {
 
                 const { id, name, description, customData } = plan;
 
-                const isFreePlan = name === "Free";
+                const plansOrder = {
+                    Free: 0,
+                    Essentials: 1,
+                    Growth: 1,
+                };
 
                 const prices: TempPrice | object = {};
 
@@ -87,6 +91,14 @@ export class PaymentService implements OnModuleInit {
                     })
                     .filter((x) => x !== undefined && x !== null);
 
+                const subDescription = Object.entries(customData)
+                    .map(([key, value]) => {
+                        if (key.includes("subDescription")) {
+                            return value as string;
+                        }
+                    })
+                    .filter((x) => x !== undefined && x !== null);
+
                 plan.prices.forEach((x) => {
                     prices[x.name as PriceName] = {
                         id: x.id,
@@ -99,26 +111,28 @@ export class PaymentService implements OnModuleInit {
                     id,
                     name,
                     description,
+                    subDescription: subDescription[0],
                     monthlyPrice: (prices as TempPrice).monthly.price,
                     monthlyPriceId: (prices as TempPrice).monthly.id,
                     yearlyPrice: (prices as TempPrice).yearly.price,
                     yearlyPriceId: (prices as TempPrice).yearly.id,
                     features,
                     moreFeatures,
-                    sort: isFreePlan ? 0 : index + 1,
+                    sort: plansOrder[plan.name],
                 });
 
                 await addPlan({
                     id,
                     name,
                     description,
+                    subDescription: subDescription[0],
                     monthlyPrice: (prices as TempPrice).monthly.price,
                     monthlyPriceId: (prices as TempPrice).monthly.id,
                     yearlyPrice: (prices as TempPrice).yearly.price,
                     yearlyPriceId: (prices as TempPrice).yearly.id,
                     features,
                     moreFeatures,
-                    sort: isFreePlan ? 0 : index + 1,
+                    sort: plansOrder[plan.name],
                 });
             }
         }

@@ -75,10 +75,9 @@ export default function SubscriptionPricinPlans({ plans }: Props) {
                 direction={isDesktop ? "row" : "column-reverse"}
             >
                 {plans.map((x, index) => {
-                    const plan = isYearly ? x.variants[1] : x.variants[0];
                     return (
-                        <Grid key={plan.id} xs={12} md={4}>
-                            <PricingCard plan={plan} isYearly={isYearly} index={index} />
+                        <Grid key={x.id} xs={12} md={4}>
+                            <PricingCard plan={x} isYearly={isYearly} index={index} />
                         </Grid>
                     );
                 })}

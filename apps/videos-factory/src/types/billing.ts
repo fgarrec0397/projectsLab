@@ -1,13 +1,13 @@
-export type IPlanVariant = {
+export type IPlan = {
     id: string;
     name: string;
     description: string;
-    price: string;
+    subDescription: string;
+    monthlyPrice: string;
+    monthlyPriceId: string;
+    yearlyPrice: string;
+    yearlyPriceId: string;
+    features: string[];
+    moreFeatures: string[];
     sort: number;
-};
-
-export type IPlan = {
-    id: number;
-    name: string;
-    variants: IPlanVariant[];
 };

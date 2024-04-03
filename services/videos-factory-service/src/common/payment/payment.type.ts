@@ -2,6 +2,7 @@ export type Plan = {
     id: string;
     name: string;
     description: string;
+    subDescription: string;
     monthlyPrice: string;
     monthlyPriceId: string;
     yearlyPrice: string;

@@ -11,7 +11,7 @@ import FreePlanIcon from "@/assets/icons/free-plan-icon";
 import GrowthPlanIcon from "@/assets/icons/growth-plan-icon";
 import Iconify from "@/components/iconify";
 import { pxToRem } from "@/theme/typography";
-import { IPlanVariant } from "@/types/billing";
+import { IPlan } from "@/types/billing";
 import { getPrice } from "@/utils/lemon-squeezy";
 
 import SubscriptionPlanButton from "./subscription-plan-button";
@@ -20,7 +20,7 @@ import SubscriptionPlanLabel from "./subscription-plan-label";
 // ----------------------------------------------------------------------
 
 type Props = {
-    plan: IPlanVariant;
+    plan: IPlan;
     index: number;
     isYearly: boolean;
 };
@@ -42,22 +42,10 @@ const planDataMapping = {
 export default function SubscriptionPlanCard({ plan, isYearly }: Props) {
     const theme = useTheme();
     const isTablet = useMediaQuery(theme.breakpoints.between("sm", "md"));
-    const mappedPlanData = (planDataMapping as any)[plan.productName as any];
+    const mappedPlanData = (planDataMapping as any)[plan.name as any];
     const isPopular = mappedPlanData?.isPopular;
     const isBestDeal = mappedPlanData?.isBestDeal;
-
-    const parsedDescription = useMemo(() => {
-        const parser = new DOMParser();
-        const doc = parser.parseFromString(plan.description, "text/html");
-
-        const description = doc.querySelector("p")?.textContent?.trim() || "";
-
-        const featuresLists = Array.from(doc.querySelectorAll("ul")).map((ul) =>
-            Array.from(ul.querySelectorAll("li p")).map((li) => li.textContent?.trim() || "")
-        );
-
-        return { description, featuresLists };
-    }, [plan.description]);
+    const featuresLists = [plan.features, plan.moreFeatures];
 
     const renderPopularLabel = (isTopRight?: boolean) => (
         <SubscriptionPlanLabel
@@ -89,14 +77,14 @@ export default function SubscriptionPlanCard({ plan, isYearly }: Props) {
     const renderSubscription = (
         <Stack spacing={1}>
             <Typography variant="h4" sx={{ textTransform: "capitalize", ...visuallyHidden }}>
-                {plan.productName}
+                {plan.name}
             </Typography>
             <Typography
                 variant="subtitle2"
                 minHeight={44}
                 sx={{ my: 2, display: "flex", alignItems: "center" }}
             >
-                {parsedDescription.description}
+                {plan.subDescription}
             </Typography>
         </Stack>
     );
@@ -105,7 +93,7 @@ export default function SubscriptionPlanCard({ plan, isYearly }: Props) {
         <Stack direction="row" flexWrap="wrap" alignItems="center" minHeight={78}>
             <Typography variant="h4">$</Typography>
             <Typography variant="h2">
-                {isYearly ? getPrice(plan.price) / 12 : getPrice(plan.price)}
+                {isYearly ? getPrice(plan.yearlyPrice) / 12 : getPrice(plan.monthlyPrice)}
             </Typography>
             <Typography
                 component="span"
@@ -135,7 +123,7 @@ export default function SubscriptionPlanCard({ plan, isYearly }: Props) {
         </Stack>
     );
 
-    const renderLists = parsedDescription.featuresLists.map((list, index) => (
+    const renderLists = featuresLists.map((list, index) => (
         <Stack key={index} spacing={2}>
             <Stack direction="row" alignItems="center" justifyContent="space-between">
                 <Box component="span" sx={{ typography: "overline" }}>

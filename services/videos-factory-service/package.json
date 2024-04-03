@@ -33,6 +33,7 @@
     "@nestjs/platform-express": "^10.3.2",
     "@nestjs/platform-socket.io": "^10.3.3",
     "@nestjs/websockets": "^10.3.3",
+    "@paddle/paddle-node-sdk": "^1.2.1",
     "@projectslab/eslint-config": "*",
     "@projectslab/helpers": "*",
     "@projectslab/prettier-config": "*",

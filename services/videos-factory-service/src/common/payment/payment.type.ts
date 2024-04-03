@@ -1,15 +1,12 @@
 export type Plan = {
     id: string;
-    productId: number;
-    productName: string;
-    variantId: number;
     name: string;
     description: string;
-    price: string;
-    isUsageBased: boolean;
-    interval: string;
-    intervalCount: number;
-    trialInterval: string;
-    trialIntervalCount: number;
+    monthlyPrice: string;
+    monthlyPriceId: string;
+    yearlyPrice: string;
+    yearlyPriceId: string;
+    features: string[];
+    moreFeatures: string[];
     sort: number;
 };

@@ -72,7 +72,7 @@ export default function RootLayout({ children }: Props) {
                     </LocalizationProvider>
                 </AuthProvider>
                 <Script
-                    src="https://app.lemonsqueezy.com/js/lemon.js"
+                    src="https://cdn.paddle.com/paddle/v2/paddle.js"
                     strategy="lazyOnload"
                 ></Script>
             </body>

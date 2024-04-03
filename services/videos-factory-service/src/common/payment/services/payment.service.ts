@@ -7,45 +7,38 @@ import {
     Variant,
 } from "@lemonsqueezy/lemonsqueezy.js";
 import { Injectable, OnModuleInit } from "@nestjs/common";
+import { Paddle } from "@paddle/paddle-node-sdk";
 import { DatabaseConfig, InjectDatabase } from "src/config/database-config.module";
 
 import { Plan } from "../payment.type";
 
+type PriceName = "monthly" | "yearly";
+type TempPrice = Record<
+    PriceName,
+    {
+        id: string;
+        price: string;
+        name: string;
+    }
+>;
+
 @Injectable()
 export class PaymentService implements OnModuleInit {
+    paddle: Paddle;
+
     constructor(@InjectDatabase() private readonly database: DatabaseConfig) {}
 
     onModuleInit() {
-        const requiredVars = [
-            "LEMONSQUEEZY_API_KEY",
-            "LEMONSQUEEZY_STORE_ID",
-            "LEMONSQUEEZY_WEBHOOK_SECRET",
-        ];
-
-        const missingVars = requiredVars.filter((varName) => !process.env[varName]);
-
-        if (missingVars.length > 0) {
-            throw new Error(
-                `Missing required LEMONSQUEEZY env variables: ${missingVars.join(
-                    ", "
-                )}. Please, set them in your .env file.`
-            );
-        }
-
-        lemonSqueezySetup({
-            apiKey: process.env.LEMONSQUEEZY_API_KEY,
-            onError: (error) => {
-                throw new Error(`Lemon Squeezy API error: ${error}`);
-            },
-        });
+        this.paddle = new Paddle(process.env.PADDLE_API_KEY);
     }
 
     async getPricingPlans() {
         try {
-            return await listProducts({
-                filter: { storeId: process.env.LEMONSQUEEZY_STORE_ID },
-                include: ["variants"],
-            });
+            return await this.paddle.products
+                .list({
+                    include: ["prices", "customData", "importMeta"],
+                })
+                .next();
         } catch (error) {
             console.log(error);
         }
@@ -54,74 +47,78 @@ export class PaymentService implements OnModuleInit {
     async syncPlans() {
         const productVariants: Plan[] = await this.database.findAll("plans");
 
-        const addVariant = async (variant: Plan) => {
-            await this.database.createOrUpdate("plans", variant);
+        // for (const plan of plans) {
+        //     await this.database.createOrUpdate("plans", plan);
+        // }
+        const addPlan = async (plan: Plan) => {
+            await this.database.createOrUpdate("plans", plan);
 
-            productVariants.push(variant);
+            productVariants.push(plan);
         };
 
-        const products = await listProducts({
-            filter: { storeId: process.env.LEMONSQUEEZY_STORE_ID },
-            include: ["variants"],
-        });
+        const plans = await this.getPricingPlans();
+        // console.log(JSON.stringify(plans), "plans");
 
-        const allVariants = products.data?.included as Variant["data"][] | undefined;
+        if (plans) {
+            for (const [index, plan] of plans.entries()) {
+                // if (plan.status !== "active" || plans.length !== 1) {
+                //     continue;
+                // }
 
-        if (allVariants) {
-            for (const [index, v] of allVariants.entries()) {
-                const variant = v.attributes;
+                const { id, name, description, customData } = plan;
 
-                if (
-                    variant.status === "draft" ||
-                    (allVariants.length !== 1 && variant.status === "pending")
-                ) {
-                    continue;
-                }
+                const isFreePlan = name === "Free";
 
-                const productName =
-                    (await getProduct(variant.product_id)).data?.data.attributes.name ?? "";
+                const prices: TempPrice | object = {};
 
-                const variantPriceObject = await listPrices({
-                    filter: {
-                        variantId: v.id,
-                    },
+                const features = Object.entries(customData)
+                    .map(([key, value]) => {
+                        if (key.includes("features_")) {
+                            return value as string;
+                        }
+                    })
+                    .filter((x) => x !== undefined && x !== null);
+
+                const moreFeatures = Object.entries(customData)
+                    .map(([key, value]) => {
+                        if (key.includes("moreFeatures_")) {
+                            return value as string;
+                        }
+                    })
+                    .filter((x) => x !== undefined && x !== null);
+
+                plan.prices.forEach((x) => {
+                    prices[x.name as PriceName] = {
+                        id: x.id,
+                        price: x.unitPrice.amount,
+                        name: x.name,
+                    };
                 });
 
-                const currentPriceObj = variantPriceObject.data?.data.at(0);
-                const isUsageBased = currentPriceObj?.attributes.usage_aggregation !== null;
-                const interval = currentPriceObj?.attributes.renewal_interval_unit;
-                const intervalCount = currentPriceObj?.attributes.renewal_interval_quantity;
-                const trialInterval = currentPriceObj?.attributes.trial_interval_unit;
-                const trialIntervalCount = currentPriceObj?.attributes.trial_interval_quantity;
+                console.log({
+                    id,
+                    name,
+                    description,
+                    monthlyPrice: (prices as TempPrice).monthly.price,
+                    monthlyPriceId: (prices as TempPrice).monthly.id,
+                    yearlyPrice: (prices as TempPrice).yearly.price,
+                    yearlyPriceId: (prices as TempPrice).yearly.id,
+                    features,
+                    moreFeatures,
+                    sort: isFreePlan ? 0 : index + 1,
+                });
 
-                const price = isUsageBased
-                    ? currentPriceObj?.attributes.unit_price_decimal
-                    : currentPriceObj.attributes.unit_price;
-
-                const priceString = price !== null ? price?.toString() ?? "" : "";
-
-                const isFreePlan = currentPriceObj?.attributes.category === "lead_magnet";
-                const canAddVariant =
-                    currentPriceObj?.attributes.category === "subscription" || isFreePlan;
-
-                if (!canAddVariant) {
-                    continue;
-                }
-
-                await addVariant({
-                    id: v.id,
-                    name: variant.name,
-                    description: variant.description,
-                    price: priceString,
-                    interval,
-                    intervalCount,
-                    isUsageBased,
-                    productId: variant.product_id,
-                    productName,
-                    variantId: parseInt(v.id) as unknown as number,
-                    trialInterval,
-                    trialIntervalCount,
-                    sort: isFreePlan ? 0 : index,
+                await addPlan({
+                    id,
+                    name,
+                    description,
+                    monthlyPrice: (prices as TempPrice).monthly.price,
+                    monthlyPriceId: (prices as TempPrice).monthly.id,
+                    yearlyPrice: (prices as TempPrice).yearly.price,
+                    yearlyPriceId: (prices as TempPrice).yearly.id,
+                    features,
+                    moreFeatures,
+                    sort: isFreePlan ? 0 : index + 1,
                 });
             }
         }

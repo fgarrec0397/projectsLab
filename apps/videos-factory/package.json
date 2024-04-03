@@ -33,6 +33,7 @@
     "@mui/x-data-grid": "^6.18.4",
     "@mui/x-date-pickers": "^6.18.4",
     "@mui/x-tree-view": "^6.17.0",
+    "@paddle/paddle-node-sdk": "^1.2.1",
     "@projectslab/eslint-config": "*",
     "@projectslab/helpers": "*",
     "@projectslab/helpers-client": "*",

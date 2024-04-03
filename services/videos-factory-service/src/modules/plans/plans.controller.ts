@@ -5,16 +5,16 @@ import { PlansService } from "./plans.service";
 
 @Controller("plans")
 export class PlansController {
-    constructor(private readonly billingService: PlansService) {}
+    constructor(private readonly plansService: PlansService) {}
 
     @Post("plans/sync")
     syncPlans() {
-        this.billingService.syncPlans();
+        this.plansService.syncPlans();
     }
 
     @Get()
     @Public()
     getPlans() {
-        return this.billingService.getPlans();
+        return this.plansService.getPlans();
     }
 }

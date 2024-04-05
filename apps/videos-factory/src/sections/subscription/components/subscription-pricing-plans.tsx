@@ -6,7 +6,7 @@ import Stack from "@mui/material/Stack";
 import Switch from "@mui/material/Switch";
 import Typography from "@mui/material/Typography";
 import Grid from "@mui/system/Unstable_Grid";
-import { ChangeEvent, useState } from "react";
+import { ChangeEvent, useLayoutEffect, useState } from "react";
 
 import { IPlan } from "@/types/billing";
 
@@ -15,6 +15,7 @@ import PricingCard from "./subscription-plan-card";
 // ----------------------------------------------------------------------
 
 type Props = {
+    align?: "left" | "center";
     plans: IPlan[];
 };
 
@@ -33,10 +34,20 @@ const arrow = (
     </svg>
 );
 
-export default function SubscriptionPricinPlans({ plans }: Props) {
+export default function SubscriptionPricinPlans({ plans, align = "left" }: Props) {
     const [isYearly, setIsYearly] = useState(true);
     const theme = useTheme();
     const isDesktop = useMediaQuery(theme.breakpoints.up("md"));
+    const isWindowLoaded = window !== undefined && window !== null;
+
+    useLayoutEffect(() => {
+        if (isWindowLoaded) {
+            (window as any).Paddle?.Environment.set("sandbox");
+            (window as any).Paddle?.Initialize({
+                token: process.env.NEXT_PUBLIC_PADDLE_CLIENTSIDE_TOKEN, // replace with a client-side token
+            });
+        }
+    }, [isWindowLoaded]);
 
     const handleSwitchChange = (event: ChangeEvent, checked: boolean) => {
         setIsYearly(checked);
@@ -44,7 +55,11 @@ export default function SubscriptionPricinPlans({ plans }: Props) {
 
     return (
         <>
-            <Box sx={{ position: "relative" }}>
+            <Stack
+                direction="row"
+                justifyContent={align === "left" ? "flex-start" : "center"}
+                sx={{ position: "relative" }}
+            >
                 <Stack direction="row" alignItems="center">
                     <Typography variant="overline">MONTHLY</Typography>
 
@@ -68,11 +83,12 @@ export default function SubscriptionPricinPlans({ plans }: Props) {
                         <Typography variant="overline">YEARLY</Typography>
                     </Box>
                 </Stack>
-            </Box>
+            </Stack>
             <Grid
                 container
                 spacing={{ xs: 2, sm: 3, md: 4, xl: 6 }}
                 direction={isDesktop ? "row" : "column-reverse"}
+                justifyContent={align === "left" ? "flex-start" : "center"}
             >
                 {plans.map((x, index) => {
                     return (

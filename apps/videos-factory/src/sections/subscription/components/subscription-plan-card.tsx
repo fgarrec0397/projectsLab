@@ -179,7 +179,7 @@ export default function SubscriptionPlanCard({ plan, isYearly }: Props) {
                 </Stack>
             </CardContent>
             <CardActions sx={{ p: 4 }}>
-                <SubscriptionPlanButton plan={plan} />
+                <SubscriptionPlanButton plan={plan} isYearly={isYearly} />
             </CardActions>
         </Card>
     );

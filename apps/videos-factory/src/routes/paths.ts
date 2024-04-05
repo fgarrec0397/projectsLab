@@ -10,6 +10,9 @@ const ROOTS = {
 export const paths = {
     minimalUI: "https://mui.com/store/items/minimal-dashboard/",
     notFound: "/page-not-found",
+    about: "/about-us",
+    faqs: "/faq",
+    pricing: "/pricing",
     // AUTH
     auth: {
         login: `${ROOTS.AUTH}/login`,

@@ -7,7 +7,7 @@ import {
     Variant,
 } from "@lemonsqueezy/lemonsqueezy.js";
 import { Injectable, OnModuleInit } from "@nestjs/common";
-import { Paddle } from "@paddle/paddle-node-sdk";
+import { Environment, Paddle } from "@paddle/paddle-node-sdk";
 import { DatabaseConfig, InjectDatabase } from "src/config/database-config.module";
 
 import { Plan } from "../payment.type";
@@ -29,7 +29,9 @@ export class PaymentService implements OnModuleInit {
     constructor(@InjectDatabase() private readonly database: DatabaseConfig) {}
 
     onModuleInit() {
-        this.paddle = new Paddle(process.env.PADDLE_API_KEY);
+        this.paddle = new Paddle(process.env.PADDLE_API_KEY, {
+            environment: Environment.sandbox, // or Environment.sandbox for accessing sandbox API
+        });
     }
 
     async getPricingPlans() {
@@ -45,17 +47,21 @@ export class PaymentService implements OnModuleInit {
     }
 
     async syncPlans() {
+        console.log("[SYNC PLANS]");
+
         const productVariants: Plan[] = await this.database.findAll("plans");
 
         // for (const plan of plans) {
         //     await this.database.createOrUpdate("plans", plan);
         // }
         const addPlan = async (plan: Plan) => {
+            console.log("[ADD PLAN]");
             await this.database.createOrUpdate("plans", plan);
 
             productVariants.push(plan);
         };
 
+        console.log("[GET PLANS]");
         const plans = await this.getPricingPlans();
         // console.log(JSON.stringify(plans), "plans");
 

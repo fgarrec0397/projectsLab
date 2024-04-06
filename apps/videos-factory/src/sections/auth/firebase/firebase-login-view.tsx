@@ -2,6 +2,7 @@
 
 import { yupResolver } from "@hookform/resolvers/yup";
 import LoadingButton from "@mui/lab/LoadingButton";
+import { Card, CardContent } from "@mui/material";
 import Alert from "@mui/material/Alert";
 import Divider from "@mui/material/Divider";
 import IconButton from "@mui/material/IconButton";
@@ -21,11 +22,14 @@ import { useBoolean } from "@/hooks/use-boolean";
 import { RouterLink } from "@/routes/components";
 import { useRouter, useSearchParams } from "@/routes/hooks";
 import { paths } from "@/routes/paths";
+import { pxToRem } from "@/theme/typography";
+
+import LoginWithGoogleButton from "./components/login-with-google-button";
 
 // ----------------------------------------------------------------------
 
 export default function FirebaseLoginView() {
-    const { login, loginWithGoogle, loginWithGithub, loginWithTwitter } = useAuthContext();
+    const { login, loginWithGoogle } = useAuthContext();
 
     const router = useRouter();
 
@@ -75,22 +79,6 @@ export default function FirebaseLoginView() {
     const handleGoogleLogin = async () => {
         try {
             await loginWithGoogle?.();
-        } catch (error) {
-            console.error(error);
-        }
-    };
-
-    const handleGithubLogin = async () => {
-        try {
-            await loginWithGithub?.();
-        } catch (error) {
-            console.error(error);
-        }
-    };
-
-    const handleTwitterLogin = async () => {
-        try {
-            await loginWithTwitter?.();
         } catch (error) {
             console.error(error);
         }
@@ -173,36 +161,35 @@ export default function FirebaseLoginView() {
             </Divider>
 
             <Stack direction="row" justifyContent="center" spacing={2}>
-                <IconButton onClick={handleGoogleLogin}>
-                    <Iconify icon="eva:google-fill" color="#DF3E30" />
-                </IconButton>
-
-                <IconButton color="inherit" onClick={handleGithubLogin}>
-                    <Iconify icon="eva:github-fill" />
-                </IconButton>
-
-                <IconButton onClick={handleTwitterLogin}>
-                    <Iconify icon="eva:twitter-fill" color="#1C9CEA" />
-                </IconButton>
+                <LoginWithGoogleButton onClick={handleGoogleLogin} />
             </Stack>
         </div>
     );
 
     return (
-        <>
-            {renderHead}
+        <Card>
+            <CardContent
+                sx={{
+                    p: pxToRem(36),
+                    "&:last-child": {
+                        pb: pxToRem(36),
+                    },
+                }}
+            >
+                {renderHead}
 
-            {!!errorMsg && (
-                <Alert severity="error" sx={{ mb: 3 }}>
-                    {errorMsg}
-                </Alert>
-            )}
+                {!!errorMsg && (
+                    <Alert severity="error" sx={{ mb: 3 }}>
+                        {errorMsg}
+                    </Alert>
+                )}
 
-            <FormProvider methods={methods} onSubmit={onSubmit}>
-                {renderForm}
-            </FormProvider>
+                <FormProvider methods={methods} onSubmit={onSubmit}>
+                    {renderForm}
+                </FormProvider>
 
-            {renderLoginOption}
-        </>
+                {renderLoginOption}
+            </CardContent>
+        </Card>
     );
 }

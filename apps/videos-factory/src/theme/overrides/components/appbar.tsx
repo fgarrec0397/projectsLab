@@ -8,6 +8,7 @@ export function appBar(theme: Theme) {
             styleOverrides: {
                 root: {
                     boxShadow: "none",
+                    backgroundColor: theme.palette.background.paper,
                 },
             },
         },

@@ -13,6 +13,9 @@ export const paths = {
     about: "/about-us",
     faqs: "/faq",
     pricing: "/pricing",
+    termsAndConditions: "/terms-and-conditions",
+    refundPolicy: "/refund-policy",
+    privacyPolicy: "/privacy-policy",
     // AUTH
     auth: {
         login: `${ROOTS.AUTH}/login`,

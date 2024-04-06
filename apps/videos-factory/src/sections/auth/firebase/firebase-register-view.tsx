@@ -2,6 +2,7 @@
 
 import { yupResolver } from "@hookform/resolvers/yup";
 import LoadingButton from "@mui/lab/LoadingButton";
+import { Card, CardContent } from "@mui/material";
 import Alert from "@mui/material/Alert";
 import Divider from "@mui/material/Divider";
 import IconButton from "@mui/material/IconButton";
@@ -20,11 +21,14 @@ import { useBoolean } from "@/hooks/use-boolean";
 import { RouterLink } from "@/routes/components";
 import { useRouter } from "@/routes/hooks";
 import { paths } from "@/routes/paths";
+import { pxToRem } from "@/theme/typography";
+
+import LoginWithGoogleButton from "./components/login-with-google-button";
 
 // ----------------------------------------------------------------------
 
 export default function FirebaseRegisterView() {
-    const { register, loginWithGoogle, loginWithGithub, loginWithTwitter } = useAuthContext();
+    const { register, loginWithGoogle } = useAuthContext();
 
     const [errorMsg, setErrorMsg] = useState("");
 
@@ -33,8 +37,6 @@ export default function FirebaseRegisterView() {
     const password = useBoolean();
 
     const RegisterSchema = Yup.object().shape({
-        firstName: Yup.string().required("First name required"),
-        lastName: Yup.string().required("Last name required"),
         email: Yup.string()
             .required("Email is required")
             .email("Email must be a valid email address"),
@@ -42,8 +44,6 @@ export default function FirebaseRegisterView() {
     });
 
     const defaultValues = {
-        firstName: "",
-        lastName: "",
         email: "",
         password: "",
     };
@@ -61,7 +61,7 @@ export default function FirebaseRegisterView() {
 
     const onSubmit = handleSubmit(async (data) => {
         try {
-            await register?.(data.email, data.password, data.firstName, data.lastName);
+            await register?.(data.email, data.password);
             const searchParams = new URLSearchParams({
                 email: data.email,
             }).toString();
@@ -84,25 +84,9 @@ export default function FirebaseRegisterView() {
         }
     };
 
-    const handleGithubLogin = async () => {
-        try {
-            await loginWithGithub?.();
-        } catch (error) {
-            console.error(error);
-        }
-    };
-
-    const handleTwitterLogin = async () => {
-        try {
-            await loginWithTwitter?.();
-        } catch (error) {
-            console.error(error);
-        }
-    };
-
     const renderHead = (
         <Stack spacing={2} sx={{ mb: 5, position: "relative" }}>
-            <Typography variant="h4">Get started absolutely free</Typography>
+            <Typography variant="h4">Sign up to Createify</Typography>
 
             <Stack direction="row" spacing={0.5}>
                 <Typography variant="body2"> Already have an account? </Typography>
@@ -125,11 +109,11 @@ export default function FirebaseRegisterView() {
             }}
         >
             {"By signing up, I agree to "}
-            <Link underline="always" color="text.primary">
+            <Link href={paths.termsAndConditions} underline="always" color="text.primary">
                 Terms of Service
             </Link>
             {" and "}
-            <Link underline="always" color="text.primary">
+            <Link href={paths.privacyPolicy} underline="always" color="text.primary">
                 Privacy Policy
             </Link>
             .
@@ -138,11 +122,6 @@ export default function FirebaseRegisterView() {
 
     const renderForm = (
         <Stack spacing={2.5}>
-            <Stack direction={{ xs: "column", sm: "row" }} spacing={2}>
-                <RHFTextField name="firstName" label="First name" />
-                <RHFTextField name="lastName" label="Last name" />
-            </Stack>
-
             <RHFTextField name="email" label="Email address" />
 
             <RHFTextField
@@ -193,38 +172,36 @@ export default function FirebaseRegisterView() {
             </Divider>
 
             <Stack direction="row" justifyContent="center" spacing={2}>
-                <IconButton onClick={handleGoogleLogin}>
-                    <Iconify icon="eva:google-fill" color="#DF3E30" />
-                </IconButton>
-
-                <IconButton color="inherit" onClick={handleGithubLogin}>
-                    <Iconify icon="eva:github-fill" />
-                </IconButton>
-
-                <IconButton onClick={handleTwitterLogin}>
-                    <Iconify icon="eva:twitter-fill" color="#1C9CEA" />
-                </IconButton>
+                <LoginWithGoogleButton onClick={handleGoogleLogin} />
             </Stack>
         </div>
     );
 
     return (
-        <>
-            {renderHead}
+        <Card>
+            <CardContent
+                sx={{
+                    p: pxToRem(36),
+                    "&:last-child": {
+                        pb: pxToRem(36),
+                    },
+                }}
+            >
+                {renderHead}
+                {!!errorMsg && (
+                    <Alert severity="error" sx={{ mb: 3 }}>
+                        {errorMsg}
+                    </Alert>
+                )}
 
-            {!!errorMsg && (
-                <Alert severity="error" sx={{ mb: 3 }}>
-                    {errorMsg}
-                </Alert>
-            )}
+                <FormProvider methods={methods} onSubmit={onSubmit}>
+                    {renderForm}
+                </FormProvider>
 
-            <FormProvider methods={methods} onSubmit={onSubmit}>
-                {renderForm}
-            </FormProvider>
+                {renderTerms}
 
-            {renderTerms}
-
-            {renderLoginOption}
-        </>
+                {renderLoginOption}
+            </CardContent>
+        </Card>
     );
 }

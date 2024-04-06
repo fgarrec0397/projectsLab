@@ -1,12 +1,12 @@
 import AppBar from "@mui/material/AppBar";
 import Badge, { badgeClasses } from "@mui/material/Badge";
 import Box from "@mui/material/Box";
-import Button from "@mui/material/Button";
 import Container from "@mui/material/Container";
 import Stack from "@mui/material/Stack";
 import { useTheme } from "@mui/material/styles";
 import Toolbar from "@mui/material/Toolbar";
 
+import { PrimaryButton } from "@/components/button";
 import Label from "@/components/label";
 import Logo from "@/components/logo";
 import { useOffSetTop } from "@/hooks/use-off-set-top";
@@ -16,7 +16,6 @@ import { bgBlur } from "@/theme/css";
 
 import HeaderShadow from "../common/header-shadow";
 import LoginButton from "../common/login-button";
-import SettingsButton from "../common/settings-button";
 import { HEADER } from "../config-layout";
 import { navConfig } from "./config-navigation";
 import NavDesktop from "./nav/desktop";
@@ -79,23 +78,9 @@ export default function Header() {
                     {mdUp && <NavDesktop data={navConfig} />}
 
                     <Stack alignItems="center" direction={{ xs: "row", md: "row-reverse" }}>
-                        <Button
-                            variant="contained"
-                            target="_blank"
-                            rel="noopener"
-                            href={paths.minimalUI}
-                        >
-                            Purchase Now
-                        </Button>
+                        <PrimaryButton href={paths.auth.register}>Try free</PrimaryButton>
 
                         {mdUp && <LoginButton />}
-
-                        <SettingsButton
-                            sx={{
-                                ml: { xs: 1, md: 0 },
-                                mr: { md: 2 },
-                            }}
-                        />
 
                         {!mdUp && <NavMobile data={navConfig} />}
                     </Stack>

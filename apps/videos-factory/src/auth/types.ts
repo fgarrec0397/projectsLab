@@ -78,12 +78,7 @@ export type FirebaseContextType = CanRemove & {
     loginWithTwitter: () => Promise<void>;
     forgotPassword?: (email: string) => Promise<void>;
     login: (email: string, password: string) => Promise<void>;
-    register: (
-        email: string,
-        password: string,
-        firstName: string,
-        lastName: string
-    ) => Promise<void>;
+    register: (email: string, password: string) => Promise<void>;
 };
 
 export type AmplifyContextType = CanRemove & {

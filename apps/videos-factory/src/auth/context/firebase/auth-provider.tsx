@@ -164,26 +164,22 @@ export function AuthProvider({ children }: Props) {
     }, []);
 
     // REGISTER
-    const register = useCallback(
-        async (email: string, password: string, firstName: string, lastName: string) => {
-            const newUser = await createUserWithEmailAndPassword(AUTH, email, password);
+    const register = useCallback(async (email: string, password: string) => {
+        const newUser = await createUserWithEmailAndPassword(AUTH, email, password);
 
-            /*
-             * (1) If skip emailVerified
-             * Remove : await sendEmailVerification(newUser.user);
-             */
-            await sendEmailVerification(newUser.user);
+        /*
+         * (1) If skip emailVerified
+         * Remove : await sendEmailVerification(newUser.user);
+         */
+        await sendEmailVerification(newUser.user);
 
-            const userProfile = doc(collection(DB, "users"), newUser.user?.uid);
+        const userProfile = doc(collection(DB, "users"), newUser.user?.uid);
 
-            await setDoc(userProfile, {
-                uid: newUser.user?.uid,
-                email,
-                displayName: `${firstName} ${lastName}`,
-            });
-        },
-        []
-    );
+        await setDoc(userProfile, {
+            uid: newUser.user?.uid,
+            email,
+        });
+    }, []);
 
     // LOGOUT
     const logout = useCallback(async () => {

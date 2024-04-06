@@ -45,14 +45,14 @@ const StyledWrapper = styled("div")(({ theme }) => ({
 
 const StyledTextGradient = styled(m.h1)(({ theme }) => ({
     ...textGradient(
-        `300deg, ${theme.palette.primary.main} 0%, ${theme.palette.warning.main} 25%, ${theme.palette.primary.main} 50%, ${theme.palette.warning.main} 75%, ${theme.palette.primary.main} 100%`
+        `300deg, ${theme.palette.primary.lighter} 0%, ${theme.palette.primary.darker} 25%, ${theme.palette.primary.lighter} 50%, ${theme.palette.primary.darker} 75%, ${theme.palette.primary.lighter} 100%`
     ),
     padding: 0,
     marginTop: 8,
     lineHeight: 1,
     fontWeight: 900,
     marginBottom: 24,
-    letterSpacing: 8,
+    // letterSpacing: 8,
     textAlign: "center",
     backgroundSize: "400%",
     fontSize: `${64 / 16}rem`,
@@ -165,12 +165,11 @@ export default function HomeHero() {
 
     const renderDescription = (
         <Stack
-            alignItems="center"
+            alignItems="flex-start"
             justifyContent="center"
             sx={{
                 height: 1,
-                mx: "auto",
-                maxWidth: 480,
+                maxWidth: 530,
                 opacity: opacity > 0 ? opacity : 0,
                 mt: {
                     md: `-${HEADER.H_DESKTOP + percent * 2.5}px`,
@@ -178,15 +177,7 @@ export default function HomeHero() {
             }}
         >
             <m.div variants={varFade().in}>
-                <Typography
-                    variant="h2"
-                    sx={{
-                        textAlign: "center",
-                    }}
-                >
-                    Start a <br />
-                    New Project with
-                </Typography>
+                <Typography variant="h2">Automate your short form videos with</Typography>
             </m.div>
 
             <m.div variants={varFade().in}>
@@ -199,12 +190,12 @@ export default function HomeHero() {
                         repeat: Infinity,
                     }}
                 >
-                    Minimal
+                    Createify
                 </StyledTextGradient>
             </m.div>
 
             <m.div variants={varFade().in}>
-                <Typography variant="body2" sx={{ textAlign: "center" }}>
+                <Typography variant="body2">
                     The starting point for your next project is based on MUI.Easy customization
                     Helps you build apps faster and better.
                 </Typography>
@@ -378,11 +369,11 @@ export default function HomeHero() {
                 <StyledWrapper>
                     <Container component={MotionContainer} sx={{ height: 1 }}>
                         <Grid container columnSpacing={{ md: 10 }} sx={{ height: 1 }}>
-                            <Grid xs={12} md={6}>
+                            <Grid xs={12} md={7}>
                                 {renderDescription}
                             </Grid>
 
-                            {mdUp && <Grid md={6}>{renderSlides}</Grid>}
+                            {mdUp && <Grid md={5}>{renderSlides}</Grid>}
                         </Grid>
                     </Container>
 

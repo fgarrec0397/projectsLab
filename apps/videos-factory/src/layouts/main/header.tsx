@@ -78,7 +78,7 @@ export default function Header() {
                     {mdUp && <NavDesktop data={navConfig} />}
 
                     <Stack alignItems="center" direction={{ xs: "row", md: "row-reverse" }}>
-                        <PrimaryButton href={paths.auth.register}>Try free</PrimaryButton>
+                        <PrimaryButton href={paths.auth.register}>Register</PrimaryButton>
 
                         {mdUp && <LoginButton />}
 

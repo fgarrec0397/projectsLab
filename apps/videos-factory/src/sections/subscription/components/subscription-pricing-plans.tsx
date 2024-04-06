@@ -60,7 +60,7 @@ export default function SubscriptionPricinPlans({ plans, align = "left" }: Props
                 justifyContent={align === "left" ? "flex-start" : "center"}
                 sx={{ position: "relative" }}
             >
-                <Stack direction="row" alignItems="center">
+                <Stack direction="row" alignItems="center" sx={{ mb: 4 }}>
                     <Typography variant="overline">MONTHLY</Typography>
 
                     <Switch checked={isYearly} onChange={handleSwitchChange} sx={{ mx: 1 }} />
@@ -72,7 +72,7 @@ export default function SubscriptionPricinPlans({ plans, align = "left" }: Props
                                 component="span"
                                 sx={{
                                     whiteSpace: "nowrap",
-                                    color: "success.main",
+                                    color: "primary.main",
                                     typography: "overline",
                                 }}
                             >

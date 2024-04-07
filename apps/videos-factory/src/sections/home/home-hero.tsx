@@ -1,7 +1,6 @@
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Container from "@mui/material/Container";
-import Rating from "@mui/material/Rating";
 import Stack from "@mui/material/Stack";
 import { alpha, styled, useTheme } from "@mui/material/styles";
 import Typography from "@mui/material/Typography";
@@ -16,6 +15,7 @@ import { HEADER } from "@/layouts/config-layout";
 import { RouterLink } from "@/routes/components";
 import { paths } from "@/routes/paths";
 import { bgBlur, bgGradient, textGradient } from "@/theme/css";
+import { pxToRem } from "@/theme/typography";
 
 // ----------------------------------------------------------------------
 
@@ -43,23 +43,19 @@ const StyledWrapper = styled("div")(({ theme }) => ({
     },
 }));
 
-const StyledTextGradient = styled(m.h1)(({ theme }) => ({
+const StyledTextGradient = styled(m.span)(({ theme }) => ({
     ...textGradient(
         `300deg, ${theme.palette.primary.lighter} 0%, ${theme.palette.primary.darker} 25%, ${theme.palette.primary.lighter} 50%, ${theme.palette.primary.darker} 75%, ${theme.palette.primary.lighter} 100%`
     ),
     padding: 0,
     marginTop: 8,
     lineHeight: 1,
-    fontWeight: 900,
     marginBottom: 24,
-    // letterSpacing: 8,
     textAlign: "center",
     backgroundSize: "400%",
-    fontSize: `${64 / 16}rem`,
+    fontSize: "inherit",
+    fontWeight: 900,
     fontFamily: theme.typography.fontSecondaryFamily,
-    [theme.breakpoints.up("md")]: {
-        fontSize: `${96 / 16}rem`,
-    },
 }));
 
 const StyledEllipseTop = styled("div")(({ theme }) => ({
@@ -167,6 +163,7 @@ export default function HomeHero() {
         <Stack
             alignItems="flex-start"
             justifyContent="center"
+            spacing={3}
             sx={{
                 height: 1,
                 maxWidth: 530,
@@ -177,85 +174,34 @@ export default function HomeHero() {
             }}
         >
             <m.div variants={varFade().in}>
-                <Typography variant="h2">Automate your short form videos with</Typography>
-            </m.div>
-
-            <m.div variants={varFade().in}>
-                <StyledTextGradient
-                    animate={{ backgroundPosition: "200% center" }}
-                    transition={{
-                        repeatType: "reverse",
-                        ease: "linear",
-                        duration: 20,
-                        repeat: Infinity,
-                    }}
-                >
-                    Createify
-                </StyledTextGradient>
-            </m.div>
-
-            <m.div variants={varFade().in}>
-                <Typography variant="body2">
-                    The starting point for your next project is based on MUI.Easy customization
-                    Helps you build apps faster and better.
+                <Typography component="h1" variant="h2" sx={{ fontSize: pxToRem(48) }}>
+                    Create unique <br /> <StyledTextGradient>FACELESS VIDEOS</StyledTextGradient>{" "}
+                    <br />
+                    <Typography component="span" variant="h4">
+                        While focusing on your business
+                    </Typography>
                 </Typography>
             </m.div>
 
             <m.div variants={varFade().in}>
-                <Stack
-                    spacing={0.75}
-                    direction="row"
-                    alignItems="center"
-                    justifyContent="center"
-                    sx={{ my: 3 }}
-                >
-                    <Rating readOnly value={4.95} precision={0.1} max={5} />
-                    <Typography variant="caption" sx={{ color: "text.secondary" }}>
-                        <Box component="strong" sx={{ mr: 0.5, color: "text.primary" }}>
-                            4.96/5
-                        </Box>
-                        (99+ reviews)
-                    </Typography>
-                </Stack>
+                <Typography variant="body2">
+                    Remove the mental load of producing content for your brand, by generating them
+                    with AI. No skills required
+                </Typography>
             </m.div>
 
             <m.div variants={varFade().in}>
-                <Stack spacing={1.5} direction={{ xs: "column-reverse", sm: "row" }} sx={{ mb: 5 }}>
-                    <Stack alignItems="center" spacing={2}>
-                        <Button
-                            component={RouterLink}
-                            href={paths.dashboard.root}
-                            color="inherit"
-                            size="large"
-                            variant="contained"
-                            startIcon={<Iconify icon="eva:flash-fill" width={24} />}
-                        >
-                            Live Preview
-                        </Button>
-                    </Stack>
-                </Stack>
+                <Button
+                    component={RouterLink}
+                    href={paths.auth.register}
+                    color="inherit"
+                    size="large"
+                    variant="contained"
+                    startIcon={<Iconify icon="eva:flash-fill" width={24} />}
+                >
+                    Start automating videos
+                </Button>
             </m.div>
-
-            <Stack spacing={3} sx={{ textAlign: "center" }}>
-                <m.div variants={varFade().in}>
-                    <Typography variant="overline" sx={{ opacity: 0.48 }}>
-                        Available For
-                    </Typography>
-                </m.div>
-
-                <Stack spacing={2} direction="row" justifyContent="center">
-                    {["js", "ts", "figma", "nextjs", "vite"].map((icon) => (
-                        <m.div key={icon} variants={varFade().in}>
-                            <Box
-                                component="img"
-                                alt={icon}
-                                src={`/assets/icons/platforms/ic_${icon}.svg`}
-                                sx={{ width: 24, height: 24 }}
-                            />
-                        </m.div>
-                    ))}
-                </Stack>
-            </Stack>
         </Stack>
     );
 
@@ -288,7 +234,7 @@ export default function HomeHero() {
                     alt={lightMode ? "light_1" : "dark_1"}
                     src={
                         lightMode
-                            ? `/assets/images/home/hero/light_1.webp`
+                            ? `/assets/images/home/hero/ezgif.com-animated-gif-maker.gif`
                             : `/assets/images/home/hero/dark_1.webp`
                     }
                     sx={{ position: "absolute", mt: -5 }}
@@ -300,7 +246,7 @@ export default function HomeHero() {
                     alt={lightMode ? "light_1" : "dark_1"}
                     src={
                         lightMode
-                            ? `/assets/images/home/hero/light_1.webp`
+                            ? `/assets/images/home/hero/ezgif.com-animated-gif-maker.gif`
                             : `/assets/images/home/hero/dark_1.webp`
                     }
                     sx={{ position: "absolute" }}
@@ -319,7 +265,7 @@ export default function HomeHero() {
                     alt={lightMode ? "light_2" : "dark_2"}
                     src={
                         lightMode
-                            ? `/assets/images/home/hero/light_2.webp`
+                            ? `/assets/images/home/hero/ezgif.com-animated-gif-maker.gif`
                             : `/assets/images/home/hero/dark_2.webp`
                     }
                     sx={{ position: "absolute", mt: -5 }}
@@ -331,7 +277,7 @@ export default function HomeHero() {
                     alt={lightMode ? "light_2" : "dark_2"}
                     src={
                         lightMode
-                            ? `/assets/images/home/hero/light_2.webp`
+                            ? `/assets/images/home/hero/ezgif.com-animated-gif-maker.gif`
                             : `/assets/images/home/hero/dark_2.webp`
                     }
                     sx={{ position: "absolute" }}

@@ -7,8 +7,9 @@ import ScrollProgress from "@/components/scroll-progress";
 import MainLayout from "@/layouts/main";
 
 import HomeHero from "../home-hero";
-import HomeMinimal from "../home-minimal";
 import HomePricing from "../home-pricing";
+import HomePromblems from "../home-problems";
+import HomeProcess from "../home-process";
 
 // ----------------------------------------------------------------------
 
@@ -28,9 +29,10 @@ export default function HomeView() {
                     bgcolor: "background.default",
                 }}
             >
-                <HomeMinimal />
+                <HomePromblems />
 
-                <HomePricing />
+                <HomeProcess />
+                {/* <HomePricing /> */}
             </Box>
         </MainLayout>
     );

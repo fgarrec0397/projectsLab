@@ -12,7 +12,7 @@ import { MotionViewport, varFade } from "@/components/animate";
 
 const CARDS = [
     {
-        icon: "/assets/icons/home/eyes.svg",
+        icon: "/assets/icons/home/no-analytics.svg",
         title: "Seeing 0 viewers on your Google Analytics",
         description:
             "Having zero traffic is very frustrating. By automating your video creation you will be able to redirect that traffic toward your website",
@@ -21,13 +21,13 @@ const CARDS = [
         icon: "/assets/icons/home/money-with-wings.svg",
         title: "Paying money for extra tools",
         description:
-            "There is a ton of UI tools for videos automation, but most of them require you to subscribe to multiple platform. Createify handle everything for you",
+            "There is a ton of AI tools for videos automation, but most of them require you to subscribe to multiple platforms. Createify regroup everything at one place",
     },
     {
         icon: "/assets/icons/home/stopwatch.svg",
         title: "Loosing time making boring videos",
         description:
-            "Not everyone has the skills or motivation to craft well made videos especially when you run a business. With Createify, tell us who will your video been viewed and we tackle the rest",
+            "Not everyone has the skills or motivation to craft well made videos especially when you run a business. With Createify, tell us who is your audience and we tackle the rest for you",
     },
 ];
 
@@ -50,7 +50,7 @@ export default function HomeProblems() {
             >
                 <m.div variants={varFade().inUp}>
                     <Typography component="div" variant="body1" sx={{ color: "text.disabled" }}>
-                        By usign Createify
+                        By using Createify
                     </Typography>
                 </m.div>
 

@@ -175,7 +175,18 @@ export default function HomeHero() {
         >
             <m.div variants={varFade().in}>
                 <Typography component="h1" variant="h2" sx={{ fontSize: pxToRem(48) }}>
-                    Create unique <br /> <StyledTextGradient>FACELESS VIDEOS</StyledTextGradient>{" "}
+                    Create unique <br />{" "}
+                    <StyledTextGradient
+                        animate={{ backgroundPosition: "200% center" }}
+                        transition={{
+                            repeatType: "reverse",
+                            ease: "linear",
+                            duration: 20,
+                            repeat: Infinity,
+                        }}
+                    >
+                        FACELESS VIDEOS
+                    </StyledTextGradient>{" "}
                     <br />
                     <Typography component="span" variant="h4">
                         While focusing on your business

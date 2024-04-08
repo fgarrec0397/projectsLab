@@ -3,7 +3,6 @@
 import { Typography } from "@mui/material";
 import Box from "@mui/material/Box";
 import Container from "@mui/material/Container";
-import { alpha } from "@mui/material/styles";
 import { m } from "framer-motion";
 
 import { MotionViewport, varFade } from "@/components/animate";
@@ -36,7 +35,7 @@ const processes = [
         title: "Render or save for later",
         subTitle: "Step 4",
         description: "Rendering your video will make it available for download once it is ready",
-        image: "",
+        image: "/assets/images/home/step4.jpg",
     },
 ];
 
@@ -48,7 +47,7 @@ export default function HomeProcess() {
             }}
         >
             <Container component={MotionViewport}>
-                <m.div variants={varFade().in}>
+                <m.div variants={varFade({ distance: 240 }).inUp}>
                     <Typography variant="h2" sx={{ mb: 3, textAlign: "center" }}>
                         Our guided process make it easy
                     </Typography>

@@ -17,7 +17,6 @@ import CreateButtonPopover from "../common/create-button-popover";
 import LanguagePopover from "../common/language-popover";
 import NotificationsPopover from "../common/notifications-popover";
 import Searchbar from "../common/searchbar";
-import SettingsButton from "../common/settings-button";
 import { HEADER, NAV } from "../config-layout";
 
 // ----------------------------------------------------------------------
@@ -75,8 +74,6 @@ export default function Header({ onOpenNav }: Props) {
                 {showContacts && <ContactsPopover />}
 
                 <CreateButtonPopover />
-
-                <SettingsButton />
 
                 <AccountPopover />
             </Stack>

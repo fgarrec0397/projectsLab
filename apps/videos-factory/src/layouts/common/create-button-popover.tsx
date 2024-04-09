@@ -29,7 +29,7 @@ const CreateButtonPopover: FC = () => {
 
     return (
         <>
-            <PrimaryButton variant="contained" color="primary" onClick={popover.onOpen}>
+            <PrimaryButton variant="contained" color="primary" href={paths.dashboard.videos.create}>
                 Create
             </PrimaryButton>
             <CustomPopover open={popover.open} onClose={popover.onClose}>
@@ -43,6 +43,20 @@ const CreateButtonPopover: FC = () => {
                     </MenuItem>
                 ))}
             </CustomPopover>
+            {/* <PrimaryButton variant="contained" color="primary" onClick={popover.onOpen}>
+                Create
+            </PrimaryButton>
+            <CustomPopover open={popover.open} onClose={popover.onClose}>
+                {OPTIONS.map((x, index) => (
+                    <MenuItem
+                        key={x.linkTo}
+                        onClick={() => handleClickItem(x.linkTo)}
+                        divider={index !== OPTIONS.length - 1}
+                    >
+                        {x.label}
+                    </MenuItem>
+                ))}
+            </CustomPopover> */}
         </>
     );
 };

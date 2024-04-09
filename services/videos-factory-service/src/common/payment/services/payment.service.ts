@@ -30,7 +30,7 @@ export class PaymentService implements OnModuleInit {
 
     onModuleInit() {
         this.paddle = new Paddle(process.env.PADDLE_API_KEY, {
-            environment: Environment.sandbox, // or Environment.sandbox for accessing sandbox API
+            environment: Environment.production, // or Environment.sandbox for accessing sandbox API
         });
     }
 

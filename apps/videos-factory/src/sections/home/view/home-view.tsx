@@ -5,7 +5,6 @@ import { styled } from "@mui/material/styles";
 import { useScroll } from "framer-motion";
 
 import ScrollProgress from "@/components/scroll-progress";
-import MainLayout from "@/layouts/main";
 
 import HomeFilesManagerShowcase from "../home-files-manager-showcase";
 import HomeHero from "../home-hero";
@@ -44,7 +43,7 @@ export default function HomeView() {
     const { scrollYProgress } = useScroll();
 
     return (
-        <MainLayout>
+        <>
             <ScrollProgress scrollYProgress={scrollYProgress} />
 
             <HomeHero />
@@ -68,6 +67,6 @@ export default function HomeView() {
                 <HomeRoadmap />
                 <HomePricing />
             </Box>
-        </MainLayout>
+        </>
     );
 }

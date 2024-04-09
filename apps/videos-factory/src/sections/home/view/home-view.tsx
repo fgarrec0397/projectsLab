@@ -36,7 +36,7 @@ const StyledPolygon = styled("div")<StyledPolygonProps>(({ anchor = "top", theme
     }),
     ...(anchor === "bottom" && {
         bottom: -1,
-        backgroundColor: theme.palette.grey[900],
+        // backgroundColor: theme.palette.grey[900],
     }),
 }));
 
@@ -66,7 +66,7 @@ export default function HomeView() {
                     <StyledPolygon anchor="bottom" />
                 </Box>
                 <HomeRoadmap />
-                {/* <HomePricing /> */}
+                <HomePricing />
             </Box>
         </MainLayout>
     );

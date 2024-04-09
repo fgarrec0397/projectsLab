@@ -27,7 +27,7 @@ export default function HomeFilesManagerShowcase() {
 
             <m.div variants={varFade().inUp}>
                 <Typography sx={{ color: "grey.500" }}>
-                    A fully integrated files manager to easy your storing
+                    A fully integrated files manager to easy your storage
                 </Typography>
             </m.div>
         </Stack>

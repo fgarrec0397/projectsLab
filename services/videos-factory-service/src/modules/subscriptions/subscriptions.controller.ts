@@ -33,6 +33,8 @@ export class SubscriptionsController {
     @Post("webhook")
     @Public()
     async catchWebhook(@Req() request: RawBodyRequest<Request>) {
+        console.log("webhook triggered");
+
         await this.subscriptionService.handleWebhook(request);
     }
 }

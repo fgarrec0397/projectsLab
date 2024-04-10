@@ -8,13 +8,14 @@ import Grid from "@mui/material/Unstable_Grid2";
 
 import Logo from "@/components/logo";
 import { RouterLink } from "@/routes/components";
+import { usePathname } from "@/routes/hooks";
 import { paths } from "@/routes/paths";
 
 // ----------------------------------------------------------------------
 
 const LINKS = [
     {
-        headline: "Createify",
+        headline: "Minimal",
         children: [
             { name: "About us", href: paths.about },
             { name: "FAQs", href: paths.faqs },
@@ -23,20 +24,46 @@ const LINKS = [
     {
         headline: "Legal",
         children: [
-            { name: "Terms and Condition", href: paths.termsAndConditions },
-            { name: "Privacy Policy", href: paths.privacyPolicy },
+            { name: "Terms and Condition", href: "#" },
+            { name: "Privacy Policy", href: "#" },
         ],
     },
     {
         headline: "Contact",
-        children: [{ name: "info@createify.io", href: "mailto:info@createify.io" }],
+        children: [{ name: "support@minimals.cc", href: "#" }],
     },
 ];
 
 // ----------------------------------------------------------------------
 
 export default function Footer() {
-    return (
+    const pathname = usePathname();
+
+    const homePage = pathname === "/";
+
+    const simpleFooter = (
+        <Box
+            component="footer"
+            sx={{
+                py: 5,
+                textAlign: "center",
+                position: "relative",
+                bgcolor: "background.default",
+            }}
+        >
+            <Container>
+                <Logo sx={{ mb: 1, mx: "auto" }} />
+
+                <Typography variant="caption" component="div">
+                    © All rights reserved
+                    <br /> made by
+                    <Link href="https://minimals.cc/"> minimals.cc </Link>
+                </Typography>
+            </Container>
+        </Box>
+    );
+
+    const mainFooter = (
         <Box
             component="footer"
             sx={{
@@ -70,8 +97,9 @@ export default function Footer() {
                                 mx: { xs: "auto", md: "unset" },
                             }}
                         >
-                            Automate your video creation process with Createify. No need to ever
-                            think about video editing and audience growing again
+                            The starting point for your next project with Minimal UI Kit, built on
+                            the newest version of Material-UI ©, ready to be customized to your
+                            style.
                         </Typography>
                     </Grid>
 
@@ -93,7 +121,6 @@ export default function Footer() {
                                             key={link.name}
                                             component={RouterLink}
                                             href={link.href}
-                                            target="_blank"
                                             color="inherit"
                                             variant="body2"
                                         >
@@ -107,9 +134,11 @@ export default function Footer() {
                 </Grid>
 
                 <Typography variant="body2" sx={{ mt: 10 }}>
-                    © 2024. All rights reserved
+                    © 2021. All rights reserved
                 </Typography>
             </Container>
         </Box>
     );
+
+    return homePage ? simpleFooter : mainFooter;
 }

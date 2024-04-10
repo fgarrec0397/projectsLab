@@ -42,7 +42,7 @@ export default function SubscriptionPricinPlans({ plans, align = "left" }: Props
 
     useLayoutEffect(() => {
         if (isWindowLoaded) {
-            (window as any).Paddle?.Environment.set("sandbox");
+            (window as any).Paddle?.Environment.set(process.env.NEXT_PUBLIC_PADDLE_ENV);
             (window as any).Paddle?.Initialize({
                 token: process.env.NEXT_PUBLIC_PADDLE_CLIENTSIDE_TOKEN, // replace with a client-side token
             });

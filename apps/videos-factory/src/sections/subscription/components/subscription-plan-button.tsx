@@ -32,40 +32,13 @@ export default function SubscriptionPlanButton({ plan, currentPlan, isYearly }: 
         }
     }, []);
 
-    console.log(auth, "auth");
-
     const onClick = async () => {
-        // // Create a checkout and open the Lemon.js modal
-        // let checkoutUrl: string | undefined = "";
-
-        // try {
-        //     checkoutUrl = await getCheckoutURL(auth.user?.accessToken, auth.user?.email, plan.id);
-        // } catch (error) {
-        //     console.error("Error creating a checkout");
-        // }
-
-        // console.log(checkoutUrl, "checkoutUrl");
-
-        // if (checkoutUrl) {
-        //     window.LemonSqueezy.Url.Open(checkoutUrl);
-        // }
-        // http://localhost:3000/dashboard/subscription
-
-        console.log({
-            customer: {
-                email: auth.user?.email,
-            },
-            items: [
-                {
-                    priceId: isYearly ? plan.yearlyPriceId : plan.monthlyPriceId,
-                    quantity: 1,
-                },
-            ],
-        });
-
         (window as any).Paddle.Checkout.open({
             customer: {
                 email: auth.user?.email,
+            },
+            customData: {
+                userId: auth.user?.id,
             },
             items: [
                 {

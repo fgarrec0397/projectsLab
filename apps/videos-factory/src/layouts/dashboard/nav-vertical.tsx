@@ -10,7 +10,6 @@ import Scrollbar from "@/components/scrollbar";
 import { useSettingsContext } from "@/components/settings";
 import { useResponsive } from "@/hooks/use-responsive";
 import { usePathname } from "@/routes/hooks";
-import { paths } from "@/routes/paths";
 import { pxToRem } from "@/theme/typography";
 
 import NavToggleButton from "../common/nav-toggle-button";
@@ -58,11 +57,7 @@ export default function NavVertical({ openNav, onCloseNav }: Props) {
                 },
             }}
         >
-            <Logo
-                sx={{ mt: 3, ml: 3, mb: 1 }}
-                showSingleLogo={isNavMini}
-                url={paths.dashboard.root}
-            />
+            <Logo sx={{ mt: 3, ml: 3, mb: 1 }} showSingleLogo={isNavMini} />
 
             <NavSectionVertical
                 data={navData}

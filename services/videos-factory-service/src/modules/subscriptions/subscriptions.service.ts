@@ -1,15 +1,12 @@
-import crypto from "node:crypto";
-
-import { getPrice } from "@lemonsqueezy/lemonsqueezy.js";
-import { HttpException, HttpStatus, Injectable, RawBodyRequest } from "@nestjs/common";
-import { uidGenerator } from "@projectslab/helpers";
+import { Injectable, RawBodyRequest } from "@nestjs/common";
+import { EventName, SubscriptionNotification } from "@paddle/paddle-node-sdk";
 import { Request } from "express";
 import { Plan } from "src/common/payment/payment.type";
 import { PaymentService } from "src/common/payment/services/payment.service";
 import { DatabaseConfig, InjectDatabase } from "src/config/database-config.module";
 
 import { UsersService } from "../users/users.service";
-import { Subscription, WebhookEvent } from "./subscriptions.types";
+import { Subscription } from "./subscriptions.types";
 
 @Injectable()
 export class SubscriptionsService {
@@ -54,7 +51,7 @@ export class SubscriptionsService {
         try {
             await this.database.createOrUpdate(subscriptionCollectionPath, subscription);
             await this.usersService.updateUser(userId, {
-                currentPlanId: subscription.planId,
+                currentPlanId: subscription.productId,
             });
 
             return subscription;
@@ -64,148 +61,56 @@ export class SubscriptionsService {
     }
 
     async handleWebhook(request: RawBodyRequest<Request>) {
-        const rawBody = request.rawBody;
-
-        if (!this.isWebhookCallValid(request)) {
-            throw new Error("Invalid signature.");
-        }
-
-        const data = JSON.parse(rawBody as any) as unknown;
-
-        if (this.webhookHasMeta(data)) {
-            const webhookEvent = await this.storeWebhookEvent((data as any).meta.event_name, data);
-
-            void this.processWebhookEvent(webhookEvent);
-
-            return { status: 200 };
-        }
-
-        throw new HttpException("Data invalid", HttpStatus.BAD_REQUEST);
-    }
-
-    private async processWebhookEvent(webhookEvent: WebhookEvent) {
-        let processingError = "";
-        const eventBody = webhookEvent.body;
-        const userId = eventBody.meta.custom_data.user_id;
-
-        if (!eventBody.meta) {
-            processingError = "Event body is missing the 'meta' property.";
-        } else if (eventBody.meta) {
-            if (webhookEvent.eventName.startsWith("subscription_payment_")) {
-                // Save subscription invoices; eventBody is a SubscriptionInvoice
-                // Not implemented.
-            } else if (webhookEvent.eventName.startsWith("subscription_")) {
-                // Save subscription events; obj is a Subscription
-                const attributes = eventBody.data.attributes;
-                const variantId = attributes.variant_id as string;
-
-                const plans = await this.database.findWithQuery<Plan>("plans", {
-                    conditions: [
-                        { field: "variantId", operator: "==", value: parseInt(variantId, 10) },
-                    ],
-                });
-
-                if (plans.length < 1) {
-                    processingError = `Plan with variantId ${variantId} not found.`;
-                } else {
-                    const priceId = attributes.first_subscription_item.price_id;
-
-                    const priceData = await getPrice(priceId);
-                    if (priceData.error) {
-                        processingError = `Failed to get the price data for the subscription ${eventBody.data.id}.`;
-                    }
-
-                    const isUsageBased = attributes.first_subscription_item.is_usage_based;
-                    const price = isUsageBased
-                        ? priceData.data?.data.attributes.unit_price_decimal
-                        : priceData.data?.data.attributes.unit_price;
-
-                    const subscription: Subscription = {
-                        id: eventBody.data.id,
-                        lemonSqueezyId: eventBody.data.id,
-                        orderId: attributes.order_id as number,
-                        name: attributes.user_name as string,
-                        email: attributes.user_email as string,
-                        status: attributes.status as string,
-                        statusFormatted: attributes.status_formatted as string,
-                        renewsAt: attributes.renews_at as string,
-                        endsAt: attributes.ends_at as string,
-                        trialEndsAt: attributes.trial_ends_at as string,
-                        price: price?.toString() ?? "",
-                        isPaused: false,
-                        subscriptionItemId: attributes.first_subscription_item.id,
-                        isUsageBased: attributes.first_subscription_item.is_usage_based,
-                        userId: eventBody.meta.custom_data.user_id,
-                        planId: plans[0].id,
-                    };
-
-                    try {
-                        await this.createSubscription(userId, subscription);
-                    } catch (error) {
-                        processingError = `Failed to upsert Subscription #${subscription.lemonSqueezyId} to the database.`;
-                        console.error(error);
-                    }
-                }
-            } else if (webhookEvent.eventName.startsWith("order_")) {
-                // Save orders; eventBody is a "Order"
-                /* Not implemented */
-            } else if (webhookEvent.eventName.startsWith("license_")) {
-                // Save license keys; eventBody is a "License key"
-                /* Not implemented */
-            }
-
-            await this.database.update("webhookEvents", webhookEvent.id, {
-                processed: true,
-                processingError,
-            });
-        }
-    }
-
-    private async storeWebhookEvent(
-        eventName: string,
-        body: WebhookEvent["body"]
-    ): Promise<WebhookEvent> {
-        const id = uidGenerator();
-
-        const existingDoc = await this.database.findOne("webhookEvents", String(id));
-
-        if (existingDoc) {
-            console.log(`Document with ID ${id} already exists. Skipping insertion.`);
-            return null;
-        }
+        const signature = (request.headers["paddle-signature"] as string) || "";
+        const rawRequestBody = request.rawBody.toString();
+        const secretKey = process.env.PADDLE_WEBHOOK_SECRET || "";
 
         try {
-            const webhookEvent: WebhookEvent = {
-                id,
-                eventName,
-                processed: false,
-                body,
-                createdAt: new Date().getTime(),
-                processingError: "",
-            };
-            await this.database.createOrUpdate("webhookEvents", webhookEvent);
+            if (signature && rawRequestBody) {
+                const eventData = this.payment.paddle.webhooks.unmarshal(
+                    rawRequestBody,
+                    secretKey,
+                    signature
+                );
 
-            return webhookEvent;
-        } catch (error) {
-            console.error(`Failed to insert webhook event: ${error}`);
+                if (!eventData) {
+                    throw new Error("Signature invalid");
+                }
+
+                switch (eventData.eventType) {
+                    case EventName.SubscriptionCreated:
+                        const subscriptionData = eventData.data as SubscriptionNotification;
+
+                        console.log(`Subscription ${eventData.data.id} was created`);
+
+                        const subscription: Subscription = {
+                            id: eventData.data.id,
+                            transactionId: eventData.data.transactionId,
+                            status: subscriptionData.status,
+                            startsAt: subscriptionData.currentBillingPeriod.startsAt,
+                            endsAt: subscriptionData.currentBillingPeriod.endsAt,
+                            price: subscriptionData.items[0].price.unitPrice.amount,
+                            productId: subscriptionData.items[0].price.productId,
+                            userId: (subscriptionData.customData as any).userId,
+                        };
+
+                        try {
+                            await this.createSubscription(subscription.userId, subscription);
+                        } catch (error) {
+                            console.error(error);
+                        }
+                        break;
+                    case EventName.SubscriptionUpdated:
+                        console.log(`Subscription ${eventData.data.id} was updated`);
+                        break;
+                    default:
+                        console.log(eventData.eventType);
+                }
+            } else {
+                console.log("Signature missing in header");
+            }
+        } catch (e) {
+            console.log(e);
         }
-    }
-
-    private webhookHasMeta(data: any) {
-        return !!data.meta;
-    }
-
-    private isWebhookCallValid(request: RawBodyRequest<Request>) {
-        if (!process.env.LEMONSQUEEZY_WEBHOOK_SECRET) {
-            throw new Error("Lemon Squeezy Webhook Secret not set in .env");
-        }
-
-        const secret = process.env.LEMONSQUEEZY_WEBHOOK_SECRET;
-
-        const hmac = crypto.createHmac("sha256", secret);
-        const digest = Buffer.from(hmac.update(request.rawBody).digest("hex"), "utf8");
-        const signature = Buffer.from(request.get("X-Signature") || "", "utf8");
-
-        return crypto.timingSafeEqual(digest, signature);
     }
 }

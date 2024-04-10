@@ -1,27 +1,19 @@
 export type WebhookEvent = {
     id: string;
-    createdAt: number;
+    createdAt: string;
     eventName: string;
-    processed: boolean;
+    status: string;
     body: any;
     processingError: string;
 };
 
 export type Subscription = {
     id: string;
-    lemonSqueezyId: string;
-    orderId: number;
-    name: string;
-    email: string;
-    statusFormatted: string;
+    transactionId: string;
     status: string;
-    renewsAt: string;
+    startsAt: string;
     endsAt: string;
-    trialEndsAt: string;
     price: string;
-    isUsageBased: boolean;
-    isPaused: boolean;
-    subscriptionItemId: string;
+    productId: string;
     userId: string;
-    planId: string;
 };

@@ -3,11 +3,7 @@ import { forwardRef } from "react";
 
 // ----------------------------------------------------------------------
 
-type Props = LinkProps & {
-    target?: string;
-};
-
-const RouterLink = forwardRef<HTMLAnchorElement, Props>(({ ...other }, ref) => (
+const RouterLink = forwardRef<HTMLAnchorElement, LinkProps>(({ ...other }, ref) => (
     <Link ref={ref} {...other} />
 ));
 

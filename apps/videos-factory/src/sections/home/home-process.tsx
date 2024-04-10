@@ -3,8 +3,9 @@
 import { Typography } from "@mui/material";
 import Box from "@mui/material/Box";
 import Container from "@mui/material/Container";
+import { m } from "framer-motion";
 
-import { MotionViewport } from "@/components/animate";
+import { MotionViewport, varFade } from "@/components/animate";
 
 import HomeProcessRow from "./home-process-row";
 
@@ -46,9 +47,11 @@ export default function HomeProcess() {
             }}
         >
             <Container component={MotionViewport}>
-                <Typography variant="h2" sx={{ mb: 3, textAlign: "center" }}>
-                    Our guided process make it easy
-                </Typography>
+                <m.div variants={varFade({ distance: 240 }).inUp}>
+                    <Typography variant="h2" sx={{ mb: 3, textAlign: "center" }}>
+                        Our guided process make it easy
+                    </Typography>
+                </m.div>
                 {processes.map((x, index) => (
                     <HomeProcessRow key={x.title} process={x} isReversed={index % 2 !== 1} />
                 ))}

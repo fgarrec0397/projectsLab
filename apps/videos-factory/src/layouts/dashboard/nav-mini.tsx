@@ -4,7 +4,6 @@ import Stack from "@mui/material/Stack";
 import { useAuthContext } from "@/auth/hooks";
 import Logo from "@/components/logo";
 import { NavSectionMini } from "@/components/nav-section";
-import { paths } from "@/routes/paths";
 import { hideScroll } from "@/theme/css";
 
 import NavToggleButton from "../common/nav-toggle-button";
@@ -42,7 +41,7 @@ export default function NavMini() {
                     ...hideScroll.x,
                 }}
             >
-                <Logo sx={{ mx: "auto", my: 2 }} url={paths.dashboard.root} showSingleLogo />
+                <Logo sx={{ mx: "auto", my: 2 }} showSingleLogo />
 
                 <NavSectionMini
                     data={navData}

@@ -17,6 +17,10 @@ import { useRouter } from "@/routes/hooks";
 
 const OPTIONS = [
     {
+        label: "Home",
+        linkTo: "/",
+    },
+    {
         label: "Profile",
         linkTo: "/#1",
     },

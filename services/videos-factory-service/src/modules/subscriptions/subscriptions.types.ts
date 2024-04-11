@@ -11,8 +11,8 @@ export type Subscription = {
     id: string;
     transactionId: string;
     status: string;
-    startsAt: string;
-    endsAt: string;
+    startsAt: number;
+    endsAt: number;
     price: string;
     productId: string;
     userId: string;

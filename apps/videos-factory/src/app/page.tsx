@@ -1,7 +1,14 @@
+"use client";
+
 // ----------------------------------------------------------------------
 
+import MainLayout from "@/layouts/main";
 import { HomeView } from "@/sections/home/view";
 
 export default function HomePage() {
-    return <HomeView />;
+    return (
+        <MainLayout>
+            <HomeView />
+        </MainLayout>
+    );
 }

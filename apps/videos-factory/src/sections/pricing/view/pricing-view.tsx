@@ -24,8 +24,10 @@ export default function PricingView() {
 
             <m.div variants={varFade().inUp}>
                 <Typography sx={{ color: "text.secondary" }}>
-                    Transparent and predictable prices to start gaining traction. No credit cards
-                    required
+                    <strong>Transparent</strong> and <strong>predictable</strong> prices to start
+                    gaining traction.
+                    <br />
+                    <i>No credit cards required</i>
                 </Typography>
             </m.div>
         </Stack>

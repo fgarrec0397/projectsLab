@@ -10,4 +10,6 @@ export type Plan = {
     features: string[];
     moreFeatures: string[];
     sort: number;
+    allowedVideos: number;
+    allowedStorage: number;
 };

@@ -4,11 +4,11 @@ import Card from "@mui/material/Card";
 import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
 import { visuallyHidden } from "@mui/utils";
-import { useMemo } from "react";
 
 import EssentialsPlanIcon from "@/assets/icons/essentials-plan-icon";
 import FreePlanIcon from "@/assets/icons/free-plan-icon";
 import GrowthPlanIcon from "@/assets/icons/growth-plan-icon";
+import { useAuthContext } from "@/auth/hooks";
 import Iconify from "@/components/iconify";
 import { pxToRem } from "@/theme/typography";
 import { IPlan } from "@/types/billing";
@@ -28,24 +28,46 @@ type Props = {
 const planDataMapping = {
     Free: {
         icon: <FreePlanIcon />,
+        buttonText: {
+            loggedIn: "Cancel and Go Free",
+            notLoggedIn: "Try Free",
+            notSubscribed: "Get Free",
+        },
     },
     Essentials: {
         icon: <EssentialsPlanIcon />,
         isPopular: true,
+        buttonText: {
+            loggedIn: "Switch to Essentials",
+            notLoggedIn: "Try Free",
+            notSubscribed: "Get Essentials",
+        },
     },
     Growth: {
         icon: <GrowthPlanIcon />,
         isBestDeal: true,
+        buttonText: {
+            loggedIn: "Switch to Growth",
+            notLoggedIn: "Try Free",
+            notSubscribed: "Get Growth",
+        },
     },
 };
 
 export default function SubscriptionPlanCard({ plan, isYearly }: Props) {
     const theme = useTheme();
+    const { authenticated, user } = useAuthContext();
     const isTablet = useMediaQuery(theme.breakpoints.between("sm", "md"));
     const mappedPlanData = (planDataMapping as any)[plan.name as any];
     const isPopular = mappedPlanData?.isPopular;
     const isBestDeal = mappedPlanData?.isBestDeal;
     const featuresLists = [plan.features, plan.moreFeatures];
+    const isCurrentPlan =
+        user?.currentPlanId === plan.id || (plan.name === "Free" && !user?.currentPlanId);
+
+    const renderIsCurrentLabel = (isTopRight?: boolean) => (
+        <SubscriptionPlanLabel text="CURRENT PLAN" color="primary" isTopRight={isTopRight} />
+    );
 
     const renderPopularLabel = (isTopRight?: boolean) => (
         <SubscriptionPlanLabel
@@ -69,8 +91,14 @@ export default function SubscriptionPlanCard({ plan, isYearly }: Props) {
         <Stack direction="row" alignItems="center" justifyContent="space-between">
             <Box sx={{ height: 48 }}>{mappedPlanData?.icon}</Box>
 
-            {isPopular && !isTablet && renderPopularLabel()}
-            {isBestDeal && !isTablet && renderBestDealLabel()}
+            {authenticated ? (
+                isCurrentPlan && !isTablet && renderIsCurrentLabel()
+            ) : (
+                <>
+                    {isPopular && !isTablet && renderPopularLabel()}
+                    {isBestDeal && !isTablet && renderBestDealLabel()}
+                </>
+            )}
         </Stack>
     );
 
@@ -171,15 +199,30 @@ export default function SubscriptionPlanCard({ plan, isYearly }: Props) {
                         {renderPrice}
                     </Stack>
 
-                    {/* <Divider sx={{ borderStyle: "dashed" }} /> */}
-
                     {renderLists}
-                    {isPopular && isTablet && renderPopularLabel(true)}
-                    {isBestDeal && isTablet && renderBestDealLabel(true)}
+                    {/* {authenticated ? (
+                        isCurrentPlan && !isTablet && renderIsCurrentLabel(true)
+                    ) : (
+                        <>
+                            {isPopular && !isTablet && renderPopularLabel(true)}
+                            {isBestDeal && !isTablet && renderBestDealLabel(true)}
+                        </>
+                    )} */}
                 </Stack>
             </CardContent>
             <CardActions sx={{ p: 4 }}>
-                <SubscriptionPlanButton plan={plan} isYearly={isYearly} />
+                <SubscriptionPlanButton
+                    plan={plan}
+                    isYearly={isYearly}
+                    isCurrentPlan={isCurrentPlan}
+                    text={
+                        authenticated
+                            ? user?.currentPlanId
+                                ? mappedPlanData.buttonText.loggedIn
+                                : mappedPlanData.buttonText.notSubscribed
+                            : mappedPlanData.buttonText.notLoggedIn
+                    }
+                />
             </CardActions>
         </Card>
     );

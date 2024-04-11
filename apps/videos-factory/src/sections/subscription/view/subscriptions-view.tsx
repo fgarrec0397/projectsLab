@@ -11,11 +11,10 @@ import SubscriptionPricinPlans from "../components/subscription-pricing-plans";
 
 export default function SubscriptionsView() {
     const { plans, isPlansLoading } = useGetPricingPlans();
-    const userHasSubscription = false;
 
     return (
         <PageWrapper
-            title={userHasSubscription ? "Subscription plans" : "Early adopters pricing"}
+            title={"Subscription plans"}
             isLoading={isPlansLoading}
             subContent={
                 <Typography>

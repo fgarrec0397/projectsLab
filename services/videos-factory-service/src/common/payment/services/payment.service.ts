@@ -1,11 +1,3 @@
-import {
-    createCheckout,
-    getProduct,
-    lemonSqueezySetup,
-    listPrices,
-    listProducts,
-    Variant,
-} from "@lemonsqueezy/lemonsqueezy.js";
 import { Injectable, OnModuleInit } from "@nestjs/common";
 import { Environment, Paddle } from "@paddle/paddle-node-sdk";
 import { DatabaseConfig, InjectDatabase } from "src/config/database-config.module";
@@ -47,30 +39,18 @@ export class PaymentService implements OnModuleInit {
     }
 
     async syncPlans() {
-        console.log("[SYNC PLANS]");
-
         const productVariants: Plan[] = await this.database.findAll("plans");
 
-        // for (const plan of plans) {
-        //     await this.database.createOrUpdate("plans", plan);
-        // }
         const addPlan = async (plan: Plan) => {
-            console.log("[ADD PLAN]");
             await this.database.createOrUpdate("plans", plan);
 
             productVariants.push(plan);
         };
 
-        console.log("[GET PLANS]");
         const plans = await this.getPricingPlans();
-        // console.log(JSON.stringify(plans), "plans");
 
         if (plans) {
             for (const [index, plan] of plans.entries()) {
-                // if (plan.status !== "active" || plans.length !== 1) {
-                //     continue;
-                // }
-
                 const { id, name, description, customData } = plan;
 
                 const plansOrder = {
@@ -105,6 +85,22 @@ export class PaymentService implements OnModuleInit {
                     })
                     .filter((x) => x !== undefined && x !== null);
 
+                const allowedVideos = Object.entries(customData)
+                    .map(([key, value]) => {
+                        if (key.includes("allowed_videos")) {
+                            return value as string;
+                        }
+                    })
+                    .filter((x) => x !== undefined && x !== null)[0];
+
+                const allowedStorage = Object.entries(customData)
+                    .map(([key, value]) => {
+                        if (key.includes("allowed_memories")) {
+                            return value as string;
+                        }
+                    })
+                    .filter((x) => x !== undefined && x !== null)[0];
+
                 plan.prices.forEach((x) => {
                     prices[x.name as PriceName] = {
                         id: x.id,
@@ -125,6 +121,8 @@ export class PaymentService implements OnModuleInit {
                     features,
                     moreFeatures,
                     sort: plansOrder[plan.name],
+                    allowedVideos,
+                    allowedStorage,
                 });
 
                 await addPlan({
@@ -139,32 +137,12 @@ export class PaymentService implements OnModuleInit {
                     features,
                     moreFeatures,
                     sort: plansOrder[plan.name],
+                    allowedVideos: Number(allowedVideos),
+                    allowedStorage: Number(allowedStorage),
                 });
             }
         }
 
         return productVariants;
-    }
-
-    async getCheckoutURL(variantId: number, user: { userId?: string; email: string }) {
-        try {
-            const checkout = await createCheckout(process.env.LEMONSQUEEZY_STORE_ID!, variantId, {
-                checkoutData: {
-                    email: user.email ?? undefined,
-                    custom: {
-                        user_id: user.userId,
-                    },
-                },
-                productOptions: {
-                    enabledVariants: [variantId],
-                    redirectUrl: `${process.env.STORE_FRONT_URL}/dashboard/`,
-                    receiptButtonText: "Go to Dashboard",
-                },
-            });
-
-            return checkout.data?.data.attributes.url;
-        } catch (error) {
-            console.log(error);
-        }
     }
 }

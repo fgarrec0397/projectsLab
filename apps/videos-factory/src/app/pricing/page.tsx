@@ -1,12 +1,9 @@
 "use client";
 
-import { useEffect } from "react";
-
-import { PATH_AFTER_LOGIN } from "@/config-global";
-import { useRouter } from "@/routes/hooks";
+import PricingView from "@/sections/pricing/view/pricing-view";
 
 // ----------------------------------------------------------------------
 
 export default function PricingPage() {
-    return <>Pricing Page</>;
+    return <PricingView />;
 }

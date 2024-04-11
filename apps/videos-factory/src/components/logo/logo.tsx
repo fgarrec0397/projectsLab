@@ -10,10 +10,11 @@ import { RouterLink } from "@/routes/components";
 export interface LogoProps extends BoxProps {
     disabledLink?: boolean;
     showSingleLogo?: boolean;
+    url?: string;
 }
 
 const Logo = forwardRef<HTMLDivElement, LogoProps>(
-    ({ disabledLink = false, showSingleLogo, sx, ...other }, ref) => {
+    ({ disabledLink = false, showSingleLogo, url, sx, ...other }, ref) => {
         const theme = useTheme();
 
         const PRIMARY_LIGHT = theme.palette.primary.light;
@@ -135,7 +136,7 @@ const Logo = forwardRef<HTMLDivElement, LogoProps>(
         }
 
         return (
-            <Link component={RouterLink} href="/" sx={{ display: "contents" }}>
+            <Link component={RouterLink} href={url ? url : "/"} sx={{ display: "contents" }}>
                 {logo}
             </Link>
         );

@@ -3,4 +3,6 @@ export type User = {
     email: string;
     uid: string;
     currentPlanId?: string;
+    billingStartsAt: number;
+    billingEndsAt: number;
 };

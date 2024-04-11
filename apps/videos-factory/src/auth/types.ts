@@ -17,6 +17,7 @@ export type AuthUserType =
     | null
     | (Record<string, any> & {
           accessToken?: string;
+          currentPlanId?: string;
       });
 
 export type AuthStateType = {

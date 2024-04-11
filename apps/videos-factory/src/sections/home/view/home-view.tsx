@@ -5,7 +5,6 @@ import { styled } from "@mui/material/styles";
 import { useScroll } from "framer-motion";
 
 import ScrollProgress from "@/components/scroll-progress";
-import MainLayout from "@/layouts/main";
 
 import HomeFilesManagerShowcase from "../home-files-manager-showcase";
 import HomeHero from "../home-hero";
@@ -36,7 +35,7 @@ const StyledPolygon = styled("div")<StyledPolygonProps>(({ anchor = "top", theme
     }),
     ...(anchor === "bottom" && {
         bottom: -1,
-        backgroundColor: theme.palette.grey[900],
+        // backgroundColor: theme.palette.grey[900],
     }),
 }));
 
@@ -44,7 +43,7 @@ export default function HomeView() {
     const { scrollYProgress } = useScroll();
 
     return (
-        <MainLayout>
+        <>
             <ScrollProgress scrollYProgress={scrollYProgress} />
 
             <HomeHero />
@@ -66,8 +65,8 @@ export default function HomeView() {
                     <StyledPolygon anchor="bottom" />
                 </Box>
                 <HomeRoadmap />
-                {/* <HomePricing /> */}
+                <HomePricing />
             </Box>
-        </MainLayout>
+        </>
     );
 }

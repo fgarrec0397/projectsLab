@@ -16,10 +16,6 @@ export class SubscriptionsService {
         @InjectDatabase() private readonly database: DatabaseConfig
     ) {}
 
-    async getCheckoutURL(variantId: number, user: { userId?: string; email: string }) {
-        return this.payment.getCheckoutURL(variantId, user);
-    }
-
     async getUserSubscriptions(userId: string) {
         const subscriptionCollectionPath = `users/${userId}/subscriptions`;
 
@@ -49,9 +45,30 @@ export class SubscriptionsService {
         const subscriptionCollectionPath = `users/${userId}/subscriptions`;
 
         try {
-            await this.database.createOrUpdate(subscriptionCollectionPath, subscription);
+            await this.database.createOrUpdate(subscriptionCollectionPath, {
+                ...subscription,
+                subscriptionId: subscription.id,
+                id: "current",
+            });
             await this.usersService.updateUser(userId, {
                 currentPlanId: subscription.productId,
+                billingStartsAt: subscription.startsAt,
+                billingEndsAt: subscription.endsAt,
+            });
+
+            return subscription;
+        } catch (error) {
+            console.log(error);
+        }
+    }
+
+    async updateSubscription(userId: string, subscription: Subscription) {
+        const subscriptionCollectionPath = `users/${userId}/subscriptions`;
+
+        try {
+            await this.database.createOrUpdate(subscriptionCollectionPath, subscription);
+            await this.usersService.updateUser(userId, {
+                currentPlanId: undefined,
             });
 
             return subscription;
@@ -77,6 +94,7 @@ export class SubscriptionsService {
                     throw new Error("Signature invalid");
                 }
 
+                console.log(eventData.eventType, "eventData.eventType");
                 switch (eventData.eventType) {
                     case EventName.SubscriptionCreated:
                         const subscriptionData = eventData.data as SubscriptionNotification;
@@ -87,8 +105,12 @@ export class SubscriptionsService {
                             id: eventData.data.id,
                             transactionId: eventData.data.transactionId,
                             status: subscriptionData.status,
-                            startsAt: subscriptionData.currentBillingPeriod.startsAt,
-                            endsAt: subscriptionData.currentBillingPeriod.endsAt,
+                            startsAt: new Date(
+                                subscriptionData.currentBillingPeriod.startsAt
+                            ).getTime(),
+                            endsAt: new Date(
+                                subscriptionData.currentBillingPeriod.endsAt
+                            ).getTime(),
                             price: subscriptionData.items[0].price.unitPrice.amount,
                             productId: subscriptionData.items[0].price.productId,
                             userId: (subscriptionData.customData as any).userId,
@@ -99,6 +121,8 @@ export class SubscriptionsService {
                         } catch (error) {
                             console.error(error);
                         }
+                        break;
+                    case EventName.SubscriptionCanceled:
                         break;
                     case EventName.SubscriptionUpdated:
                         console.log(`Subscription ${eventData.data.id} was updated`);

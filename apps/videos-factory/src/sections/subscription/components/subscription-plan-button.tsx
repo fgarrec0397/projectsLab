@@ -1,44 +1,37 @@
 import { CardProps } from "@mui/material/Card";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
 
 import { useAuthContext } from "@/auth/hooks";
 import { PrimaryButton } from "@/components/button";
-import { getCheckoutURL } from "@/services/subscriptionsService/subscriptionsService";
+import { paths } from "@/routes/paths";
 import { IPlan } from "@/types/billing";
-// import { IPlanVariant } from "@/types/billing";
 
 // ----------------------------------------------------------------------
 
 type Props = CardProps & {
     plan: IPlan;
-    currentPlan?: IPlan;
     isYearly?: boolean;
-    embed?: boolean;
+    isCurrentPlan?: boolean;
+    text: string;
 };
 
-export default function SubscriptionPlanButton({ plan, currentPlan, isYearly }: Props) {
+export default function SubscriptionPlanButton({ plan, isYearly, isCurrentPlan, text }: Props) {
     const router = useRouter();
-    const auth = useAuthContext();
-    const [loading, setLoading] = useState(false);
-    const isCurrent = plan.id === currentPlan?.id;
+    const { authenticated, user } = useAuthContext();
 
-    const label = isCurrent ? "Your plan" : "Sign up";
-
-    // Make sure Lemon.js is loaded, you need to enqueue the Lemon Squeezy SDK in your app first.
-    useEffect(() => {
-        if (typeof window.createLemonSqueezy === "function") {
-            window.createLemonSqueezy();
-        }
-    }, []);
+    const buttonText = isCurrentPlan ? "Current plan" : text;
 
     const onClick = async () => {
+        if (!authenticated) {
+            return router.push(paths.auth.register);
+        }
+
         (window as any).Paddle.Checkout.open({
             customer: {
-                email: auth.user?.email,
+                email: user?.email,
             },
             customData: {
-                userId: auth.user?.id,
+                userId: user?.id,
             },
             items: [
                 {
@@ -55,10 +48,9 @@ export default function SubscriptionPlanButton({ plan, currentPlan, isYearly }: 
             size="large"
             variant="contained"
             onClick={onClick}
-            // disabled={basic}
-            // color={starter ? "primary" : "inherit"}
+            disabled={isCurrentPlan}
         >
-            {"test"}
+            {buttonText}
         </PrimaryButton>
     );
 }

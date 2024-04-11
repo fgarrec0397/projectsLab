@@ -38,6 +38,14 @@ export class PaymentService implements OnModuleInit {
         }
     }
 
+    async getPricingPlanById(id: string) {
+        try {
+            return await this.database.findOne<Plan>("plans", id);
+        } catch (error) {
+            console.log(error);
+        }
+    }
+
     async syncPlans() {
         const productVariants: Plan[] = await this.database.findAll("plans");
 
@@ -95,7 +103,7 @@ export class PaymentService implements OnModuleInit {
 
                 const allowedStorage = Object.entries(customData)
                     .map(([key, value]) => {
-                        if (key.includes("allowed_memories")) {
+                        if (key.includes("allowed_storage")) {
                             return value as string;
                         }
                     })

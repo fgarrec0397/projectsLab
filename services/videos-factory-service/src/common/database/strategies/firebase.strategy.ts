@@ -18,6 +18,7 @@ type FirebaseTypes = {
         admin.firestore.DocumentSnapshot<admin.firestore.DocumentData, admin.firestore.DocumentData>
     >;
     update: Promise<admin.firestore.WriteResult>;
+    updateBatch: Promise<admin.firestore.WriteResult[]>;
     delete: Promise<admin.firestore.WriteResult>;
     findWithQuery: unknown;
     findWithQueryOptions: FindWithQueryOptions;
@@ -82,6 +83,22 @@ export class FirebaseDatabase implements DatabaseStrategy<FirebaseTypes> {
         },
     >(collection: string, id: string, data: TData) {
         return this.getDB().collection(collection).doc(id).update(data);
+    }
+
+    async updateBatch<
+        TData extends {
+            [x: string]: any;
+        },
+    >(collection: string, data: TData[]) {
+        const batch = this.getDB().batch();
+
+        data.forEach((item) => {
+            const sanitizedData = this.removeUndefinedProperties(item);
+            const docRef = this.getDB().collection(collection).doc(item.id);
+            batch.update(docRef, sanitizedData);
+        });
+
+        return batch.commit();
     }
 
     async delete(collection: string, id: string) {

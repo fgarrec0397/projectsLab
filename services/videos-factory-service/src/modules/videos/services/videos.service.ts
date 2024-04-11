@@ -2,7 +2,7 @@ import { Injectable } from "@nestjs/common";
 import { uidGenerator } from "@projectslab/helpers";
 import { DatabaseConfig, InjectDatabase } from "src/config/database-config.module";
 import { InjectStorageConfig, StorageConfig } from "src/config/storage-config.module";
-import { JobsService } from "src/modules/jobs/services/jobs.service";
+import { VideoRenderingJobService } from "src/modules/jobs/services/video-rendering-jobs.service";
 
 import { VIDEOS_CACHE_DURATION } from "../videos.constants";
 import { IVideo, IVideoDraft, VideoStatus } from "../videos.types";
@@ -12,7 +12,7 @@ export class VideosService {
     constructor(
         @InjectDatabase() private readonly database: DatabaseConfig,
         @InjectStorageConfig() private readonly storage: StorageConfig,
-        private readonly jobsService: JobsService
+        private readonly VideoRenderingJobService: VideoRenderingJobService
     ) {}
 
     async getVideos(userId: string, withThumbnails?: boolean) {
@@ -136,7 +136,7 @@ export class VideosService {
             updatedAt: new Date().getTime(),
         });
 
-        await this.jobsService.renderVideo({ userId, video });
+        await this.VideoRenderingJobService.renderVideo({ userId, video });
 
         return updatedDocument;
     }

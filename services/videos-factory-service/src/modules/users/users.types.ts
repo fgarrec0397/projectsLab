@@ -1,8 +1,13 @@
 export type User = {
-    displayName: string;
-    email: string;
-    uid: string;
+    displayName?: string;
+    email?: string;
+    id: string;
     currentPlanId?: string;
-    billingStartsAt: number;
-    billingEndsAt: number;
+    usageCycleEndsAt?: number;
+    subscriptionStatus?: string;
+    allowedStorage: number;
+    allowedVideos: number;
+    usedStorage: number;
+    usedVideos: number;
+    hasEarlyAdopterBadge?: boolean;
 };

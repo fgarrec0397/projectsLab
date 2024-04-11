@@ -2,9 +2,15 @@ import { BullModule } from "@nestjs/bull";
 import { Global, Module } from "@nestjs/common";
 import { NotificationsModule } from "src/modules/notifications/notifications.module";
 
+import { UsersModule } from "../users/users.module";
 import { VideoProcessingModule } from "../video-processing/video-processing.module";
 import { VideosModule } from "../videos/videos.module";
-import { JobsService } from "./services/jobs.service";
+import {
+    dailySubscriptionCheckKey,
+    DailySubscriptionCheckProcessor,
+} from "./processors/daily-subscription-check.processor";
+import { SchedulerService } from "./services/scheduler.service";
+import { VideoRenderingJobService } from "./services/video-rendering-jobs.service";
 
 @Global()
 @Module({
@@ -15,11 +21,15 @@ import { JobsService } from "./services/jobs.service";
                 port: 6379,
             },
         }),
+        BullModule.registerQueue({
+            name: dailySubscriptionCheckKey,
+        }),
         NotificationsModule,
         VideoProcessingModule,
         VideosModule,
+        UsersModule,
     ],
-    providers: [JobsService],
-    exports: [JobsService],
+    providers: [VideoRenderingJobService, SchedulerService, DailySubscriptionCheckProcessor],
+    exports: [VideoRenderingJobService],
 })
 export class JobsModule {}

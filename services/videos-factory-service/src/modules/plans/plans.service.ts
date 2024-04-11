@@ -15,7 +15,7 @@ export class PlansService {
     }
 
     async getPlans() {
-        await this.payment.syncPlans(); // TODO - remove this once user admins are created and a sync button is added
+        // await this.payment.syncPlans(); // TODO - remove this once user admins are created and a sync button is added
 
         const plans = await this.database.findWithQuery<Plan>("plans", {
             orderByField: "sort",
@@ -23,5 +23,13 @@ export class PlansService {
         });
 
         return plans;
+    }
+
+    async getFreePlan() {
+        const plans = await this.database.findWithQuery<Plan>("plans", {
+            conditions: [{ field: "yearlyPrice", operator: "==", value: "0" }],
+        });
+
+        return plans[0];
     }
 }

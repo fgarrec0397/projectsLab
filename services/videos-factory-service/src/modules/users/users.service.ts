@@ -13,6 +13,12 @@ export class UsersService {
         private readonly plansService: PlansService
     ) {}
 
+    async getUserById(userId: string) {
+        console.log(userId, "userId");
+        const user = await this.database.findOne<User>("users", userId);
+        console.log(user, "user");
+    }
+
     async createUser(userId: string) {
         const usersCollectionPath = `users`;
         const freePlan = await this.plansService.getFreePlan();
@@ -29,7 +35,7 @@ export class UsersService {
             hasEarlyAdopterBadge: true,
         };
 
-        await this.database.create(usersCollectionPath, user);
+        await this.database.createOrUpdate(usersCollectionPath, user);
     }
 
     async updateUser(userId: string, user: Partial<User>) {

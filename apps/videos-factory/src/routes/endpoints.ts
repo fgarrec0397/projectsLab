@@ -34,6 +34,7 @@ export const endpoints = {
         get: `${baseURL}/plans`,
     },
     users: {
+        create: `${baseURL}/users/create`,
         byId: (userId?: string) => `${baseURL}/users/${userId}`,
     },
 };

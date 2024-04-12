@@ -3,7 +3,6 @@
 import {
     createUserWithEmailAndPassword,
     getAuth,
-    GithubAuthProvider,
     GoogleAuthProvider,
     onAuthStateChanged,
     sendEmailVerification,
@@ -11,12 +10,12 @@ import {
     signInWithEmailAndPassword,
     signInWithPopup,
     signOut,
-    TwitterAuthProvider,
 } from "firebase/auth";
 import { collection, doc, getDoc, getFirestore, setDoc } from "firebase/firestore";
 import { useCallback, useEffect, useMemo, useReducer } from "react";
 
-import { sessionLogin, sessionLogout } from "@/services/auth/authService";
+import { sessionLogout } from "@/services/auth/authService";
+import { createUser } from "@/services/usersService/usersService";
 
 import { ActionMapType, AuthStateType, AuthUserType } from "../../types";
 import { AuthContext } from "./auth-context";
@@ -126,41 +125,24 @@ export function AuthProvider({ children }: Props) {
 
     // LOGIN
     const login = useCallback(async (email: string, password: string) => {
-        const credentials = await signInWithEmailAndPassword(AUTH, email, password);
-
-        const idToken = await credentials.user.getIdToken();
-
-        await sessionLogin(idToken);
+        await signInWithEmailAndPassword(AUTH, email, password);
     }, []);
 
     const loginWithGoogle = useCallback(async () => {
         const provider = new GoogleAuthProvider();
+        const now = Date.now();
 
         const credentials = await signInWithPopup(AUTH, provider);
+        const userCreatedAt = Number((credentials.user.metadata as any).createdAt) as number;
+        const oneMinute = 1 * 60 * 1000;
+        const targetTimestamp = userCreatedAt + oneMinute;
 
-        const idToken = await credentials.user.getIdToken();
+        if (now <= targetTimestamp) {
+            const token = await credentials.user.getIdToken();
+            const userId = credentials.user.uid;
 
-        await sessionLogin(idToken);
-    }, []);
-
-    const loginWithGithub = useCallback(async () => {
-        const provider = new GithubAuthProvider();
-
-        const credentials = await signInWithPopup(AUTH, provider);
-
-        const idToken = await credentials.user.getIdToken();
-
-        await sessionLogin(idToken);
-    }, []);
-
-    const loginWithTwitter = useCallback(async () => {
-        const provider = new TwitterAuthProvider();
-
-        const credentials = await signInWithPopup(AUTH, provider);
-
-        const idToken = await credentials.user.getIdToken();
-
-        await sessionLogin(idToken);
+            await createUser(token, userId);
+        }
     }, []);
 
     // REGISTER
@@ -216,8 +198,6 @@ export function AuthProvider({ children }: Props) {
             register,
             forgotPassword,
             loginWithGoogle,
-            loginWithGithub,
-            loginWithTwitter,
         }),
         [
             status,
@@ -227,9 +207,7 @@ export function AuthProvider({ children }: Props) {
             logout,
             register,
             forgotPassword,
-            loginWithGithub,
             loginWithGoogle,
-            loginWithTwitter,
         ]
     );
 

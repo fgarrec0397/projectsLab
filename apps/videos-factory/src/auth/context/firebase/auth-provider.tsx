@@ -11,10 +11,8 @@ import {
     signInWithPopup,
     signOut,
 } from "firebase/auth";
-import { collection, doc, getDoc, getFirestore, setDoc } from "firebase/firestore";
 import { useCallback, useEffect, useMemo, useReducer } from "react";
 
-import { sessionLogout } from "@/services/auth/authService";
 import { createUser } from "@/services/usersService/usersService";
 
 import { ActionMapType, AuthStateType, AuthUserType } from "../../types";
@@ -30,8 +28,6 @@ import { firebaseApp } from "./lib";
 // ----------------------------------------------------------------------
 
 export const AUTH = getAuth(firebaseApp);
-
-const DB = getFirestore(firebaseApp);
 
 enum Types {
     INITIAL = "INITIAL",
@@ -74,20 +70,12 @@ export function AuthProvider({ children }: Props) {
             onAuthStateChanged(AUTH, async (user) => {
                 if (user) {
                     if (user.emailVerified) {
-                        const userProfile = doc(DB, "users", user.uid);
-
-                        const docSnap = await getDoc(userProfile);
-
-                        const profile = docSnap.data();
-
                         dispatch({
                             type: Types.INITIAL,
                             payload: {
                                 user: {
                                     ...user,
-                                    ...profile,
                                     id: user.uid,
-                                    role: "admin",
                                 },
                             },
                         });
@@ -109,7 +97,6 @@ export function AuthProvider({ children }: Props) {
                 }
             });
         } catch (error) {
-            console.error(error);
             dispatch({
                 type: Types.INITIAL,
                 payload: {
@@ -123,7 +110,10 @@ export function AuthProvider({ children }: Props) {
         initialize();
     }, [initialize]);
 
-    // LOGIN
+    const handleRegister = async (token: string, userId: string) => {
+        await createUser(token, userId);
+    };
+
     const login = useCallback(async (email: string, password: string) => {
         await signInWithEmailAndPassword(AUTH, email, password);
     }, []);
@@ -141,7 +131,7 @@ export function AuthProvider({ children }: Props) {
             const token = await credentials.user.getIdToken();
             const userId = credentials.user.uid;
 
-            await createUser(token, userId);
+            await handleRegister(token, userId);
         }
     }, []);
 
@@ -155,18 +145,11 @@ export function AuthProvider({ children }: Props) {
          */
         await sendEmailVerification(newUser.user);
 
-        const userProfile = doc(collection(DB, "users"), newUser.user?.uid);
-
-        await setDoc(userProfile, {
-            uid: newUser.user?.uid,
-            email,
-        });
+        await handleRegister((newUser.user as any).accessToken, newUser.user.uid);
     }, []);
 
     // LOGOUT
     const logout = useCallback(async () => {
-        await sessionLogout();
-
         await signOut(AUTH);
     }, []);
 

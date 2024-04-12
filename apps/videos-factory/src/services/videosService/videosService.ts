@@ -5,6 +5,10 @@ import axiosInstance from "@/utils/axios";
 export const getVideos = async (accessToken: string | undefined) => {
     const url = `${endpoints.videos.get}?withThumbnails=true`;
 
+    if (!accessToken) {
+        return [];
+    }
+
     const response = await axiosInstance.get<IVideo[]>(url, {
         headers: {
             Accept: "application/json",
@@ -18,6 +22,10 @@ export const getVideos = async (accessToken: string | undefined) => {
 
 export const getVideoById = async (accessToken: string | undefined, videoId?: string) => {
     const url = endpoints.videos.byId(videoId);
+
+    if (!accessToken) {
+        return;
+    }
 
     const response = await axiosInstance.get<IVideo>(url, {
         headers: {

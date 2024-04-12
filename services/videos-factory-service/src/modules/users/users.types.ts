@@ -4,6 +4,8 @@ export type User = {
     id: string;
     currentPlanId?: string;
     usageCycleEndsAt?: number;
+    billingEndsAt?: number;
+    billingStartsAt?: number;
     subscriptionStatus?: string;
     allowedStorage: number;
     allowedVideos: number;

@@ -48,9 +48,21 @@ export class FirebaseDatabase implements DatabaseStrategy<FirebaseTypes> {
         return this.defaultApp.firestore();
     }
 
-    async create<TData>(collection: string, data: TData) {
+    async create<TData>(collection: string, data: TData, id?: string) {
         const sanitizedData = this.removeUndefinedProperties(data);
-        return this.getDB().collection(collection).add(sanitizedData);
+        const db = this.getDB();
+
+        console.log({ collection, id });
+
+        // If an ID is provided, use it to create the document.
+        // Otherwise, let Firestore generate the ID.
+        const docRef = id ? db.collection(collection).doc(id) : db.collection(collection).doc();
+
+        // Use set() to create or overwrite the document.
+        await docRef.set(sanitizedData);
+
+        // Return the document reference.
+        return docRef;
     }
 
     async createOrUpdate<TData extends { id: string }>(collection: string, data: TData) {

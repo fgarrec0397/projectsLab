@@ -63,7 +63,8 @@ export default function SubscriptionPlanCard({ plan, isYearly }: Props) {
     const isBestDeal = mappedPlanData?.isBestDeal;
     const featuresLists = [plan.features, plan.moreFeatures];
     const isCurrentPlan =
-        user?.currentPlanId === plan.id || (plan.name === "Free" && !user?.currentPlanId);
+        user?.currentPlanId === plan.id || (plan.name === "Free" && user?.currentPlanId === "free");
+    console.log();
 
     const renderIsCurrentLabel = (isTopRight?: boolean) => (
         <SubscriptionPlanLabel text="CURRENT PLAN" color="primary" isTopRight={isTopRight} />

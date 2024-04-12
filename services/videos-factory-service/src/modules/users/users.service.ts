@@ -14,9 +14,9 @@ export class UsersService {
     ) {}
 
     async getUserById(userId: string) {
-        console.log(userId, "userId");
         const user = await this.database.findOne<User>("users", userId);
-        console.log(user, "user");
+
+        return user;
     }
 
     async createUser(userId: string) {
@@ -35,7 +35,7 @@ export class UsersService {
             hasEarlyAdopterBadge: true,
         };
 
-        await this.database.createOrUpdate(usersCollectionPath, user);
+        await this.database.create(usersCollectionPath, user, userId);
     }
 
     async updateUser(userId: string, user: Partial<User>) {

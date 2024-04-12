@@ -12,9 +12,7 @@ export class UsersController {
     }
 
     @Post("create")
-    createUser(@Body() userId: string) {
-        console.log("create user");
-
+    createUser(@Body("userId") userId: string) {
         return this.usersService.createUser(userId);
     }
 }

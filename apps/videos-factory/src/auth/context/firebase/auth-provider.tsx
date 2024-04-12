@@ -130,9 +130,9 @@ export function AuthProvider({ children }: Props) {
 
     const loginWithGoogle = useCallback(async () => {
         const provider = new GoogleAuthProvider();
-        const now = Date.now();
 
         const credentials = await signInWithPopup(AUTH, provider);
+        const now = Date.now();
         const userCreatedAt = Number((credentials.user.metadata as any).createdAt) as number;
         const oneMinute = 1 * 60 * 1000;
         const targetTimestamp = userCreatedAt + oneMinute;

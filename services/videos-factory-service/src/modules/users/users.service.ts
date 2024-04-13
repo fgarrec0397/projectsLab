@@ -19,12 +19,13 @@ export class UsersService {
         return user;
     }
 
-    async createUser(userId: string) {
+    async createUser(user: User) {
         const usersCollectionPath = `users`;
         const freePlan = await this.plansService.getFreePlan();
+        console.log(user);
 
-        const user: User = {
-            id: userId,
+        const newUser: User = {
+            ...user,
             currentPlanId: "free",
             usageCycleEndsAt: addMonth(Date.now()),
             subscriptionStatus: "free",
@@ -32,10 +33,9 @@ export class UsersService {
             allowedVideos: freePlan.allowedVideos,
             usedStorage: 0,
             usedVideos: 0,
-            hasEarlyAdopterBadge: true,
         };
 
-        await this.database.create(usersCollectionPath, user, userId);
+        await this.database.createOrUpdate(usersCollectionPath, newUser);
     }
 
     async updateUser(userId: string, user: Partial<User>) {

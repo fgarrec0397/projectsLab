@@ -9,6 +9,7 @@ import Grid from "@mui/system/Unstable_Grid";
 import { ChangeEvent, useLayoutEffect, useState } from "react";
 
 import { IPlan } from "@/types/billing";
+import { IUser } from "@/types/user";
 
 import PricingCard from "./subscription-plan-card";
 
@@ -17,6 +18,7 @@ import PricingCard from "./subscription-plan-card";
 type Props = {
     align?: "left" | "center";
     plans: IPlan[];
+    user: IUser;
 };
 
 const arrow = (
@@ -34,7 +36,7 @@ const arrow = (
     </svg>
 );
 
-export default function SubscriptionPricinPlans({ plans, align = "left" }: Props) {
+export default function SubscriptionPricinPlans({ plans, align = "left", user }: Props) {
     const [isYearly, setIsYearly] = useState(true);
     const theme = useTheme();
     const isDesktop = useMediaQuery(theme.breakpoints.up("md"));
@@ -93,7 +95,7 @@ export default function SubscriptionPricinPlans({ plans, align = "left" }: Props
                 {plans.map((x, index) => {
                     return (
                         <Grid key={x.id} xs={12} md={4}>
-                            <PricingCard plan={x} isYearly={isYearly} index={index} />
+                            <PricingCard plan={x} isYearly={isYearly} index={index} user={user} />
                         </Grid>
                     );
                 })}

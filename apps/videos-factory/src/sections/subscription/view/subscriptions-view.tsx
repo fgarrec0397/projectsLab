@@ -31,7 +31,7 @@ export default function SubscriptionsView() {
                 </>
             }
         >
-            <SubscriptionPricinPlans plans={plans} />
+            {user !== undefined && <SubscriptionPricinPlans plans={plans} user={user} />}
         </PageWrapper>
     );
 }

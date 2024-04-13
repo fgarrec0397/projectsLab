@@ -3,6 +3,8 @@ export type User = {
     email?: string;
     id: string;
     currentPlanId?: string;
+    currentPlanPriceId?: string;
+    subscriptionId?: string;
     usageCycleEndsAt?: number;
     billingEndsAt?: number;
     billingStartsAt?: number;

@@ -1,21 +1,26 @@
 import { endpoints } from "@/routes/endpoints";
 import axiosInstance from "@/utils/axios";
 
-export const getCheckoutURL = async (
+export const updateSubscription = async (
     accessToken: string | undefined,
-    email: string,
-    variantId: string
+    newPriceId: string,
+    isPreview = false
 ) => {
-    const response = await axiosInstance.get<string>(
-        `${endpoints.subscriptions.checkout.get}?email=${email}&variantId=${variantId}`,
+    const response = await axiosInstance.patch<any>(
+        `${endpoints.subscriptions.update}?isPreview=${isPreview}`,
+        {
+            newPriceId,
+            isPreview,
+        },
         {
             headers: {
                 Accept: "application/json",
                 Authorization: `Bearer ${accessToken}`,
-                "ngrok-skip-browser-warning": "asd",
             },
         }
     );
+
+    console.log(response.data, "response.data");
 
     return response.data;
 };

@@ -46,6 +46,36 @@ export class PaymentService implements OnModuleInit {
         }
     }
 
+    async updatePlan(
+        subscriptionId: string,
+        newPricingId: string,
+        oldPricingId: string,
+        isPreview = false
+    ) {
+        try {
+            const currentSubscription = await this.paddle.subscriptions.get(subscriptionId);
+            const currentItems = currentSubscription.items
+                .map((x) => ({
+                    priceId: x.price.id,
+                    quantity: x.quantity,
+                }))
+                .filter((x) => x.priceId !== oldPricingId);
+
+            if (isPreview) {
+                return await this.paddle.subscriptions.previewUpdate(subscriptionId, {
+                    prorationBillingMode: "prorated_immediately",
+                    items: [...currentItems, { priceId: newPricingId, quantity: 1 }],
+                });
+            }
+
+            await this.paddle.subscriptions.update(subscriptionId, {
+                prorationBillingMode: "prorated_immediately",
+            });
+        } catch (error) {
+            console.log(error);
+        }
+    }
+
     async syncPlans() {
         const productVariants: Plan[] = await this.database.findAll("plans");
 

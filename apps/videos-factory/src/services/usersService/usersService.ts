@@ -2,19 +2,15 @@ import { endpoints } from "@/routes/endpoints";
 import { IUser } from "@/types/user";
 import axiosInstance from "@/utils/axios";
 
-export async function createUser(accessToken: string | undefined, userId: string) {
+export async function createUser(accessToken: string | undefined, user: Partial<IUser>) {
     try {
-        return await axiosInstance.post(
-            endpoints.users.create,
-            { userId },
-            {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    Authorization: `Bearer ${accessToken}`,
-                },
-            }
-        );
+        return await axiosInstance.post(endpoints.users.create, user, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${accessToken}`,
+            },
+        });
     } catch (error) {
         console.error("An error occurred during login:", error);
         throw error;

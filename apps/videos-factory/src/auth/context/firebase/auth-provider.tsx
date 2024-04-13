@@ -14,6 +14,7 @@ import {
 import { useCallback, useEffect, useMemo, useReducer } from "react";
 
 import { createUser } from "@/services/usersService/usersService";
+import { IUser } from "@/types/user";
 
 import { ActionMapType, AuthStateType, AuthUserType } from "../../types";
 import { AuthContext } from "./auth-context";
@@ -110,8 +111,8 @@ export function AuthProvider({ children }: Props) {
         initialize();
     }, [initialize]);
 
-    const handleRegister = async (token: string, userId: string) => {
-        await createUser(token, userId);
+    const handleRegister = async (token: string, user: Partial<IUser>) => {
+        await createUser(token, user);
     };
 
     const login = useCallback(async (email: string, password: string) => {
@@ -129,23 +130,29 @@ export function AuthProvider({ children }: Props) {
 
         if (now <= targetTimestamp) {
             const token = await credentials.user.getIdToken();
-            const userId = credentials.user.uid;
+            const { user } = credentials;
 
-            await handleRegister(token, userId);
+            await handleRegister(token, {
+                id: user.uid,
+                email: user.email || undefined,
+            });
         }
     }, []);
 
     // REGISTER
     const register = useCallback(async (email: string, password: string) => {
         const newUser = await createUserWithEmailAndPassword(AUTH, email, password);
-
+        const { user } = newUser;
         /*
          * (1) If skip emailVerified
          * Remove : await sendEmailVerification(newUser.user);
          */
-        await sendEmailVerification(newUser.user);
+        await sendEmailVerification(user);
 
-        await handleRegister((newUser.user as any).accessToken, newUser.user.uid);
+        await handleRegister((user as any).accessToken, {
+            id: user.uid,
+            email: user.email || undefined,
+        });
     }, []);
 
     // LOGOUT

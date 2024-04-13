@@ -12,6 +12,7 @@ import { useAuthContext } from "@/auth/hooks";
 import Iconify from "@/components/iconify";
 import { pxToRem } from "@/theme/typography";
 import { IPlan } from "@/types/billing";
+import { IUser } from "@/types/user";
 import { getPrice } from "@/utils/lemon-squeezy";
 
 import SubscriptionPlanButton from "./subscription-plan-button";
@@ -23,6 +24,7 @@ type Props = {
     plan: IPlan;
     index: number;
     isYearly: boolean;
+    user: IUser;
 };
 
 const planDataMapping = {
@@ -54,9 +56,9 @@ const planDataMapping = {
     },
 };
 
-export default function SubscriptionPlanCard({ plan, isYearly }: Props) {
+export default function SubscriptionPlanCard({ plan, isYearly, user }: Props) {
     const theme = useTheme();
-    const { authenticated, user } = useAuthContext();
+    const { authenticated } = useAuthContext();
     const isTablet = useMediaQuery(theme.breakpoints.between("sm", "md"));
     const mappedPlanData = (planDataMapping as any)[plan.name as any];
     const isPopular = mappedPlanData?.isPopular;
@@ -215,6 +217,7 @@ export default function SubscriptionPlanCard({ plan, isYearly }: Props) {
                     plan={plan}
                     isYearly={isYearly}
                     isCurrentPlan={isCurrentPlan}
+                    user={user}
                     text={
                         authenticated
                             ? user?.currentPlanId

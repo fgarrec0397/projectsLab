@@ -96,7 +96,10 @@ export class SubscriptionsService {
                     } catch (error) {
                         console.error(error);
                     }
-                } else if (eventData.eventType === EventName.SubscriptionCanceled) {
+                } else if (
+                    eventData.eventType === EventName.SubscriptionCanceled ||
+                    eventData.eventType === EventName.SubscriptionPastDue
+                ) {
                     try {
                         console.log(`Subscription ${eventData.data.id} was cancelled`);
 

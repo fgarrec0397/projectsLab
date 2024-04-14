@@ -14,4 +14,5 @@ export type User = {
     usedStorage: number;
     usedVideos: number;
     hasEarlyAdopterBadge?: boolean;
+    cancelReasons?: string[];
 };

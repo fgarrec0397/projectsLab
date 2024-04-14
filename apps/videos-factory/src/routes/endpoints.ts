@@ -27,6 +27,7 @@ export const endpoints = {
     },
     subscriptions: {
         update: `${baseURL}/subscriptions/update`,
+        cancel: `${baseURL}/subscriptions/cancel`,
     },
     plans: {
         get: `${baseURL}/plans`,

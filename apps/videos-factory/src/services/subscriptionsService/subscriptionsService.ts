@@ -20,7 +20,22 @@ export const updateSubscription = async (
         }
     );
 
-    console.log(response.data, "response.data");
+    return response.data;
+};
+
+export const cancelSubscription = async (accessToken: string | undefined, reason: string) => {
+    const response = await axiosInstance.patch<any>(
+        `${endpoints.subscriptions.cancel}`,
+        {
+            reason,
+        },
+        {
+            headers: {
+                Accept: "application/json",
+                Authorization: `Bearer ${accessToken}`,
+            },
+        }
+    );
 
     return response.data;
 };

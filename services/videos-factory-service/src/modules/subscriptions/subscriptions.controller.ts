@@ -1,4 +1,13 @@
-import { Body, Controller, Patch, Post, Query, RawBodyRequest, Req } from "@nestjs/common";
+import {
+    Body,
+    Controller,
+    ParseBoolPipe,
+    Patch,
+    Post,
+    Query,
+    RawBodyRequest,
+    Req,
+} from "@nestjs/common";
 import { Request } from "express";
 
 import { Public } from "../auth/decorators/use-public.guard";
@@ -12,9 +21,14 @@ export class SubscriptionsController {
     async updateSubscription(
         @Req() request: Request,
         @Body("newPriceId") newPriceId: string,
-        @Query("isPreview") isPreview: boolean
+        @Query("isPreview", ParseBoolPipe) isPreview: boolean
     ) {
         return this.subscriptionService.updateSubscription(request.userId, newPriceId, isPreview);
+    }
+
+    @Patch("cancel")
+    async cancelSubscription(@Req() request: Request, @Body("reason") reason: string) {
+        return this.subscriptionService.cancelSubscription(request.userId, reason);
     }
 
     @Post("webhook")

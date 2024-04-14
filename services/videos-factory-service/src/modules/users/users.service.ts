@@ -28,7 +28,9 @@ export class UsersService {
             ...user,
             currentPlanId: "free",
             usageCycleEndsAt: addMonth(Date.now()),
-            subscriptionStatus: "free",
+            subscriptionStatus: "trialing",
+            billingStartsAt: 0,
+            billingEndsAt: 0,
             allowedStorage: freePlan.allowedStorage,
             allowedVideos: freePlan.allowedVideos,
             usedStorage: 0,
@@ -49,6 +51,7 @@ export class UsersService {
         const usageCycleEndtimeFrame = new Date().getTime() + DAY_IN_SECONDS * 1000;
 
         const updatedUsers: User[] = [];
+        const freePlan = await this.plansService.getFreePlan();
         const users = await this.database.findWithQuery<User>(usersCollectionPath, {
             conditions: [{ field: "usageCycleEnd", operator: "<=", value: usageCycleEndtimeFrame }],
         });
@@ -56,7 +59,11 @@ export class UsersService {
         users.forEach((x) => {
             const newUser: User = {
                 ...x,
-                usedVideos: x.allowedVideos,
+                usedVideos: 0,
+                allowedStorage:
+                    x.subscriptionStatus === "cancel" ? freePlan.allowedStorage : x.allowedStorage,
+                allowedVideos:
+                    x.subscriptionStatus === "cancel" ? freePlan.allowedVideos : x.allowedVideos,
                 usageCycleEndsAt: addMonth(x.usageCycleEndsAt),
             };
 

@@ -3,10 +3,13 @@ import { useRouter } from "next/navigation";
 
 import { useAuthContext } from "@/auth/hooks";
 import { PrimaryButton } from "@/components/button";
+import { useBoolean } from "@/hooks/use-boolean";
 import { paths } from "@/routes/paths";
-import { updateSubscription } from "@/services/subscriptionsService/subscriptionsService";
 import { IPlan } from "@/types/billing";
 import { IUser } from "@/types/user";
+
+import SubscriptionPlanCancelDialog from "./subscription-plan-cancel-dialog";
+import SubscriptionPlanUpdateDialog from "./subscription-plan-update-dialog";
 
 // ----------------------------------------------------------------------
 
@@ -26,11 +29,11 @@ export default function SubscriptionPlanButton({
     user,
 }: Props) {
     const router = useRouter();
-    const { authenticated, user: authUser } = useAuthContext();
+    const isPreviewOpened = useBoolean();
+    const isCancelOpened = useBoolean();
+    const { authenticated } = useAuthContext();
     const isAlreadyOnPaidPlan = user.currentPlanId !== "free";
     const priceId = isYearly ? plan.yearlyPriceId : plan.monthlyPriceId;
-
-    console.log({ authUser, user });
 
     const buttonText = isCurrentPlan ? "Current plan" : text;
 
@@ -39,8 +42,14 @@ export default function SubscriptionPlanButton({
             return router.push(paths.auth.register);
         }
 
+        if (isAlreadyOnPaidPlan && plan.name === "Free") {
+            isCancelOpened.onTrue();
+            return;
+        }
+
         if (isAlreadyOnPaidPlan) {
-            return updateSubscription(authUser?.accessToken, priceId);
+            isPreviewOpened.onTrue();
+            return;
         }
 
         (window as any).Paddle.Checkout.open({
@@ -60,14 +69,30 @@ export default function SubscriptionPlanButton({
     };
 
     return (
-        <PrimaryButton
-            fullWidth
-            size="large"
-            variant="contained"
-            onClick={onClick}
-            disabled={isCurrentPlan}
-        >
-            {buttonText}
-        </PrimaryButton>
+        <>
+            <PrimaryButton
+                fullWidth
+                size="large"
+                variant="contained"
+                onClick={onClick}
+                disabled={isCurrentPlan}
+            >
+                {buttonText}
+            </PrimaryButton>
+            {isPreviewOpened.value && (
+                <SubscriptionPlanUpdateDialog
+                    plan={plan}
+                    open={isPreviewOpened.value}
+                    onClose={isPreviewOpened.onFalse}
+                />
+            )}
+            {isCancelOpened.value && (
+                <SubscriptionPlanCancelDialog
+                    plan={plan}
+                    open={isCancelOpened.value}
+                    onClose={isCancelOpened.onFalse}
+                />
+            )}
+        </>
     );
 }

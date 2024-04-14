@@ -68,12 +68,17 @@ export class PaymentService implements OnModuleInit {
                 });
             }
 
-            await this.paddle.subscriptions.update(subscriptionId, {
+            return await this.paddle.subscriptions.update(subscriptionId, {
                 prorationBillingMode: "prorated_immediately",
+                items: [...currentItems, { priceId: newPricingId, quantity: 1 }],
             });
         } catch (error) {
             console.log(error);
         }
+    }
+
+    async cancelPlan(subscriptionId: string) {
+        return this.paddle.subscriptions.cancel(subscriptionId, { effectiveFrom: "immediately" });
     }
 
     async syncPlans() {
@@ -88,6 +93,7 @@ export class PaymentService implements OnModuleInit {
         const plans = await this.getPricingPlans();
 
         if (plans) {
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
             for (const [index, plan] of plans.entries()) {
                 const { id, name, description, customData } = plan;
 

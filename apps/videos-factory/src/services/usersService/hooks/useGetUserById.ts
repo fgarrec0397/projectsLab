@@ -10,7 +10,7 @@ import { getUserById } from "../usersService";
 export const useGetUser = () => {
     const auth = useAuthContext();
 
-    const { data, isLoading, error, isValidating } = useSWR(
+    const { data, isLoading, error, isValidating, mutate } = useSWR(
         "currentUser",
         () => getUserById(auth.user?.accessToken, auth.user?.uid),
         {
@@ -25,8 +25,9 @@ export const useGetUser = () => {
             isUserLoading: isLoading,
             userError: error,
             isUserValidating: isValidating,
+            mutateUser: mutate,
         }),
-        [data, isLoading, error, isValidating]
+        [data, isLoading, error, isValidating, mutate]
     );
 
     return memoizedResponse;

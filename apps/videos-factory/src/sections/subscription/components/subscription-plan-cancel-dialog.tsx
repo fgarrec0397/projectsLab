@@ -9,17 +9,20 @@ import { ConfirmDialog } from "@/components/custom-dialog";
 import { useSnackbar } from "@/components/snackbar";
 import { useBoolean } from "@/hooks/use-boolean";
 import { cancelSubscription } from "@/services/subscriptionsService/subscriptionsService";
-import { IPlan } from "@/types/billing";
 
 // ----------------------------------------------------------------------
 
 type Props = CardProps & {
-    plan: IPlan;
     open: boolean;
     onClose: () => void;
+    onSubscriptionCancel?: () => void;
 };
 
-export default function SubscriptionPlanCancelDialog({ open, onClose }: Props) {
+export default function SubscriptionPlanCancelDialog({
+    open,
+    onClose,
+    onSubscriptionCancel,
+}: Props) {
     const { user } = useAuthContext();
     const { enqueueSnackbar } = useSnackbar();
     const [reason, setReason] = useState<string>("does-not-fill-need");
@@ -33,6 +36,7 @@ export default function SubscriptionPlanCancelDialog({ open, onClose }: Props) {
         try {
             isSubmitting.onTrue();
             await submitCancelPlan();
+            onSubscriptionCancel?.();
             enqueueSnackbar(`Plan changed with success!`, { variant: "success" });
             onClose();
         } catch (error) {

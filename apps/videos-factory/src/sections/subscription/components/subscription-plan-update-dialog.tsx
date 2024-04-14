@@ -30,9 +30,15 @@ type Props = CardProps & {
     plan: IPlan;
     open: boolean;
     onClose: () => void;
+    onSubscriptionSubmit?: () => void;
 };
 
-export default function SubscriptionPlanUpdateDialog({ plan, open, onClose }: Props) {
+export default function SubscriptionPlanUpdateDialog({
+    plan,
+    open,
+    onClose,
+    onSubscriptionSubmit,
+}: Props) {
     const [subscriptionPreview, setSubscriptionPreview] = useState<any>();
     const { user } = useAuthContext();
     const { enqueueSnackbar } = useSnackbar();
@@ -60,6 +66,7 @@ export default function SubscriptionPlanUpdateDialog({ plan, open, onClose }: Pr
         try {
             isSubmitting.onTrue();
             await submitPlanChange();
+            onSubscriptionSubmit?.();
             enqueueSnackbar(`Plan changed with success!`, { variant: "success" });
             onClose();
         } catch (error) {

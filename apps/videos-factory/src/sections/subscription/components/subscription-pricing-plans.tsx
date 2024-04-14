@@ -6,7 +6,7 @@ import Stack from "@mui/material/Stack";
 import Switch from "@mui/material/Switch";
 import Typography from "@mui/material/Typography";
 import Grid from "@mui/system/Unstable_Grid";
-import { ChangeEvent, useLayoutEffect, useState } from "react";
+import { ChangeEvent, useEffect, useLayoutEffect, useState } from "react";
 
 import { IPlan } from "@/types/billing";
 import { IUser } from "@/types/user";
@@ -37,6 +37,8 @@ const arrow = (
 );
 
 export default function SubscriptionPricinPlans({ plans, align = "left", user }: Props) {
+    const [isCheckoutCompleted, setIsCheckoutCompleted] = useState(false);
+    const [isCheckoutClosed, setIsCheckoutClosed] = useState(false);
     const [isYearly, setIsYearly] = useState(true);
     const theme = useTheme();
     const isDesktop = useMediaQuery(theme.breakpoints.up("md"));
@@ -44,12 +46,29 @@ export default function SubscriptionPricinPlans({ plans, align = "left", user }:
 
     useLayoutEffect(() => {
         if (isWindowLoaded) {
-            (window as any).Paddle?.Environment.set(process.env.NEXT_PUBLIC_PADDLE_ENV);
-            (window as any).Paddle?.Initialize({
-                token: process.env.NEXT_PUBLIC_PADDLE_CLIENTSIDE_TOKEN, // replace with a client-side token
+            window.Paddle?.Environment.set(process.env.NEXT_PUBLIC_PADDLE_ENV);
+            window.Paddle?.Initialize({
+                token: process.env.NEXT_PUBLIC_PADDLE_CLIENTSIDE_TOKEN,
+                eventCallback: function (data: any) {
+                    switch (data.name) {
+                        case "checkout.closed":
+                            setIsCheckoutClosed(true);
+                            break;
+                        case "checkout.completed":
+                            setIsCheckoutCompleted(true);
+                            break;
+                        default:
+                    }
+                },
             });
         }
     }, [isWindowLoaded]);
+
+    useEffect(() => {
+        if (isCheckoutCompleted && isCheckoutClosed) {
+            window.location.reload();
+        }
+    }, [isCheckoutCompleted, isCheckoutClosed]);
 
     const handleSwitchChange = (event: ChangeEvent, checked: boolean) => {
         setIsYearly(checked);

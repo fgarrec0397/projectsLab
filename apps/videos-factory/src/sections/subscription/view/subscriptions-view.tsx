@@ -25,6 +25,10 @@ export default function SubscriptionsView() {
         [plans, user?.currentPlanId]
     );
 
+    const onSubscriptionSubmit = () => {
+        window.location.reload();
+    };
+
     return (
         <PageWrapper
             title={"Subscription plans"}
@@ -51,6 +55,7 @@ export default function SubscriptionsView() {
                                     plan={currentPlan}
                                     open={isUpdateOpened.value}
                                     onClose={isUpdateOpened.onFalse}
+                                    onSubscriptionSubmit={onSubscriptionSubmit}
                                 />
                             )}
                         </Stack>

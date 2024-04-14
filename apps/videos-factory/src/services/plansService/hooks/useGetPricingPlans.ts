@@ -6,7 +6,7 @@ import useSWR from "swr";
 import { getPricingPlans } from "../plansService";
 
 export const useGetPricingPlans = () => {
-    const { data, isLoading, error, isValidating } = useSWR(
+    const { data, isLoading, error, isValidating, mutate } = useSWR(
         "pricingPlans",
         () => getPricingPlans(),
         {
@@ -21,8 +21,9 @@ export const useGetPricingPlans = () => {
             isPlansLoading: isLoading,
             plansError: error,
             isPlansValidating: isValidating,
+            mutatePlans: mutate,
         }),
-        [data, isLoading, error, isValidating]
+        [data, isLoading, error, isValidating, mutate]
     );
 
     return memoizedResponse;

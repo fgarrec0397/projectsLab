@@ -189,7 +189,10 @@ export default function SubscriptionPlanCard({ plan, isYearly, user }: Props) {
                 <Stack
                     spacing={4}
                     flexDirection={isTablet ? "row" : "column"}
-                    sx={{ position: "relative" }}
+                    sx={{
+                        position: "relative",
+                        color: isCurrentPlan ? "action.disabled" : undefined,
+                    }}
                 >
                     <Stack>
                         {renderIcon}

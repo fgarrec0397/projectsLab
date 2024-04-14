@@ -37,6 +37,10 @@ export default function SubscriptionPlanButton({
 
     const buttonText = isCurrentPlan ? "Current plan" : text;
 
+    const onSubscriptionChange = () => {
+        window.location.reload();
+    };
+
     const onClick = async () => {
         if (!authenticated) {
             return router.push(paths.auth.register);
@@ -84,13 +88,14 @@ export default function SubscriptionPlanButton({
                     plan={plan}
                     open={isPreviewOpened.value}
                     onClose={isPreviewOpened.onFalse}
+                    onSubscriptionSubmit={onSubscriptionChange}
                 />
             )}
             {isCancelOpened.value && (
                 <SubscriptionPlanCancelDialog
-                    plan={plan}
                     open={isCancelOpened.value}
                     onClose={isCancelOpened.onFalse}
+                    onSubscriptionCancel={onSubscriptionChange}
                 />
             )}
         </>

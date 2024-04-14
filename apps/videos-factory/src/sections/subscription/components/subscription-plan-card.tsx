@@ -25,6 +25,7 @@ type Props = {
     index: number;
     isYearly: boolean;
     user?: IUser;
+    isStaticSubscriptions?: boolean;
 };
 
 const planDataMapping = {
@@ -42,7 +43,7 @@ const planDataMapping = {
         buttonText: {
             loggedIn: "Switch to Essentials",
             notLoggedIn: "Try Free",
-            notSubscribed: "Get Essentials",
+            notSubscribed: "Upgrade to Essentials",
         },
     },
     Growth: {
@@ -51,12 +52,17 @@ const planDataMapping = {
         buttonText: {
             loggedIn: "Switch to Growth",
             notLoggedIn: "Try Free",
-            notSubscribed: "Get Growth",
+            notSubscribed: "Upgrade to Growth",
         },
     },
 };
 
-export default function SubscriptionPlanCard({ plan, isYearly, user }: Props) {
+export default function SubscriptionPlanCard({
+    plan,
+    isYearly,
+    user,
+    isStaticSubscriptions,
+}: Props) {
     const theme = useTheme();
     const { authenticated } = useAuthContext();
     const isTablet = useMediaQuery(theme.breakpoints.between("sm", "md"));
@@ -93,7 +99,7 @@ export default function SubscriptionPlanCard({ plan, isYearly, user }: Props) {
         <Stack direction="row" alignItems="center" justifyContent="space-between">
             <Box sx={{ height: 48 }}>{mappedPlanData?.icon}</Box>
 
-            {authenticated ? (
+            {authenticated && !isStaticSubscriptions ? (
                 isCurrentPlan && !isTablet && renderIsCurrentLabel()
             ) : (
                 <>
@@ -219,8 +225,9 @@ export default function SubscriptionPlanCard({ plan, isYearly, user }: Props) {
                     isYearly={isYearly}
                     isCurrentPlan={isCurrentPlan}
                     user={user}
+                    isStaticSubscriptions={isStaticSubscriptions}
                     text={
-                        authenticated
+                        authenticated && !isStaticSubscriptions
                             ? user?.currentPlanId
                                 ? mappedPlanData.buttonText.loggedIn
                                 : mappedPlanData.buttonText.notSubscribed

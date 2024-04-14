@@ -19,6 +19,7 @@ type Props = CardProps & {
     isCurrentPlan?: boolean;
     text: string;
     user?: IUser;
+    isStaticSubscriptions?: boolean;
 };
 
 export default function SubscriptionPlanButton({
@@ -27,6 +28,7 @@ export default function SubscriptionPlanButton({
     isCurrentPlan,
     text,
     user,
+    isStaticSubscriptions,
 }: Props) {
     const router = useRouter();
     const isPreviewOpened = useBoolean();
@@ -42,8 +44,12 @@ export default function SubscriptionPlanButton({
     };
 
     const onClick = async () => {
-        if (!authenticated) {
+        if (!authenticated && isStaticSubscriptions) {
             return router.push(paths.auth.register);
+        }
+
+        if (authenticated && isStaticSubscriptions) {
+            return router.push(paths.dashboard.subscription);
         }
 
         if (isAlreadyOnPaidPlan && plan.name === "Free") {

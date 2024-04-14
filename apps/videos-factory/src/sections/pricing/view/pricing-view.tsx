@@ -36,11 +36,12 @@ export default function PricingView() {
     if (isPlansLoading) {
         return null;
     }
+
     return (
         <Container sx={{ py: 10 }}>
             {renderDescription}
             <m.div variants={varFade().inUp}>
-                <SubscriptionPricinPlans plans={plans} align="center" />
+                <SubscriptionPricinPlans plans={plans} align="center" isStaticSubscriptions />
             </m.div>
         </Container>
     );

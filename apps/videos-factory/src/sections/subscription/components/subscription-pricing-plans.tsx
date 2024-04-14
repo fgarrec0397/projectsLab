@@ -19,6 +19,7 @@ type Props = {
     align?: "left" | "center";
     plans: IPlan[];
     user?: IUser;
+    isStaticSubscriptions?: boolean;
 };
 
 const arrow = (
@@ -36,7 +37,12 @@ const arrow = (
     </svg>
 );
 
-export default function SubscriptionPricinPlans({ plans, align = "left", user }: Props) {
+export default function SubscriptionPricinPlans({
+    plans,
+    align = "left",
+    user,
+    isStaticSubscriptions = false,
+}: Props) {
     const [isCheckoutCompleted, setIsCheckoutCompleted] = useState(false);
     const [isCheckoutClosed, setIsCheckoutClosed] = useState(false);
     const [isYearly, setIsYearly] = useState(true);
@@ -45,7 +51,7 @@ export default function SubscriptionPricinPlans({ plans, align = "left", user }:
     const isWindowLoaded = window !== undefined && window !== null;
 
     useLayoutEffect(() => {
-        if (isWindowLoaded) {
+        if (isWindowLoaded && user) {
             window.Paddle?.Environment.set(process.env.NEXT_PUBLIC_PADDLE_ENV);
             window.Paddle?.Initialize({
                 token: process.env.NEXT_PUBLIC_PADDLE_CLIENTSIDE_TOKEN,
@@ -62,7 +68,7 @@ export default function SubscriptionPricinPlans({ plans, align = "left", user }:
                 },
             });
         }
-    }, [isWindowLoaded]);
+    }, [isWindowLoaded, user]);
 
     useEffect(() => {
         if (isCheckoutCompleted && isCheckoutClosed) {
@@ -114,7 +120,13 @@ export default function SubscriptionPricinPlans({ plans, align = "left", user }:
                 {plans.map((x, index) => {
                     return (
                         <Grid key={x.id} xs={12} md={4}>
-                            <PricingCard plan={x} isYearly={isYearly} index={index} user={user} />
+                            <PricingCard
+                                plan={x}
+                                isYearly={isYearly}
+                                index={index}
+                                user={user}
+                                isStaticSubscriptions={isStaticSubscriptions}
+                            />
                         </Grid>
                     );
                 })}

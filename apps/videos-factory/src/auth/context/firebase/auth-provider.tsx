@@ -13,7 +13,7 @@ import {
 } from "firebase/auth";
 import { useCallback, useEffect, useMemo, useReducer } from "react";
 
-import { createUser } from "@/services/usersService/usersService";
+import { createUser, getCurrentUser } from "@/services/usersService/usersService";
 import { IUser } from "@/types/user";
 
 import { ActionMapType, AuthStateType, AuthUserType } from "../../types";
@@ -71,12 +71,14 @@ export function AuthProvider({ children }: Props) {
             onAuthStateChanged(AUTH, async (user) => {
                 if (user) {
                     if (user.emailVerified) {
+                        const userData = await getCurrentUser((user as any).accessToken);
+
                         dispatch({
                             type: Types.INITIAL,
                             payload: {
                                 user: {
                                     ...user,
-                                    id: user.uid,
+                                    ...userData,
                                 },
                             },
                         });

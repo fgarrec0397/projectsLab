@@ -9,6 +9,8 @@ export type DatabaseTypes = {
     update: unknown;
     updateBatch: unknown;
     delete: unknown;
+    deleteBatch: unknown;
+    deleteUser: unknown;
     findWithQuery: unknown;
     findWithQueryOptions: any;
 };
@@ -41,6 +43,8 @@ export interface DatabaseStrategy<T extends DatabaseTypes> {
         data: TData[]
     ): T["updateBatch"];
     delete(collection: string, id: string): T["delete"];
+    deleteBatch(collection: string, ids: string[]): T["deleteBatch"];
+    deleteUser(userId: string): T["deleteUser"];
     findWithQuery(collection: string, options: T["findWithQueryOptions"]): T["findWithQuery"];
 }
 

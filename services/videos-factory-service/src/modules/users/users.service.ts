@@ -4,13 +4,15 @@ import { addMonth } from "src/common/dates/dates.utils";
 import { DatabaseConfig, InjectDatabase } from "src/config/database-config.module";
 
 import { PlansService } from "../plans/plans.service";
+import { VideosService } from "../videos/services/videos.service";
 import { User } from "./users.types";
 
 @Injectable()
 export class UsersService {
     constructor(
         @InjectDatabase() private readonly database: DatabaseConfig,
-        private readonly plansService: PlansService
+        private readonly plansService: PlansService,
+        private readonly videosService: VideosService
     ) {}
 
     async getUserById(userId: string) {
@@ -44,6 +46,11 @@ export class UsersService {
         const usersCollectionPath = `users`;
 
         await this.database.update(usersCollectionPath, userId, user);
+    }
+
+    async deleteUser(userId: string) {
+        await this.videosService.deleteUserVideos(userId);
+        await this.database.deleteUser(userId);
     }
 
     async refillUsersUsage() {

@@ -1,5 +1,6 @@
 import { Injectable } from "@nestjs/common";
 import { uidGenerator } from "@projectslab/helpers";
+import { FindWithQueryOptions } from "src/common/database/strategies/firebase.strategy";
 import { DatabaseConfig, InjectDatabase } from "src/config/database-config.module";
 import { InjectStorageConfig, StorageConfig } from "src/config/storage-config.module";
 import { VideoRenderingJobService } from "src/modules/jobs/services/video-rendering-jobs.service";
@@ -12,7 +13,7 @@ export class VideosService {
     constructor(
         @InjectDatabase() private readonly database: DatabaseConfig,
         @InjectStorageConfig() private readonly storage: StorageConfig,
-        private readonly VideoRenderingJobService: VideoRenderingJobService
+        private readonly videoRenderingJobService: VideoRenderingJobService
     ) {}
 
     async getVideos(userId: string, withThumbnails?: boolean) {
@@ -41,6 +42,26 @@ export class VideosService {
             const video = await this.database.findOne<IVideo>(videoCollectionPath, videoId);
 
             return video;
+        } catch (error) {
+            throw new Error("Video not found");
+        }
+    }
+
+    async getVideosByIds(userId: string, videosIds: string[]): Promise<IVideo[]> {
+        const videoCollectionPath = `users/${userId}/videos`;
+
+        try {
+            const videos = await this.database.findWithQuery<IVideo>(videoCollectionPath, {
+                conditions: [
+                    ...(videosIds.map((x) => ({
+                        field: "id",
+                        operator: "==",
+                        value: x,
+                    })) as FindWithQueryOptions["conditions"]),
+                ],
+            });
+
+            return videos;
         } catch (error) {
             throw new Error("Video not found");
         }
@@ -127,6 +148,28 @@ export class VideosService {
         return deleteResult;
     }
 
+    async deleteVideosBatch(userId: string, videosIds: string[]) {
+        const videoCollectionPath = `users/${userId}/videos`;
+        const videos = await this.getVideosByIds(userId, videosIds);
+
+        await this.storage.deleteFiles(videos.map((x) => [x.thumbnailKey, x.videoKey]).flat());
+
+        const deleteResult = await this.database.deleteBatch(videoCollectionPath, videosIds);
+
+        return deleteResult;
+    }
+
+    async deleteUserVideos(userId: string) {
+        const userVideos = await this.getVideos(userId);
+        const videosIds = userVideos.map((x) => x.id);
+
+        await this.storage.deleteFiles(userVideos.map((x) => [x.thumbnailKey, x.videoKey]).flat());
+
+        const deleteResult = await this.deleteVideosBatch(userId, videosIds);
+
+        return deleteResult;
+    }
+
     async startRendering(userId: string, video: IVideo) {
         const videoCollectionPath = `users/${userId}/videos`;
 
@@ -136,7 +179,7 @@ export class VideosService {
             updatedAt: new Date().getTime(),
         });
 
-        await this.VideoRenderingJobService.renderVideo({ userId, video });
+        await this.videoRenderingJobService.renderVideo({ userId, video });
 
         return updatedDocument;
     }

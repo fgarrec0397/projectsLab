@@ -5,14 +5,14 @@ import useSWR from "swr";
 
 import { useAuthContext } from "@/auth/hooks";
 
-import { getUserById } from "../usersService";
+import { getCurrentUser } from "../usersService";
 
-export const useGetUser = () => {
+export const useGetCurrentUser = () => {
     const auth = useAuthContext();
 
     const { data, isLoading, error, isValidating, mutate } = useSWR(
-        ["user", auth.user?.uid],
-        () => getUserById(auth.user?.accessToken, auth.user?.uid),
+        "currentUser",
+        () => getCurrentUser(auth.user?.accessToken),
         {
             revalidateIfStale: false,
             revalidateOnFocus: false,
@@ -21,11 +21,11 @@ export const useGetUser = () => {
 
     const memoizedResponse = useMemo(
         () => ({
-            user: data,
-            isUserLoading: isLoading,
-            userError: error,
-            isUserValidating: isValidating,
-            mutateUser: mutate,
+            currentUser: data,
+            isCurrentUserLoading: isLoading,
+            currentUserError: error,
+            isCurrentUserValidating: isValidating,
+            mutateCurrentUser: mutate,
         }),
         [data, isLoading, error, isValidating, mutate]
     );

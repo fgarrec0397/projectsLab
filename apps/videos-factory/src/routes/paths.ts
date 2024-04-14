@@ -38,5 +38,8 @@ export const paths = {
         },
         fileManager: `${ROOTS.DASHBOARD}/file-manager`,
         subscription: `${ROOTS.DASHBOARD}/subscription`,
+        user: {
+            myAccount: `${ROOTS.DASHBOARD}/my-account`,
+        },
     },
 };

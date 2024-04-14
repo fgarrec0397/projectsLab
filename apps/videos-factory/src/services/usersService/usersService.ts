@@ -17,8 +17,45 @@ export async function createUser(accessToken: string | undefined, user: Partial<
     }
 }
 
+export const getCurrentUser = async (accessToken: string | undefined) => {
+    const response = await axiosInstance.get<IUser>(`${endpoints.users.current}`, {
+        headers: {
+            Accept: "application/json",
+            Authorization: `Bearer ${accessToken}`,
+        },
+    });
+
+    return response.data;
+};
+
 export const getUserById = async (accessToken: string | undefined, userId: string) => {
     const response = await axiosInstance.get<IUser>(`${endpoints.users.byId(userId)}`, {
+        headers: {
+            Accept: "application/json",
+            Authorization: `Bearer ${accessToken}`,
+        },
+    });
+
+    return response.data;
+};
+
+export const updateUser = async (
+    accessToken: string | undefined,
+    userId: string,
+    data: Partial<IUser>
+) => {
+    const response = await axiosInstance.patch<IUser>(`${endpoints.users.byId(userId)}`, data, {
+        headers: {
+            Accept: "application/json",
+            Authorization: `Bearer ${accessToken}`,
+        },
+    });
+
+    return response.data;
+};
+
+export const deleteUser = async (accessToken: string | undefined, userId: string) => {
+    const response = await axiosInstance.delete<IUser>(`${endpoints.users.byId(userId)}`, {
         headers: {
             Accept: "application/json",
             Authorization: `Bearer ${accessToken}`,

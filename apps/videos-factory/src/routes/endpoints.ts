@@ -33,7 +33,8 @@ export const endpoints = {
         get: `${baseURL}/plans`,
     },
     users: {
-        create: `${baseURL}/users/create`,
+        current: `${baseURL}/users/current`,
         byId: (userId?: string) => `${baseURL}/users/${userId}`,
+        create: `${baseURL}/users/create`,
     },
 };

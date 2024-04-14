@@ -20,11 +20,13 @@ type FirebaseTypes = {
     update: Promise<admin.firestore.WriteResult>;
     updateBatch: Promise<admin.firestore.WriteResult[]>;
     delete: Promise<admin.firestore.WriteResult>;
+    deleteBatch: Promise<admin.firestore.WriteResult[]>;
+    deleteUser: Promise<void>;
     findWithQuery: unknown;
     findWithQueryOptions: FindWithQueryOptions;
 };
 
-type FindWithQueryOptions = {
+export type FindWithQueryOptions = {
     conditions?: { field: string; operator: WhereFilterOp; value: any }[];
     orderByField?: string;
     orderByDirection?: "asc" | "desc";
@@ -115,6 +117,27 @@ export class FirebaseDatabase implements DatabaseStrategy<FirebaseTypes> {
 
     async delete(collection: string, id: string) {
         return this.getDB().collection(collection).doc(id).delete();
+    }
+
+    async deleteBatch(collection: string, ids: string[]) {
+        const db = this.getDB();
+        const batch = db.batch();
+
+        ids.forEach((id) => {
+            const docRef = db.collection(collection).doc(id);
+            batch.delete(docRef);
+        });
+
+        const result = await batch.commit();
+        console.log(
+            `Batch delete operation completed for ${ids.length} documents in collection ${collection}`
+        );
+
+        return result;
+    }
+
+    async deleteUser(userId: string) {
+        return this.defaultApp.auth().deleteUser(userId);
     }
 
     async findWithQuery<TData>(collection: string, options: FindWithQueryOptions) {

@@ -12,13 +12,14 @@ import { useAuthContext } from "@/auth/hooks";
 import { varHover } from "@/components/animate";
 import CustomPopover, { usePopover } from "@/components/custom-popover";
 import { useRouter } from "@/routes/hooks";
+import { paths } from "@/routes/paths";
 
 // ----------------------------------------------------------------------
 
 const OPTIONS = [
     {
         label: "Profile",
-        linkTo: "/#1",
+        linkTo: paths.dashboard.user.myAccount,
     },
     {
         label: "Settings",

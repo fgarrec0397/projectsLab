@@ -45,7 +45,7 @@ export default function HomePricing() {
             <Container component={MotionViewport}>
                 {renderDescription}
                 <m.div variants={varFade().inUp}>
-                    <SubscriptionPricinPlans plans={plans} align="center" />
+                    <SubscriptionPricinPlans plans={plans} align="center" isStaticSubscriptions />
                 </m.div>
             </Container>
         </Box>

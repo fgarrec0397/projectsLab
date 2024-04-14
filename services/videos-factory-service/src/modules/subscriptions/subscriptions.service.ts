@@ -122,6 +122,12 @@ export class SubscriptionsService {
                     const priceData = subscriptionData.items[0].price;
                     const plan = await this.payment.getPricingPlanById(priceData.productId);
                     const userId = (subscriptionData.customData as any).userId;
+                    const billingStartsAt = new Date(
+                        subscriptionData.currentBillingPeriod.startsAt
+                    ).getTime();
+                    const billingEndsAt = new Date(
+                        subscriptionData.currentBillingPeriod.endsAt
+                    ).getTime();
                     const usageCycleEndsAt = addMonth(
                         new Date(subscriptionData.currentBillingPeriod.startsAt).getTime()
                     );
@@ -133,6 +139,8 @@ export class SubscriptionsService {
                             currentPlanPriceId: priceData.id,
                             usageCycleEndsAt,
                             subscriptionStatus,
+                            billingStartsAt,
+                            billingEndsAt,
                             subscriptionId: subscriptionData.id,
                             allowedStorage: plan.allowedStorage,
                             allowedVideos: plan.allowedVideos,

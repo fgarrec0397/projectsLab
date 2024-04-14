@@ -8,6 +8,7 @@ import {
     Radio,
     RadioGroup,
     Stack,
+    Typography,
 } from "@mui/material";
 import { CardProps } from "@mui/material/Card";
 import { useEffect, useState } from "react";
@@ -103,20 +104,33 @@ export default function SubscriptionPlanUpdateDialog({ plan, open, onClose }: Pr
                 {isLoadingSubscription.value && <CircularProgress size={20} sx={{ mt: 2 }} />}
             </Stack>
             <Divider sx={{ my: 2 }} />
-            <SubscriptionCheckoutSummary
-                subTotal={getPrice(
-                    subscriptionPreview?.immediateTransaction?.details?.lineItems?.[0].totals
-                        ?.subtotal
-                )}
-                taxes={getPrice(
-                    subscriptionPreview?.immediateTransaction?.details?.lineItems?.[0].totals?.tax
-                )}
-                totalWithTaxes={getPrice(subscriptionPreview?.updateSummary?.charge?.amount)}
-                credit={getPrice(subscriptionPreview?.updateSummary?.credit?.amount)}
-                total={getPrice(subscriptionPreview?.updateSummary?.result?.amount)}
-                frequency={subscriptionPreview?.billingCycle?.interval}
-                action={subscriptionPreview?.updateSummary?.result?.action}
-            />
+            {!isLoadingSubscription.value &&
+                (subscriptionPreview?.updateSummary === null ? (
+                    <Stack spacing={2}>
+                        <Typography variant="subtitle1">
+                            This is your current subscription
+                        </Typography>
+                        <Typography>Select another billing cycle to see the preview</Typography>
+                    </Stack>
+                ) : (
+                    <SubscriptionCheckoutSummary
+                        subTotal={getPrice(
+                            subscriptionPreview?.immediateTransaction?.details?.lineItems?.[0]
+                                .totals?.subtotal
+                        )}
+                        taxes={getPrice(
+                            subscriptionPreview?.immediateTransaction?.details?.lineItems?.[0]
+                                .totals?.tax
+                        )}
+                        totalWithTaxes={getPrice(
+                            subscriptionPreview?.updateSummary?.charge?.amount
+                        )}
+                        credit={getPrice(subscriptionPreview?.updateSummary?.credit?.amount)}
+                        total={getPrice(subscriptionPreview?.updateSummary?.result?.amount)}
+                        frequency={subscriptionPreview?.billingCycle?.interval}
+                        action={subscriptionPreview?.updateSummary?.result?.action}
+                    />
+                ))}
         </Box>
     );
 
@@ -136,6 +150,10 @@ export default function SubscriptionPlanUpdateDialog({ plan, open, onClose }: Pr
                             loadingPosition="end"
                             variant="contained"
                             color="primary"
+                            disabled={
+                                subscriptionPreview?.updateSummary === null ||
+                                isLoadingSubscription.value
+                            }
                         >
                             Change plan
                         </LoadingButton>

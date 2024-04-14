@@ -18,7 +18,7 @@ import PricingCard from "./subscription-plan-card";
 type Props = {
     align?: "left" | "center";
     plans: IPlan[];
-    user: IUser;
+    user?: IUser;
 };
 
 const arrow = (

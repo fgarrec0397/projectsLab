@@ -68,7 +68,7 @@ export default function PageWrapper({
                     <Stack
                         spacing={2.5}
                         sx={{
-                            mb: { xs: 3, md: 5 },
+                            mb: { xs: 3, md: 5, lg: 8 },
                         }}
                     >
                         {subContent}

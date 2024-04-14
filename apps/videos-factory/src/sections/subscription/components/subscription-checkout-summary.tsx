@@ -81,7 +81,7 @@ export default function SubscriptionCheckoutSummary({
                                 )}
                                 {action === "credit" && (
                                     <>
-                                        {fCurrency(total)} is credited from your account <br />
+                                        {fCurrency(total)} is credited to your account <br />
                                         Then, you will pay {fCurrency(totalWithTaxes)} each{" "}
                                         {frequency}
                                     </>

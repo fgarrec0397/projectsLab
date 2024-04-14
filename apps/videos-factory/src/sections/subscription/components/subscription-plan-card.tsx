@@ -24,7 +24,7 @@ type Props = {
     plan: IPlan;
     index: number;
     isYearly: boolean;
-    user: IUser;
+    user?: IUser;
 };
 
 const planDataMapping = {
@@ -136,20 +136,18 @@ export default function SubscriptionPlanCard({ plan, isYearly, user }: Props) {
             >
                 / month
             </Typography>
-            {isYearly && (
-                <Typography
-                    component="span"
-                    sx={{
-                        alignSelf: "center",
-                        color: "text.disabled",
-                        typography: "body2",
-                        ml: 2,
-                        fontSize: pxToRem(12),
-                    }}
-                >
-                    Billed annually
-                </Typography>
-            )}
+            <Typography
+                component="span"
+                sx={{
+                    alignSelf: "center",
+                    color: "text.disabled",
+                    typography: "body2",
+                    ml: 2,
+                    fontSize: pxToRem(12),
+                }}
+            >
+                {isYearly ? "Billed yearly" : "Billed monthly"}
+            </Typography>
         </Stack>
     );
 

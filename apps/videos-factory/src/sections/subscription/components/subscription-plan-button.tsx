@@ -18,7 +18,7 @@ type Props = CardProps & {
     isYearly?: boolean;
     isCurrentPlan?: boolean;
     text: string;
-    user: IUser;
+    user?: IUser;
 };
 
 export default function SubscriptionPlanButton({
@@ -32,7 +32,7 @@ export default function SubscriptionPlanButton({
     const isPreviewOpened = useBoolean();
     const isCancelOpened = useBoolean();
     const { authenticated } = useAuthContext();
-    const isAlreadyOnPaidPlan = user.currentPlanId !== "free";
+    const isAlreadyOnPaidPlan = user?.currentPlanId !== "free";
     const priceId = isYearly ? plan.yearlyPriceId : plan.monthlyPriceId;
 
     const buttonText = isCurrentPlan ? "Current plan" : text;

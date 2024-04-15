@@ -30,8 +30,6 @@ export class SubscriptionsService {
     }
 
     async cancelSubscription(userId: string, reason: string) {
-        console.log("cancelSubscription");
-
         const user = await this.usersService.getUserById(userId);
 
         const cancelReasons = user.cancelReasons || [];

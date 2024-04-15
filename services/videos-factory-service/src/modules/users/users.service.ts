@@ -1,6 +1,7 @@
 import { Injectable } from "@nestjs/common";
 import { DAY_IN_SECONDS } from "src/common/constants";
 import { addMonth } from "src/common/dates/dates.utils";
+import { PaymentService } from "src/common/payment/services/payment.service";
 import { DatabaseConfig, InjectDatabase } from "src/config/database-config.module";
 
 import { PlansService } from "../plans/plans.service";
@@ -12,6 +13,7 @@ export class UsersService {
     constructor(
         @InjectDatabase() private readonly database: DatabaseConfig,
         private readonly plansService: PlansService,
+        private readonly payment: PaymentService,
         private readonly videosService: VideosService
     ) {}
 
@@ -49,8 +51,28 @@ export class UsersService {
     }
 
     async deleteUser(userId: string) {
-        await this.videosService.deleteUserVideos(userId);
-        await this.database.deleteUser(userId);
+        console.log("deleteUser");
+
+        const user = await this.getUserById(userId);
+        console.log(userId, "userId");
+        console.log(user, "user");
+
+        try {
+            await this.videosService.deleteUserVideos(userId);
+            await this.database.deleteUser(userId);
+
+            await this.database.delete("users", userId);
+
+            if (user.subscriptionId !== "free") {
+                await this.payment.cancelPlan(user.subscriptionId);
+            }
+
+            return { message: "User deleted with success" };
+        } catch (error) {
+            console.log(error, "deleteUser error");
+
+            return { message: "Someting went wrong, check the logs" };
+        }
     }
 
     async refillUsersUsage() {

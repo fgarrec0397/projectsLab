@@ -37,7 +37,7 @@ export default function SubscriptionPlanCancelDialog({
             isSubmitting.onTrue();
             await submitCancelPlan();
             onSubscriptionCancel?.();
-            enqueueSnackbar(`Plan changed with success!`, { variant: "success" });
+            enqueueSnackbar(`Plan canceled with success!`, { variant: "info" });
             onClose();
         } catch (error) {
             enqueueSnackbar(`Something went wrong`, {

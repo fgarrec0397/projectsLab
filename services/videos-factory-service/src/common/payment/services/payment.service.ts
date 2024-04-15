@@ -78,7 +78,13 @@ export class PaymentService implements OnModuleInit {
     }
 
     async cancelPlan(subscriptionId: string) {
-        return this.paddle.subscriptions.cancel(subscriptionId, { effectiveFrom: "immediately" });
+        try {
+            return await this.paddle.subscriptions.cancel(subscriptionId, {
+                effectiveFrom: "immediately",
+            });
+        } catch (error) {
+            console.log(error, "cancelPlan");
+        }
     }
 
     async syncPlans() {

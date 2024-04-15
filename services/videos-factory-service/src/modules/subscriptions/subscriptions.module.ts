@@ -9,5 +9,6 @@ import { SubscriptionsService } from "./subscriptions.service";
     imports: [UsersModule, PlansModule],
     controllers: [SubscriptionsController],
     providers: [SubscriptionsService],
+    exports: [SubscriptionsService],
 })
 export class SubscriptionsModule {}

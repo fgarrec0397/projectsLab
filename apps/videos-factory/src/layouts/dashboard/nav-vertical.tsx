@@ -14,9 +14,9 @@ import { paths } from "@/routes/paths";
 import { pxToRem } from "@/theme/typography";
 
 import NavToggleButton from "../common/nav-toggle-button";
-import NavUpgrade from "../common/nav-upgrade";
 import { NAV } from "../config-layout";
 import { useNavData } from "./config-navigation";
+import NavUsage from "./usage/nav-usage";
 
 // ----------------------------------------------------------------------
 
@@ -38,8 +38,6 @@ export default function NavVertical({ openNav, onCloseNav }: Props) {
 
     const isNavMini = settings.themeLayout === "mini";
 
-    const showNavUpgrade = false;
-
     useEffect(() => {
         if (openNav) {
             onCloseNav();
@@ -50,6 +48,8 @@ export default function NavVertical({ openNav, onCloseNav }: Props) {
     const renderContent = (
         <Scrollbar
             sx={{
+                display: "flex",
+                flexDirection: "column",
                 height: 1,
                 "& .simplebar-content": {
                     height: 1,
@@ -74,7 +74,7 @@ export default function NavVertical({ openNav, onCloseNav }: Props) {
 
             <Box sx={{ flexGrow: 1 }} />
 
-            {showNavUpgrade && <NavUpgrade />}
+            <NavUsage />
         </Scrollbar>
     );
 

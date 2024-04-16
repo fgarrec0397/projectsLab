@@ -8,8 +8,8 @@ import Typography from "@mui/material/Typography";
 import Grid from "@mui/system/Unstable_Grid";
 import { ChangeEvent, useEffect, useLayoutEffect, useState } from "react";
 
+import { AuthUserType } from "@/auth/types";
 import { IPlan } from "@/types/billing";
-import { IUser } from "@/types/user";
 
 import PricingCard from "./subscription-plan-card";
 
@@ -18,7 +18,7 @@ import PricingCard from "./subscription-plan-card";
 type Props = {
     align?: "left" | "center";
     plans: IPlan[];
-    user?: IUser;
+    user?: AuthUserType;
     isStaticSubscriptions?: boolean;
 };
 

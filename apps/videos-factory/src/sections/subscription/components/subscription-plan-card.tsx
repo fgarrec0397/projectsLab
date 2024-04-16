@@ -5,14 +5,12 @@ import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
 import { visuallyHidden } from "@mui/utils";
 
-import EssentialsPlanIcon from "@/assets/icons/essentials-plan-icon";
-import FreePlanIcon from "@/assets/icons/free-plan-icon";
-import GrowthPlanIcon from "@/assets/icons/growth-plan-icon";
+import { subscriptionsData } from "@/assets/data/subscriptionsData";
 import { useAuthContext } from "@/auth/hooks";
+import { AuthUserType } from "@/auth/types";
 import Iconify from "@/components/iconify";
 import { pxToRem } from "@/theme/typography";
 import { IPlan } from "@/types/billing";
-import { IUser } from "@/types/user";
 import { getPrice } from "@/utils/lemon-squeezy";
 
 import SubscriptionPlanButton from "./subscription-plan-button";
@@ -24,37 +22,8 @@ type Props = {
     plan: IPlan;
     index: number;
     isYearly: boolean;
-    user?: IUser;
+    user?: AuthUserType;
     isStaticSubscriptions?: boolean;
-};
-
-const planDataMapping = {
-    Free: {
-        icon: <FreePlanIcon />,
-        buttonText: {
-            loggedIn: "Cancel and Go Free",
-            notLoggedIn: "Try Free",
-            notSubscribed: "Get Free",
-        },
-    },
-    Essentials: {
-        icon: <EssentialsPlanIcon />,
-        isPopular: true,
-        buttonText: {
-            loggedIn: "Switch to Essentials",
-            notLoggedIn: "Try Free",
-            notSubscribed: "Upgrade to Essentials",
-        },
-    },
-    Growth: {
-        icon: <GrowthPlanIcon />,
-        isBestDeal: true,
-        buttonText: {
-            loggedIn: "Switch to Growth",
-            notLoggedIn: "Try Free",
-            notSubscribed: "Upgrade to Growth",
-        },
-    },
 };
 
 export default function SubscriptionPlanCard({
@@ -66,7 +35,7 @@ export default function SubscriptionPlanCard({
     const theme = useTheme();
     const { authenticated } = useAuthContext();
     const isTablet = useMediaQuery(theme.breakpoints.between("sm", "md"));
-    const mappedPlanData = (planDataMapping as any)[plan.name as any];
+    const mappedPlanData = (subscriptionsData as any)[plan.name as any];
     const isPopular = mappedPlanData?.isPopular;
     const isBestDeal = mappedPlanData?.isBestDeal;
     const featuresLists = [plan.features, plan.moreFeatures];

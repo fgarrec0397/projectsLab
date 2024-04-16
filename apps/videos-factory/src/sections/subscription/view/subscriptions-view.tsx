@@ -2,12 +2,12 @@
 
 import { Button, Divider, Typography } from "@mui/material";
 import { Stack } from "@mui/system";
-import { useMemo } from "react";
 
+import { useAuthContext } from "@/auth/hooks";
 import PageWrapper from "@/components/page-wrapper/page-wrapper";
 import { useBoolean } from "@/hooks/use-boolean";
+import { useGetCurrentPlan } from "@/services/plansService/hooks/useGetCurrentPlan";
 import { useGetPricingPlans } from "@/services/plansService/hooks/useGetPricingPlans";
-import { useGetUser } from "@/services/usersService/hooks/useGetUserById";
 import { pxToRem } from "@/theme/typography";
 import { fDate } from "@/utils/format-time";
 
@@ -18,12 +18,9 @@ import SubscriptionPricinPlans from "../components/subscription-pricing-plans";
 
 export default function SubscriptionsView() {
     const { plans, isPlansLoading } = useGetPricingPlans();
-    const { user, isUserLoading } = useGetUser();
+    const { user } = useAuthContext();
     const isUpdateOpened = useBoolean();
-    const currentPlan = useMemo(
-        () => plans.find((x) => x.id === user?.currentPlanId),
-        [plans, user?.currentPlanId]
-    );
+    const { currentPlan } = useGetCurrentPlan();
 
     const onSubscriptionSubmit = () => {
         window.location.reload();
@@ -32,7 +29,7 @@ export default function SubscriptionsView() {
     return (
         <PageWrapper
             title={"Subscription plans"}
-            isLoading={isPlansLoading && isUserLoading}
+            isLoading={isPlansLoading}
             subContent={
                 <>
                     {user?.billingStartsAt && user?.billingEndsAt ? (

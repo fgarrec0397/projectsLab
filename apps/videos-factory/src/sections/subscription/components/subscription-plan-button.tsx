@@ -2,11 +2,11 @@ import { CardProps } from "@mui/material/Card";
 import { useRouter } from "next/navigation";
 
 import { useAuthContext } from "@/auth/hooks";
+import { AuthUserType } from "@/auth/types";
 import { PrimaryButton } from "@/components/button";
 import { useBoolean } from "@/hooks/use-boolean";
 import { paths } from "@/routes/paths";
 import { IPlan } from "@/types/billing";
-import { IUser } from "@/types/user";
 
 import SubscriptionPlanCancelDialog from "./subscription-plan-cancel-dialog";
 import SubscriptionPlanUpdateDialog from "./subscription-plan-update-dialog";
@@ -18,7 +18,7 @@ type Props = CardProps & {
     isYearly?: boolean;
     isCurrentPlan?: boolean;
     text: string;
-    user?: IUser;
+    user?: AuthUserType;
     isStaticSubscriptions?: boolean;
 };
 

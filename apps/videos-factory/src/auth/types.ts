@@ -1,5 +1,7 @@
 import { LogoutOptions, PopupLoginOptions, RedirectLoginOptions } from "@auth0/auth0-react";
 
+import { IUser } from "@/types/user";
+
 // ----------------------------------------------------------------------
 
 export type ActionMapType<M extends { [index: string]: any }> = {
@@ -14,10 +16,10 @@ export type ActionMapType<M extends { [index: string]: any }> = {
 };
 
 export type AuthUserType =
+    | IUser
     | null
     | (Record<string, any> & {
           accessToken?: string;
-          currentPlanId?: string;
       });
 
 export type AuthStateType = {

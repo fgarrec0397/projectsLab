@@ -3,6 +3,7 @@ import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
 
 import { subscriptionsData } from "@/assets/data/subscriptionsData";
+import { useAuthContext } from "@/auth/hooks";
 import { PrimaryButton } from "@/components/button";
 import { paths } from "@/routes/paths";
 import { useGetCurrentPlan } from "@/services/plansService/hooks/useGetCurrentPlan";
@@ -13,6 +14,7 @@ import UsageWidget from "./usage-widget";
 // ----------------------------------------------------------------------
 
 export default function NavUsage() {
+    const { user } = useAuthContext();
     const { currentPlan } = useGetCurrentPlan();
     const mappedSubscriptionData = (subscriptionsData as any)[currentPlan?.name as any];
 
@@ -37,8 +39,13 @@ export default function NavUsage() {
                         <Box sx={{ height: 40 }}>{mappedSubscriptionData?.icon}</Box>
                     </Stack>
                     <Stack>
-                        <UsageWidget value={29} total={30} units="videos" />
-                        <UsageWidget value={6000000000} total={10000000000} />
+                        <UsageWidget
+                            value={user?.usedVideos}
+                            total={user?.allowedVideos}
+                            units="videos"
+                            format="with-units"
+                        />
+                        <UsageWidget value={user?.usedStorage} total={user?.allowedStorage} />
                     </Stack>
                 </Stack>
 

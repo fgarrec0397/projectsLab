@@ -1,10 +1,14 @@
 import { Injectable } from "@nestjs/common";
 import path from "path";
 import { InjectStorageConfig, StorageConfig } from "src/config/storage-config.module";
+import { UsageService } from "src/modules/usage/usage.service";
 
 @Injectable()
 export class FilesService {
-    constructor(@InjectStorageConfig() private readonly storageConfig: StorageConfig) {}
+    constructor(
+        @InjectStorageConfig() private readonly storageConfig: StorageConfig,
+        private readonly usageService: UsageService
+    ) {}
 
     getUserFiles = async (userId: string, filesPath?: string, shouldFetchAll?: boolean) => {
         let userFilesPath = filesPath ? path.join(userId, filesPath) : userId;
@@ -22,6 +26,8 @@ export class FilesService {
         userId: string,
         files: Array<Express.Multer.File> | Express.Multer.File
     ) => {
+        console.log("uploadUserFiles");
+
         if (Array.isArray(files)) {
             const uploadPromises = files.map((file) => {
                 const fileName = `${userId}/${file.originalname}`;
@@ -29,11 +35,17 @@ export class FilesService {
             });
 
             const uploadResults = await Promise.all(uploadPromises);
+            await this.usageService.updateUserUsage(userId);
+
             return uploadResults;
         }
 
         const fileName = `${userId}/${files.originalname}`;
-        return this.storageConfig.uploadFile(files, fileName);
+        const uploadResult = await this.storageConfig.uploadFile(files, fileName);
+
+        await this.usageService.updateUserUsage(userId);
+
+        return uploadResult;
     };
 
     renameFile = async (userId: string, filePath: string, newFileName: string) => {

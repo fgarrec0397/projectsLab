@@ -10,9 +10,22 @@ interface Props {
     value: number;
     total: number;
     units?: string;
+    format?: "data" | "with-units";
 }
 
-export default function UsageWidget({ value, total, units }: Props) {
+export default function UsageWidget({ value, total, units, format = "data" }: Props) {
+    const formatValue = (valueToFormat: number) => {
+        if (format === "data") {
+            return fData(valueToFormat);
+        }
+
+        if (format === "with-units") {
+            return `${valueToFormat} ${units}`;
+        }
+
+        return `${valueToFormat}`;
+    };
+
     return (
         <Stack sx={{ px: 3 }}>
             <Stack direction="row" sx={{ typography: "caption", fontWeight: "bold" }}>
@@ -22,10 +35,10 @@ export default function UsageWidget({ value, total, units }: Props) {
                         typography: "caption",
                     }}
                 >
-                    {fData(value, units)}
+                    {formatValue(value)}
                 </Box>
 
-                {` / ${fData(total, units)}`}
+                {` / ${formatValue(total)}`}
             </Stack>
             <LinearProgress
                 value={(value / total) * 100}

@@ -152,6 +152,32 @@ export class S3StorageManager implements StorageStrategy<S3StorageManagerTypes> 
         }
     }
 
+    async calculateFolderSize(folderPrefix: string): Promise<number> {
+        let totalSize = 0;
+        let continuationToken = null;
+
+        const incrementTotalSize = (item: AWS.S3.Object) => {
+            totalSize += item.Size;
+        };
+
+        do {
+            const params: AWS.S3.ListObjectsV2Request = {
+                Bucket: this.bucketName,
+                Prefix: folderPrefix,
+                ContinuationToken: continuationToken,
+            };
+
+            const data = await this.s3.listObjectsV2(params).promise();
+
+            data.Contents.forEach(incrementTotalSize);
+
+            continuationToken = data.IsTruncated ? data.NextContinuationToken : null;
+        } while (continuationToken);
+
+        console.log(`Total size of '${folderPrefix}' in '${this.bucketName}': ${totalSize} bytes`);
+        return totalSize;
+    }
+
     async uploadFile(file: Express.Multer.File | string, fileName: string) {
         let fileToUpload: { buffer: Buffer; mimetype: string };
 

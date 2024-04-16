@@ -95,7 +95,7 @@ export function fShortenNumber(inputValue: InputValue) {
 
 // ----------------------------------------------------------------------
 
-export function fData(inputValue: InputValue, customUnits?: string) {
+export function fData(inputValue: InputValue) {
     if (!inputValue) return "";
 
     if (inputValue === 0) return "0 Bytes";
@@ -110,9 +110,7 @@ export function fData(inputValue: InputValue, customUnits?: string) {
 
     const index = Math.floor(Math.log(number) / Math.log(baseValue));
 
-    const fm = `${parseFloat((number / baseValue ** index).toFixed(decimal))} ${
-        customUnits || units[index]
-    }`;
+    const fm = `${parseFloat((number / baseValue ** index).toFixed(decimal))} ${units[index]}`;
 
     return fm;
 }

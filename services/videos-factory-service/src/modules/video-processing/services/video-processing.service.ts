@@ -131,6 +131,8 @@ export class VideoProcessingService {
                         }
                     });
                 } catch (error) {
+                    console.log(error, "error");
+
                     throw new Error(
                         "An issue happened while rendering the video. Please contact us pasting this error message"
                     );

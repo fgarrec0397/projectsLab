@@ -1,9 +1,10 @@
-import { Injectable } from "@nestjs/common";
+import { forwardRef, Inject, Injectable } from "@nestjs/common";
 import { uidGenerator } from "@projectslab/helpers";
 import { FindWithQueryOptions } from "src/common/database/strategies/firebase.strategy";
 import { DatabaseConfig, InjectDatabase } from "src/config/database-config.module";
 import { InjectStorageConfig, StorageConfig } from "src/config/storage-config.module";
 import { VideoRenderingJobService } from "src/modules/jobs/services/video-rendering-jobs.service";
+import { UsageService } from "src/modules/usage/usage.service";
 
 import { VIDEOS_CACHE_DURATION } from "../videos.constants";
 import { IVideo, IVideoDraft, VideoStatus } from "../videos.types";
@@ -13,15 +14,22 @@ export class VideosService {
     constructor(
         @InjectDatabase() private readonly database: DatabaseConfig,
         @InjectStorageConfig() private readonly storage: StorageConfig,
-        private readonly videoRenderingJobService: VideoRenderingJobService
+        @Inject(forwardRef(() => VideoRenderingJobService))
+        private readonly videoRenderingJobService: VideoRenderingJobService,
+        @Inject(forwardRef(() => UsageService))
+        private readonly usageService: UsageService
     ) {}
 
-    async getVideos(userId: string, withThumbnails?: boolean) {
-        const videoCollectionPath = `users/${userId}/videos`;
-        const videos = await this.database.findWithQuery<IVideo>(videoCollectionPath, {
+    async getVideos(
+        userId: string,
+        withThumbnails?: boolean,
+        options: FindWithQueryOptions = {
             orderByField: "createdAt",
             orderByDirection: "desc",
-        });
+        }
+    ) {
+        const videoCollectionPath = `users/${userId}/videos`;
+        const videos = await this.database.findWithQuery<IVideo>(videoCollectionPath, options);
 
         if (!withThumbnails) {
             return videos;
@@ -144,6 +152,8 @@ export class VideosService {
         await this.storage.deleteFiles([video.thumbnailKey, video.videoKey]);
 
         const deleteResult = await this.database.delete(videoCollectionPath, videoId);
+
+        await this.usageService.deleteUserVideosUsage(userId);
 
         return deleteResult;
     }

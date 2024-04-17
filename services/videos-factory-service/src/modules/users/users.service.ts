@@ -1,4 +1,4 @@
-import { Injectable } from "@nestjs/common";
+import { forwardRef, Inject, Injectable } from "@nestjs/common";
 import { DAY_IN_SECONDS } from "src/common/constants";
 import { addMonth } from "src/common/dates/dates.utils";
 import { PaymentService } from "src/common/payment/services/payment.service";
@@ -14,7 +14,7 @@ export class UsersService {
         @InjectDatabase() private readonly database: DatabaseConfig,
         private readonly plansService: PlansService,
         private readonly payment: PaymentService,
-        private readonly videosService: VideosService
+        @Inject(forwardRef(() => VideosService)) private readonly videosService: VideosService
     ) {}
 
     async getUserById(userId: string) {

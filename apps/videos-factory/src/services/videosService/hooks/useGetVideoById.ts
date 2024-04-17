@@ -12,7 +12,7 @@ import { useOnVideoUpdate } from "./useOnVideoUpdate";
 export const useGetVideoById = (videoId?: string) => {
     const auth = useAuthContext();
 
-    const { data, isLoading, error, isValidating, mutate } = useSWR<IVideo | string>(
+    const { data, isLoading, error, isValidating, mutate } = useSWR<IVideo | undefined>(
         [auth.user?.accessToken, videoId, "video"],
         () => getVideoById(auth.user?.accessToken, videoId),
         {

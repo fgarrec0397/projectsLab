@@ -7,6 +7,7 @@ import { useAuthContext } from "@/auth/hooks";
 import { PrimaryButton } from "@/components/button";
 import { paths } from "@/routes/paths";
 import { useGetCurrentPlan } from "@/services/plansService/hooks/useGetCurrentPlan";
+import { useGetCurrentUser } from "@/services/usersService/hooks/useGetCurrentUser";
 import { pxToRem } from "@/theme/typography";
 
 import UsageWidget from "./usage-widget";
@@ -14,7 +15,7 @@ import UsageWidget from "./usage-widget";
 // ----------------------------------------------------------------------
 
 export default function NavUsage() {
-    const { user } = useAuthContext();
+    const { currentUser } = useGetCurrentUser();
     const { currentPlan } = useGetCurrentPlan();
     const mappedSubscriptionData = (subscriptionsData as any)[currentPlan?.name as any];
 
@@ -40,12 +41,17 @@ export default function NavUsage() {
                     </Stack>
                     <Stack>
                         <UsageWidget
-                            value={user?.usedVideos}
-                            total={user?.allowedVideos}
+                            value={currentUser?.usedVideos || 0}
+                            total={currentUser?.allowedVideos || 0}
                             units="videos"
                             format="with-units"
                         />
-                        <UsageWidget value={user?.usedStorage} total={user?.allowedStorage} />
+                        <UsageWidget
+                            value={currentUser?.usedStorage || 0}
+                            total={currentUser?.allowedStorage || 0}
+                            units="GB"
+                            format="with-units"
+                        />
                     </Stack>
                 </Stack>
 

@@ -4,8 +4,10 @@ import { useMemo } from "react";
 import useSWR from "swr";
 
 import { useAuthContext } from "@/auth/hooks";
+import { IUser } from "@/types/user";
 
 import { getCurrentUser } from "../usersService";
+import { useOnUserUpdate } from "./useOnUserUpdate";
 
 export const useGetCurrentUser = () => {
     const auth = useAuthContext();
@@ -18,6 +20,19 @@ export const useGetCurrentUser = () => {
             revalidateOnFocus: false,
         }
     );
+
+    useOnUserUpdate((value) => {
+        mutate(
+            async () => {
+                const promise = new Promise<IUser>((resolve) => {
+                    resolve(value);
+                });
+
+                return promise;
+            },
+            { revalidate: false }
+        );
+    });
 
     const memoizedResponse = useMemo(
         () => ({

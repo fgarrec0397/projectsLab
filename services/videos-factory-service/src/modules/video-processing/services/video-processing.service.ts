@@ -5,6 +5,7 @@ import { VideoUtils } from "src/common/utils/video.utils";
 import { DatabaseConfig, InjectDatabase } from "src/config/database-config.module";
 import { InjectStorageConfig, StorageConfig } from "src/config/storage-config.module";
 import { NotificationsService } from "src/modules/notifications/services/notifications.service";
+import { UsageService } from "src/modules/usage/usage.service";
 
 import { getVideoByIdCacheKey, getVideosCacheKey } from "../../videos/utils/videos.utils";
 import { IVideo, VideoStatus } from "../../videos/videos.types";
@@ -28,6 +29,7 @@ export class VideoProcessingService {
         private readonly notificationService: NotificationsService,
         private readonly tempFoldersService: TempFoldersService,
         private readonly fileSystem: FileSystemService,
+        private readonly usageService: UsageService,
         @InjectDatabase() private readonly database: DatabaseConfig,
         @InjectStorageConfig() private readonly storage: StorageConfig
     ) {}
@@ -122,6 +124,8 @@ export class VideoProcessingService {
                                 },
                                 VideoStatus.Rendered
                             );
+
+                            await this.usageService.addUserVideosUsage(userId);
                         } catch (error) {
                             console.log(error, "error");
 

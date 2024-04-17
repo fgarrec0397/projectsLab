@@ -1,4 +1,4 @@
-import { Injectable, OnModuleInit } from "@nestjs/common";
+import { forwardRef, Inject, Injectable, OnModuleInit } from "@nestjs/common";
 import Bull, { Queue } from "bull";
 import { Redis } from "ioredis";
 import { TempFoldersService } from "src/common/files-system/services/temp-folders.service";
@@ -40,6 +40,7 @@ export class VideoRenderingJobService implements OnModuleInit {
     };
 
     constructor(
+        @Inject(forwardRef(() => VideoProcessingService))
         private readonly videoProcessingService: VideoProcessingService,
         private readonly notificationService: NotificationsService,
         private readonly tempFoldersService: TempFoldersService,

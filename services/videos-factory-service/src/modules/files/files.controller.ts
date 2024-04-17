@@ -104,13 +104,15 @@ export class FilesController {
 
     @Delete()
     @UseInvalidateCache(filesCacheKey)
-    async delete(@Query("fileIds") fileIds: string | undefined) {
+    async delete(@Req() request: Request, @Query("fileIds") fileIds: string | undefined) {
+        console.log(fileIds, "fileIds");
+
         if (!fileIds) {
             throw new HttpException("fileIds parameter missing", HttpStatus.BAD_REQUEST);
         }
 
         const idsArray = fileIds.split(",");
-        await this.filesService.delete(idsArray);
+        await this.filesService.delete(request.userId, idsArray);
 
         return { message: `files uploaded successfully!` };
     }

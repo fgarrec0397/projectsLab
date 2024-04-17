@@ -16,11 +16,11 @@ export type ActionMapType<M extends { [index: string]: any }> = {
 };
 
 export type AuthUserType =
-    | IUser
     | null
-    | (Record<string, any> & {
-          accessToken?: string;
-      });
+    | (Record<string, any> &
+          IUser & {
+              accessToken?: string;
+          });
 
 export type AuthStateType = {
     status?: string;

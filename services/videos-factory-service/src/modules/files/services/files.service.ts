@@ -35,7 +35,7 @@ export class FilesService {
             });
 
             const uploadResults = await Promise.all(uploadPromises);
-            await this.usageService.updateUserUsage(userId);
+            await this.usageService.updateUserStorageUsage(userId);
 
             return uploadResults;
         }
@@ -43,7 +43,7 @@ export class FilesService {
         const fileName = `${userId}/${files.originalname}`;
         const uploadResult = await this.storageConfig.uploadFile(files, fileName);
 
-        await this.usageService.updateUserUsage(userId);
+        await this.usageService.updateUserStorageUsage(userId);
 
         return uploadResult;
     };
@@ -74,7 +74,11 @@ export class FilesService {
         return this.storageConfig.createFolder(userFolderName);
     };
 
-    delete = async (fileIds: string[]) => {
-        return this.storageConfig.deleteFiles(fileIds);
+    delete = async (userId: string, fileIds: string[]) => {
+        const deleteResult = this.storageConfig.deleteFiles(fileIds);
+
+        await this.usageService.updateUserStorageUsage(userId);
+
+        return deleteResult;
     };
 }

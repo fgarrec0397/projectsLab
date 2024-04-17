@@ -13,7 +13,7 @@ export const useGetCurrentUser = () => {
     const auth = useAuthContext();
 
     const { data, isLoading, error, isValidating, mutate } = useSWR(
-        "currentUser",
+        ["currentUser", auth.user?.id],
         () => getCurrentUser(auth.user?.accessToken),
         {
             revalidateIfStale: false,

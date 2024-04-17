@@ -137,8 +137,8 @@ export type IUserAccountChangePassword = {
 };
 
 export type IUser = {
-    displayName?: string;
-    email?: string;
+    displayName: string | null;
+    email: string | null;
     id: string;
     currentPlanId?: string;
     usageCycleEndsAt?: number;

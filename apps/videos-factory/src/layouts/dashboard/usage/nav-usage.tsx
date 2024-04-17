@@ -3,6 +3,7 @@ import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
 
 import { subscriptionsData } from "@/assets/data/subscriptionsData";
+import { useAuthContext } from "@/auth/hooks";
 import { PrimaryButton } from "@/components/button";
 import { paths } from "@/routes/paths";
 import { useGetCurrentPlan } from "@/services/plansService/hooks/useGetCurrentPlan";
@@ -54,15 +55,9 @@ export default function NavUsage() {
                     </Stack>
                 </Stack>
 
-                {currentPlan?.name !== "Growth" && (
-                    <PrimaryButton
-                        variant="soft"
-                        href={paths.dashboard.subscription}
-                        rel="noopener"
-                    >
-                        Upgrade
-                    </PrimaryButton>
-                )}
+                <PrimaryButton variant="soft" href={paths.dashboard.subscription} rel="noopener">
+                    Upgrade
+                </PrimaryButton>
             </Stack>
         </Stack>
     );

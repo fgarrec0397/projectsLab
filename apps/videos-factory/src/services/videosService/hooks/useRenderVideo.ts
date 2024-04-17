@@ -24,8 +24,8 @@ export const useRenderVideo = () => {
             mutateVideoDraft();
             mutateVideos();
             router.push(paths.dashboard.videos.root);
-        } catch (error) {
-            enqueueSnackbar("Something went wrong", { variant: "error" });
+        } catch (error: any) {
+            enqueueSnackbar(error.response.data.message, { variant: "error" });
         }
     };
 

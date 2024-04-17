@@ -13,17 +13,18 @@ export class UsageService {
         private readonly usersService: UsersService
     ) {}
 
-    async updateUserStorageUsage(userId: string) {
-        const generatedVideosPath = `system/${userId}`;
+    async updateUserStorageUsage(userId: string, optimisticValue = 0) {
+        const generatedVideosPath = `system/${userId}/videos`;
         const filesStorage = await this.storage.calculateFolderSize(userId);
         const generatedVideosStorage = await this.storage.calculateFolderSize(generatedVideosPath);
-        const usedStorage = filesStorage + generatedVideosStorage;
+        const usedStorage = filesStorage + generatedVideosStorage + optimisticValue;
 
         await this.usersService.updateUser(userId, {
             usedStorage: this.bytesToGigabytes(usedStorage),
         });
 
         const user = await this.usersService.getUserById(userId);
+        console.log(user, "user in updateUserStorageUsage");
 
         this.notifyUsageChange(user);
     }
@@ -48,7 +49,7 @@ export class UsageService {
         this.notifyUsageChange({ ...user, usedVideos: user.usedVideos + 1 });
     }
 
-    private bytesToGigabytes(bytes: number): number {
+    bytesToGigabytes(bytes: number): number {
         return Math.round((bytes / 1024 ** 3) * 100) / 100;
     }
 
@@ -56,6 +57,7 @@ export class UsageService {
         this.notificationService.notifyClient(user.id, {
             event: "usageUpdate",
             data: user,
+            // cacheKey: [getVideosCacheKey(userId), getVideoByIdCacheKey(video.id)],
         });
     }
 }

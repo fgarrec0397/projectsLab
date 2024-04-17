@@ -1,10 +1,11 @@
-import { forwardRef, Inject, Injectable } from "@nestjs/common";
+import { forwardRef, HttpException, HttpStatus, Inject, Injectable } from "@nestjs/common";
 import { uidGenerator } from "@projectslab/helpers";
 import { FindWithQueryOptions } from "src/common/database/strategies/firebase.strategy";
 import { DatabaseConfig, InjectDatabase } from "src/config/database-config.module";
 import { InjectStorageConfig, StorageConfig } from "src/config/storage-config.module";
 import { VideoRenderingJobService } from "src/modules/jobs/services/video-rendering-jobs.service";
 import { UsageService } from "src/modules/usage/usage.service";
+import { UsersService } from "src/modules/users/users.service";
 
 import { VIDEOS_CACHE_DURATION } from "../videos.constants";
 import { IVideo, IVideoDraft, VideoStatus } from "../videos.types";
@@ -16,6 +17,8 @@ export class VideosService {
         @InjectStorageConfig() private readonly storage: StorageConfig,
         @Inject(forwardRef(() => VideoRenderingJobService))
         private readonly videoRenderingJobService: VideoRenderingJobService,
+        @Inject(forwardRef(() => UsersService))
+        private readonly usersService: UsersService,
         @Inject(forwardRef(() => UsageService))
         private readonly usageService: UsageService
     ) {}
@@ -153,7 +156,7 @@ export class VideosService {
 
         const deleteResult = await this.database.delete(videoCollectionPath, videoId);
 
-        await this.usageService.deleteUserVideosUsage(userId);
+        await this.usageService.updateUserStorageUsage(userId);
 
         return deleteResult;
     }
@@ -165,6 +168,8 @@ export class VideosService {
         await this.storage.deleteFiles(videos.map((x) => [x.thumbnailKey, x.videoKey]).flat());
 
         const deleteResult = await this.database.deleteBatch(videoCollectionPath, videosIds);
+
+        await this.usageService.updateUserStorageUsage(userId);
 
         return deleteResult;
     }
@@ -182,6 +187,15 @@ export class VideosService {
 
     async startRendering(userId: string, video: IVideo) {
         const videoCollectionPath = `users/${userId}/videos`;
+
+        const user = await this.usersService.getUserById(userId);
+
+        if (user.usedVideos >= user.allowedVideos) {
+            throw new HttpException(
+                "You reached your maximum number of videos",
+                HttpStatus.FORBIDDEN
+            );
+        }
 
         const updatedDocument = await this.database.createOrUpdate(videoCollectionPath, {
             ...video,

@@ -17,6 +17,7 @@ import Image from "@/components/image";
 import { RouterLink } from "@/routes/components";
 import { paths } from "@/routes/paths";
 import { useDeleteVideo } from "@/services/videosService/hooks/useDeleteVideo";
+import { useGetVideoUrl } from "@/services/videosService/hooks/useGetVideoUrl";
 import { icon } from "@/theme/icons";
 import { pxToRem } from "@/theme/typography";
 import { IVideo, VideoStatus } from "@/types/video";
@@ -33,6 +34,7 @@ export default function VideosListVideoCard({ video }: Props) {
     const popover = usePopover();
     const router = useRouter();
     const deleteVideo = useDeleteVideo();
+    const { videoUrl } = useGetVideoUrl(video.id);
     const thumbnail = video.thumbnailKey || "https://placehold.co/135x240";
 
     const handleDeleteVideo = async () => {
@@ -145,6 +147,10 @@ export default function VideosListVideoCard({ video }: Props) {
                 arrow="bottom-center"
                 sx={{ width: 140 }}
             >
+                <MenuItem component={Link} href={videoUrl}>
+                    <Iconify icon="solar:cloud-download-bold-duotone" />
+                    Download
+                </MenuItem>
                 {video.status === VideoStatus.Draft ? (
                     <MenuItem
                         onClick={() => {
@@ -152,7 +158,7 @@ export default function VideosListVideoCard({ video }: Props) {
                             router.push(paths.dashboard.videos.create);
                         }}
                     >
-                        <Iconify icon="solar:pen-bold" />
+                        <Iconify icon="solar:pen-bold-duotone" />
                         Edit
                     </MenuItem>
                 ) : (
@@ -162,13 +168,13 @@ export default function VideosListVideoCard({ video }: Props) {
                             router.push(paths.dashboard.videos.byId(video.id));
                         }}
                     >
-                        <Iconify icon="solar:eye-bold" />
+                        <Iconify icon="solar:eye-bold-duotone" />
                         View
                     </MenuItem>
                 )}
 
                 <MenuItem onClick={handleDeleteVideo} sx={{ color: "error.main" }}>
-                    <Iconify icon="solar:trash-bin-trash-bold" />
+                    <Iconify icon="solar:trash-bin-trash-bold-duotone" />
                     Delete
                 </MenuItem>
             </CustomPopover>

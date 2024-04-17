@@ -3,6 +3,10 @@ import { IUser } from "@/types/user";
 import axiosInstance from "@/utils/axios";
 
 export async function createUser(accessToken: string | undefined, user: Partial<IUser>) {
+    if (!accessToken) {
+        return;
+    }
+
     try {
         return await axiosInstance.post(endpoints.users.create, user, {
             method: "POST",

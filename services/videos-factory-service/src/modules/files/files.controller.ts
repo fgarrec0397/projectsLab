@@ -66,6 +66,10 @@ export class FilesController {
         @UploadedFiles(new FilesValidationPipe())
         files: Array<Express.Multer.File> | Express.Multer.File
     ) {
+        if ((Array.isArray(files) && !files.length) || (!Array.isArray(files) && !files)) {
+            throw new HttpException("No valid file(s)", HttpStatus.BAD_REQUEST);
+        }
+
         const uploadedFiles = await this.filesService.uploadUserFiles(request.userId, files);
 
         const uploadedFilesIds = Array.isArray(uploadedFiles)

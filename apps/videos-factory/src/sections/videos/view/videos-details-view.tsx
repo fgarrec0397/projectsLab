@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { useMemo } from "react";
 import ReactPlayer from "react-player";
 
+import { SecondaryButton } from "@/components/button";
 import FilesTableCard from "@/components/files-table-card/files-table-card";
 import PageWrapper from "@/components/page-wrapper/page-wrapper";
 import { paths } from "@/routes/paths";
@@ -48,7 +49,12 @@ export default function VideosDetailsView({ videoId }: Props) {
             title={video?.name}
             backLink={paths.dashboard.videos.root}
             isLoading={isVideoLoading}
-            titleItem={<VideosStatus status={video?.status} size="medium" />}
+            titleItem={
+                <Stack spacing={2} direction="row" alignItems="center">
+                    <VideosStatus status={video?.status} size="medium" />
+                    <SecondaryButton href={videoUrl}>Download video</SecondaryButton>
+                </Stack>
+            }
             subContent={
                 video?.failedReason !== undefined && (
                     <Typography color="error">{video.failedReason}</Typography>

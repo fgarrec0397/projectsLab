@@ -56,7 +56,6 @@ export class UsageService {
         this.notificationService.notifyClient(user.id, {
             event: "usageUpdate",
             data: user,
-            // cacheKey: [getVideosCacheKey(userId), getVideoByIdCacheKey(video.id)],
         });
     }
 }

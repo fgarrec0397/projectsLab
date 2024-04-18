@@ -152,7 +152,7 @@ export const deleteFiles = async (accessToken: string | undefined, fileId: strin
         fileIdParam = fileIdParam.join(",");
     }
 
-    const url = `${endpoints.files.delete}?fileIds=${fileIdParam}`;
+    const url = `${endpoints.files.delete}?fileIds=${encodeURIComponent(fileIdParam)}`;
     const swrKey: GetFilesParams = [accessToken, undefined];
 
     try {

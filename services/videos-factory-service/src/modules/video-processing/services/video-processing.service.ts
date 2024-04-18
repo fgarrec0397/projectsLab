@@ -127,7 +127,7 @@ export class VideoProcessingService {
 
                             await this.usageService.addUserVideosUsage(userId);
                         } catch (error) {
-                            console.log(error, "error");
+                            console.log({ error }, "error");
 
                             throw new Error(
                                 "The generated video was not uploaded successfully to the storage provider. Please contact us pasting this error message"
@@ -135,7 +135,7 @@ export class VideoProcessingService {
                         }
                     });
                 } catch (error) {
-                    console.log(error, "error");
+                    console.log({ error }, "error");
 
                     throw new Error(
                         "An issue happened while rendering the video. Please contact us pasting this error message"

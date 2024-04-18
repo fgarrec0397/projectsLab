@@ -12,11 +12,7 @@ export const useGetVideoUrl = (videoId?: string) => {
 
     const { data, isLoading, error, isValidating, mutate } = useSWR<string>(
         [auth.user?.accessToken, videoId, "video-url"],
-        () => getVideoUrlById(auth.user?.accessToken, videoId),
-        {
-            revalidateIfStale: false,
-            revalidateOnFocus: false,
-        }
+        () => getVideoUrlById(auth.user?.accessToken, videoId)
     );
 
     const memoizedResponse = useMemo(

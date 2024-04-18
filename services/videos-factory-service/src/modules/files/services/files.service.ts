@@ -29,7 +29,6 @@ export class FilesService {
         files: Array<Express.Multer.File> | Express.Multer.File
     ) => {
         const user = await this.usersService.getUserById(userId);
-        console.log(files, "files");
 
         const filesSize = Array.isArray(files)
             ? files.map((x) => x.size).reduce((prev, current) => prev + current)
@@ -64,7 +63,7 @@ export class FilesService {
         const fileName = `${userId}/${files.originalname}`;
         const uploadResult = await this.storageConfig.uploadFile(files, fileName);
 
-        await this.usageService.updateUserStorageUsage(userId);
+        await this.usageService.updateUserStorageUsage(userId, inComingUsage);
 
         return uploadResult;
     };
@@ -96,7 +95,9 @@ export class FilesService {
     };
 
     delete = async (userId: string, fileIds: string[]) => {
-        const deleteResult = this.storageConfig.deleteFiles(fileIds);
+        const deleteResult = await this.storageConfig.deleteFiles(fileIds);
+
+        await this.usageService.updateUserStorageUsage(userId);
 
         return deleteResult;
     };

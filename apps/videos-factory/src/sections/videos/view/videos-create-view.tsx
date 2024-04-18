@@ -9,6 +9,7 @@ import {
     inputBaseClasses,
     MenuItem,
     Stack,
+    Tooltip,
 } from "@mui/material";
 import Typography from "@mui/material/Typography";
 import Grid from "@mui/system/Unstable_Grid";
@@ -28,8 +29,8 @@ import FormProvider, {
 } from "@/components/hook-form";
 import RHFFilesSelector from "@/components/hook-form/rhf-files-selector";
 import PageWrapper from "@/components/page-wrapper/page-wrapper";
-import { useSnackbar } from "@/components/snackbar";
 import { useGetFiles } from "@/services/filesService/hooks/useGetFiles";
+import { useGetCurrentUser } from "@/services/usersService/hooks/useGetCurrentUser";
 import { useGetVideoDraft } from "@/services/videosService/hooks/useGetVideoDraft";
 import { useRenderVideo } from "@/services/videosService/hooks/useRenderVideo";
 import { useSaveDraft } from "@/services/videosService/hooks/useSaveDraft";
@@ -53,11 +54,12 @@ const STRUCTURE_TYPE_OPTIONS = [
 
 export default function VideosCreateView() {
     const { allFiles } = useGetFiles();
+    const { currentUser } = useGetCurrentUser();
     const [isEditingVideoName, setIsEditingVideoName] = useState(false);
     const { videoDraft, isVideoDraftLoading } = useGetVideoDraft();
     const saveDraft = useSaveDraft();
     const renderVideo = useRenderVideo();
-    const { enqueueSnackbar } = useSnackbar();
+    const canUserRender = (currentUser?.usedVideos || 0) <= (currentUser?.allowedVideos || 0);
 
     const NewVideoSchema = Yup.object().shape({
         name: Yup.string().required("Name is required"),
@@ -193,7 +195,14 @@ export default function VideosCreateView() {
                         <TertiaryButton onClick={onSaveDraft} sx={{ mr: 1 }}>
                             Save Draft
                         </TertiaryButton>
-                        <SecondaryButton type="submit">Start rendering</SecondaryButton>
+
+                        {canUserRender ? (
+                            <SecondaryButton type="submit">Start rendering</SecondaryButton>
+                        ) : (
+                            <Tooltip title="Not enough videos left. Upgrade or buy more videos usage">
+                                <SecondaryButton disabled>Start rendering</SecondaryButton>
+                            </Tooltip>
+                        )}
                     </>
                 }
                 isLoading={isVideoDraftLoading}

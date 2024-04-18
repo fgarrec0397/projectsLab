@@ -19,13 +19,13 @@ export type IVideo = {
     age: number[];
     gender: string;
     language: string;
-    interests?: string;
-    challenges?: string;
+    interests: string | undefined;
+    challenges: string | undefined;
     topic: string;
     specificityLevel: string;
     structureType: string;
     pace: string;
-    moreSpecificities?: string;
+    moreSpecificities: string | undefined;
     files?: string[];
     status: VideoStatus;
     duration?: number;
@@ -42,5 +42,16 @@ export type IVideoDraft = Partial<IVideo>;
 
 export type IFormVideo = Omit<
     IVideo,
-    "id" | "documentId" | "status" | "thumbnail" | "createdAt" | "updatedAt"
+    | "id"
+    | "documentId"
+    | "status"
+    | "thumbnail"
+    | "createdAt"
+    | "updatedAt"
+    | "failedReason"
+    | "duration"
+    | "videoKey"
+    | "videoUrl"
+    | "thumbnailKey"
+    | "thumbnailUrl"
 >;

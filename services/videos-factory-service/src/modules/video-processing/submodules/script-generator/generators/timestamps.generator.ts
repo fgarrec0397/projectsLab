@@ -39,8 +39,8 @@ export class TimestampsGenerator {
 
         const subtitles = alternatives.words.map(({ punctuated_word, word, start, end }) => ({
             word: punctuated_word || word,
-            start,
-            end,
+            start: start,
+            end: end,
         })) as TimedText[];
 
         const sentences: TimedSentence[] = [];

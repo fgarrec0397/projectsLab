@@ -1,5 +1,6 @@
 import {
     alpha,
+    Button,
     Card,
     IconButton,
     Link,
@@ -11,16 +12,20 @@ import {
 import Box from "@mui/material/Box";
 import { useRouter } from "next/navigation";
 
+import { useAuthContext } from "@/auth/hooks";
+import { ConfirmDialog } from "@/components/custom-dialog";
 import CustomPopover, { usePopover } from "@/components/custom-popover";
 import Iconify from "@/components/iconify";
 import Image from "@/components/image";
+import { useBoolean } from "@/hooks/use-boolean";
 import { RouterLink } from "@/routes/components";
 import { paths } from "@/routes/paths";
 import { useDeleteVideo } from "@/services/videosService/hooks/useDeleteVideo";
-import { useGetVideoUrl } from "@/services/videosService/hooks/useGetVideoUrl";
+import { getVideoUrlById } from "@/services/videosService/videosService";
 import { icon } from "@/theme/icons";
 import { pxToRem } from "@/theme/typography";
 import { IVideo, VideoStatus } from "@/types/video";
+import { downloadURI } from "@/utils/dowloadURI";
 import { fDate, formatSeconds } from "@/utils/format-time";
 
 import VideosStatus from "../common/videos-status";
@@ -33,13 +38,21 @@ export default function VideosListVideoCard({ video }: Props) {
     const theme = useTheme();
     const popover = usePopover();
     const router = useRouter();
+    const { user } = useAuthContext();
     const deleteVideo = useDeleteVideo();
-    const { videoUrl } = useGetVideoUrl(video.id);
+
+    const isConfirmDeleteOpened = useBoolean();
     const thumbnail = video.thumbnailKey || "https://placehold.co/135x240";
 
     const handleDeleteVideo = async () => {
         await deleteVideo(video.id);
         popover.onClose();
+    };
+
+    const clickDownload = async () => {
+        const videoUrl = await getVideoUrlById(user?.accessToken, video.id);
+
+        downloadURI(videoUrl);
     };
 
     return (
@@ -147,7 +160,7 @@ export default function VideosListVideoCard({ video }: Props) {
                 arrow="bottom-center"
                 sx={{ width: 140 }}
             >
-                <MenuItem component={Link} href={videoUrl}>
+                <MenuItem onClick={clickDownload}>
                     <Iconify icon="solar:cloud-download-bold-duotone" />
                     Download
                 </MenuItem>
@@ -173,11 +186,28 @@ export default function VideosListVideoCard({ video }: Props) {
                     </MenuItem>
                 )}
 
-                <MenuItem onClick={handleDeleteVideo} sx={{ color: "error.main" }}>
+                <MenuItem onClick={isConfirmDeleteOpened.onTrue} sx={{ color: "error.main" }}>
                     <Iconify icon="solar:trash-bin-trash-bold-duotone" />
                     Delete
                 </MenuItem>
             </CustomPopover>
+            <ConfirmDialog
+                open={isConfirmDeleteOpened.value}
+                onClose={isConfirmDeleteOpened.onFalse}
+                title="Read carefully"
+                content={
+                    <>
+                        Deleting a video <strong> does not restore your used videos</strong> and
+                        will be lost forever. <br />
+                        Are you sure want to delete it?
+                    </>
+                }
+                action={
+                    <Button variant="contained" color="error" onClick={handleDeleteVideo}>
+                        Delete
+                    </Button>
+                }
+            />
         </>
     );
 }

@@ -108,6 +108,7 @@ export class TemplateGeneratorService<T extends BaseTemplateData = BaseTemplateD
                         }
                     ]
                 }
+                The asset needs to exist, you cannot invent an asset that you did not receive
                 The "end" property of each videos should match the "start" property of the video before as shown in the example. "start" of video1 matches "end" of video2
                 End and start properties should not contain milliseconds. The "end" property of the last item of type video should be equal to ${this.data?.script?.duration}.
                 If you decide to put a video, the type should be "video", "audio", when it is an audio file. The name should be the corresponding name of the video or audio you

@@ -35,6 +35,8 @@ export class VideoProcessingService {
     ) {}
 
     async renderVideo(userId: string, video: IVideo) {
+        console.log(video.name, "renderVideo");
+
         const videoRenderingFolder = this.tempFoldersService.getTempFolderPath(
             this.tempFoldersService.videoRenderingFolder,
             userId
@@ -60,6 +62,8 @@ export class VideoProcessingService {
             this.scriptService.init(video);
 
             script = await this.scriptService.generateScript(speechFilePath);
+
+            console.log(script, "generated script");
         }
 
         if (canGenerateTemplate) {
@@ -68,6 +72,8 @@ export class VideoProcessingService {
             this.templateService.prepareTemplate(script, speechFilePath, video);
 
             template = await this.templateService.createTemplate();
+
+            console.log(JSON.stringify(template), "generated template");
 
             if (!template) {
                 throw new Error(
@@ -142,9 +148,9 @@ export class VideoProcessingService {
                     );
                 }
 
-                await finalVoiceFolder.cleanUp();
-                await thumbnailFolder.cleanUp();
-                await videoRenderingFolder.cleanUp();
+                // await finalVoiceFolder.cleanUp();
+                // await thumbnailFolder.cleanUp();
+                // await videoRenderingFolder.cleanUp();
 
                 return { result: "Video created" };
             }
@@ -153,7 +159,7 @@ export class VideoProcessingService {
                 "An issue happened and the video was not generated. Please contact us pasting this error message"
             );
         } catch (error) {
-            console.log(error, "yoyo error 1");
+            console.log(error);
 
             throw new Error(
                 "An unknow error occured. Please contact us pasting this error message"
@@ -172,7 +178,7 @@ export class VideoProcessingService {
             await this.database.update(videoCollectionPath, newVideo.id, newVideo);
         } catch {
             throw new Error(
-                "An unknow error occured. Please contact us pasting this error message"
+                "Error while notifying client. Please contact us pasting this error message"
             );
         }
 

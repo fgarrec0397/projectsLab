@@ -103,25 +103,25 @@ export class VideoRenderingJobService implements OnModuleInit {
         await userQueue.add(data);
 
         userQueue.on("failed", async (job) => {
-            console.log("failed");
-            const videoCollectionPath = `users/${data.userId}/videos`;
+            console.log(job.data.video.name, "failed");
+            const videoCollectionPath = `users/${job.data.userId}/videos`;
 
             const failedVideo: IVideo = {
-                ...data.video,
+                ...job.data.video,
                 status: VideoStatus.Failed,
                 failedReason: job.failedReason,
             };
 
             await this.database.createOrUpdate(videoCollectionPath, failedVideo);
 
-            this.notificationService.notifyClient(data.userId, {
+            this.notificationService.notifyClient(job.data.userId, {
                 event: "videoUpdate",
                 data: {
-                    ...data.video,
+                    ...job.data.video,
                     status: VideoStatus.Failed,
                     failedReason: job.failedReason,
                 },
-                cacheKey: [getVideosCacheKey(data.userId), getVideoByIdCacheKey(data.video.id)],
+                cacheKey: [getVideosCacheKey(job.data.userId), getVideoByIdCacheKey(data.video.id)],
             });
         });
     }

@@ -1,6 +1,8 @@
 import ffmpeg, { FfmpegCommand } from "fluent-ffmpeg";
+import { FileSystemService } from "src/common/files-system/services/file-system.service";
 import { CanvasRendererService } from "src/modules/canvas-renderer/canvas-renderer.service";
 
+import { AssFileBuilder } from "./builders/ass-file.builder";
 import { ComplexFilterBuilder } from "./builders/video-complexfilter.builder";
 import { IElementComponent } from "./components/BaseComponent";
 import { IFragmentableComponent } from "./components/FragmentableComponent";
@@ -32,6 +34,8 @@ export class VideoRendererService {
 
     complexFilterBuilder: ComplexFilterBuilder;
 
+    assFileBuilder: AssFileBuilder;
+
     templateMapper?: VideoTemplateMapper;
 
     elementsFactory?: ElementComponentFactory;
@@ -52,6 +56,8 @@ export class VideoRendererService {
 
     shouldProcessFragments?: boolean;
 
+    fileSystem: FileSystemService;
+
     constructor(
         private readonly template: Template,
         private readonly folderPath: string
@@ -61,6 +67,7 @@ export class VideoRendererService {
         this.finalFfmpegCommand = ffmpeg();
 
         this.complexFilterBuilder = new ComplexFilterBuilder();
+        this.assFileBuilder = new AssFileBuilder();
 
         this.template = template;
         this.canvasRenderer = new CanvasRendererService({
@@ -70,6 +77,7 @@ export class VideoRendererService {
         this.complexFilterBuilder = new ComplexFilterBuilder();
         this.elementsFactory = new ElementComponentFactory(
             this.complexFilterBuilder,
+            this.assFileBuilder,
             this.canvasRenderer,
             { videoOutputPath: this.folderPath }
         );
@@ -87,6 +95,8 @@ export class VideoRendererService {
         this.folderPath = folderPath;
         this.outputPath = `${this.folderPath}/video.mp4`;
         this.tempOutputPath = `${this.folderPath}/temp-video.mov`;
+
+        this.fileSystem = new FileSystemService();
     }
 
     public async initRender(afterRender?: (filePath: string) => Promise<void>) {
@@ -96,17 +106,19 @@ export class VideoRendererService {
 
         await this.renderTempVideo();
 
-        if (!this.shouldProcessFragments) {
-            await this.renderFinalVideo();
+        this.buildAssFile();
 
-            return;
-        }
-
-        this.complexFilterBuilder.reset();
-
-        await this.processFragmentElements();
-
+        // if (!this.shouldProcessFragments) {
         await this.renderFinalVideo();
+
+        //     return;
+        // }
+
+        // this.complexFilterBuilder.reset();
+
+        // await this.processFragmentElements();
+
+        // await this.renderFinalVideo();
 
         if (afterRender) {
             await afterRender(this.outputPath);
@@ -199,6 +211,21 @@ export class VideoRendererService {
         this.tempFfmpegCommand.complexFilter(complexFilterCommand, complexFilterMapping);
     }
 
+    private buildAssFile() {
+        const assFileContent = this.assFileBuilder.build();
+        const substitlesPath = `${this.folderPath}/subtitles.ass`;
+
+        this.fileSystem.createFile(substitlesPath, assFileContent);
+
+        const path = substitlesPath.replace(/\\/g, "\\\\").replace(/:/g, "\\:");
+
+        this.finalFfmpegCommand.outputOptions([
+            `-vf subtitles='${path}'`,
+            "-preset slow",
+            "-movflags +faststart",
+        ]);
+    }
+
     private async renderTempVideo() {
         console.log("Rendering started...");
         console.time("Rendering finished");
@@ -215,7 +242,7 @@ export class VideoRendererService {
                     console.log(`Spawned Ffmpeg with command: ${commandLine}`);
                 })
                 .on("end", () => {
-                    console.timeEnd("Rendering finished");
+                    console.log("Temp video rendering finished");
                     resolve();
                 })
                 .on("error", (error: Error) => {
@@ -239,8 +266,11 @@ export class VideoRendererService {
 
             this.finalFfmpegCommand
                 .input(this.tempOutputPath)
-                .videoCodec("libx264")
-                .outputOptions(["-pix_fmt yuv420p"])
+                .videoCodec("libx264") // Use H.264 codec for video
+                .audioCodec("aac") // Use AAC codec for audio
+                .audioBitrate(192) // Set audio bitrate to 192 kbps
+                .audioChannels(2) // Use stereo for audio channels
+                .videoBitrate("5000k")
                 .fps(this.template.fps)
                 .on("start", (commandLine) => {
                     console.log(`Spawned Ffmpeg with command: ${commandLine}`);

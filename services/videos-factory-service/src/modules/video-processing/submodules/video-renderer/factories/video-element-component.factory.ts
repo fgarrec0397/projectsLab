@@ -1,5 +1,6 @@
 import { CanvasRendererService } from "src/modules/canvas-renderer/canvas-renderer.service";
 
+import { AssFileBuilder } from "../builders/ass-file.builder";
 import { ComplexFilterBuilder } from "../builders/video-complexfilter.builder";
 import { AudioComponent } from "../components/AudioComponent";
 import { IElementComponent } from "../components/BaseComponent";
@@ -19,6 +20,7 @@ export type ComponentConfig = {
 export class ElementComponentFactory {
     constructor(
         private readonly complexFilterBuilder: ComplexFilterBuilder,
+        private readonly assFileBuilder: AssFileBuilder,
         private readonly canvasRenderer: CanvasRendererService,
         private readonly config: ComponentConfig
     ) {
@@ -58,7 +60,7 @@ export class ElementComponentFactory {
             return new TextComponent(
                 text,
                 this.complexFilterBuilder,
-                this.canvasRenderer,
+                this.assFileBuilder,
                 this.config
             );
         }
@@ -73,7 +75,7 @@ export class ElementComponentFactory {
             return new TextComponent(
                 text,
                 this.complexFilterBuilder,
-                this.canvasRenderer,
+                this.assFileBuilder,
                 this.config
             );
         }

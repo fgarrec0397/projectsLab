@@ -7,8 +7,11 @@ import Typography from "@mui/material/Typography";
 import Grid from "@mui/material/Unstable_Grid2";
 import { m, useScroll } from "framer-motion";
 import { useCallback, useEffect, useRef, useState } from "react";
+import ReactPlayer from "react-player";
+import Slider from "react-slick";
 
 import { MotionContainer, varFade } from "@/components/animate";
+import Carousel from "@/components/carousel";
 import Iconify from "@/components/iconify";
 import { useResponsive } from "@/hooks/use-responsive";
 import { HEADER } from "@/layouts/config-layout";
@@ -118,7 +121,7 @@ const StyledPolygon = styled("div")<StyledPolygonProps>(
 // ----------------------------------------------------------------------
 
 export default function HomeHero() {
-    const mdUp = useResponsive("up", "md");
+    const smUp = useResponsive("up", "sm");
 
     const theme = useTheme();
 
@@ -129,6 +132,18 @@ export default function HomeHero() {
     const [percent, setPercent] = useState(0);
 
     const lightMode = theme.palette.mode === "light";
+    const settings = {
+        dots: false,
+        arrows: false,
+        infinite: true,
+        slidesToShow: 2,
+        // slidesToScroll: 1,
+        autoplay: true,
+        speed: 10000,
+        autoplaySpeed: 0,
+        cssEase: "linear",
+        vertical: true,
+    };
 
     const getScroll = useCallback(() => {
         let heroHeight = 0;
@@ -178,12 +193,7 @@ export default function HomeHero() {
                     Create unique <br />{" "}
                     <StyledTextGradient
                         animate={{ backgroundPosition: "200% center" }}
-                        transition={{
-                            repeatType: "reverse",
-                            ease: "linear",
-                            duration: 20,
-                            repeat: Infinity,
-                        }}
+                        transition={transition}
                     >
                         FACELESS VIDEOS
                     </StyledTextGradient>{" "}
@@ -219,81 +229,121 @@ export default function HomeHero() {
     const renderSlides = (
         <Stack
             direction="row"
-            alignItems="flex-start"
+            spacing={1}
             sx={{
-                height: "150%",
-                position: "absolute",
                 opacity: opacity > 0 ? opacity : 0,
-                transform: `skew(${-16 - percent / 24}deg, ${4 - percent / 16}deg)`,
-                ...(theme.direction === "rtl" && {
-                    transform: `skew(${16 + percent / 24}deg, ${4 + percent / 16}deg)`,
-                }),
+                ".slick-list": {
+                    overflow: "visible",
+                },
+                "slick-slide": {
+                    maxWidth: 200,
+                },
             }}
         >
-            <Stack
-                component={m.div}
-                variants={varFade().in}
-                sx={{
-                    width: 344,
-                    position: "relative",
-                }}
-            >
-                <Box
-                    component={m.img}
-                    animate={{ y: ["0%", "100%"] }}
-                    transition={transition}
-                    alt={lightMode ? "light_1" : "dark_1"}
-                    src={
-                        lightMode
-                            ? `/assets/images/home/hero/ezgif.com-animated-gif-maker.gif`
-                            : `/assets/images/home/hero/dark_1.webp`
-                    }
-                    sx={{ position: "absolute", mt: -5 }}
+            <Carousel {...settings}>
+                <ReactPlayer
+                    url="assets/demo-video1.mp4"
+                    width={200}
+                    height={355}
+                    loop
+                    playing
+                    muted
                 />
-                <Box
-                    component={m.img}
-                    animate={{ y: ["-100%", "0%"] }}
-                    transition={transition}
-                    alt={lightMode ? "light_1" : "dark_1"}
-                    src={
-                        lightMode
-                            ? `/assets/images/home/hero/ezgif.com-animated-gif-maker.gif`
-                            : `/assets/images/home/hero/dark_1.webp`
-                    }
-                    sx={{ position: "absolute" }}
+                <ReactPlayer
+                    url="assets/demo-video2.mp4"
+                    width={200}
+                    height={355}
+                    loop
+                    playing
+                    muted
                 />
-            </Stack>
 
-            <Stack
-                component={m.div}
-                variants={varFade().in}
-                sx={{ width: 720, position: "relative", ml: -5 }}
-            >
-                <Box
-                    component={m.img}
-                    animate={{ y: ["100%", "0%"] }}
-                    transition={transition}
-                    alt={lightMode ? "light_2" : "dark_2"}
-                    src={
-                        lightMode
-                            ? `/assets/images/home/hero/ezgif.com-animated-gif-maker.gif`
-                            : `/assets/images/home/hero/dark_2.webp`
-                    }
-                    sx={{ position: "absolute", mt: -5 }}
+                <ReactPlayer
+                    url="assets/demo-video3.mp4"
+                    width={200}
+                    height={355}
+                    loop
+                    playing
+                    muted
                 />
-                <Box
-                    component={m.img}
-                    animate={{ y: ["0%", "-100%"] }}
-                    transition={transition}
-                    alt={lightMode ? "light_2" : "dark_2"}
-                    src={
-                        lightMode
-                            ? `/assets/images/home/hero/ezgif.com-animated-gif-maker.gif`
-                            : `/assets/images/home/hero/dark_2.webp`
-                    }
-                    sx={{ position: "absolute" }}
+
+                <ReactPlayer
+                    url="assets/demo-video4.mp4"
+                    width={200}
+                    height={355}
+                    loop
+                    playing
+                    muted
                 />
-            </Stack>
+            </Carousel>
+            <Carousel {...settings} rtl>
+                <ReactPlayer
+                    url="assets/demo-video1.mp4"
+                    width={200}
+                    height={355}
+                    loop
+                    playing
+                    muted
+                />
+                <ReactPlayer
+                    url="assets/demo-video2.mp4"
+                    width={200}
+                    height={355}
+                    loop
+                    playing
+                    muted
+                />
+                <ReactPlayer
+                    url="assets/demo-video3.mp4"
+                    width={200}
+                    height={355}
+                    loop
+                    playing
+                    muted
+                />
+                <ReactPlayer
+                    url="assets/demo-video4.mp4"
+                    width={200}
+                    height={355}
+                    loop
+                    playing
+                    muted
+                />
+            </Carousel>
+            <Carousel {...settings}>
+                <ReactPlayer
+                    url="assets/demo-video1.mp4"
+                    width={200}
+                    height={355}
+                    loop
+                    playing
+                    muted
+                />
+                <ReactPlayer
+                    url="assets/demo-video2.mp4"
+                    width={200}
+                    height={355}
+                    loop
+                    playing
+                    muted
+                />
+                <ReactPlayer
+                    url="assets/demo-video3.mp4"
+                    width={200}
+                    height={355}
+                    loop
+                    playing
+                    muted
+                />
+                <ReactPlayer
+                    url="assets/demo-video4.mp4"
+                    width={200}
+                    height={355}
+                    loop
+                    playing
+                    muted
+                />
+            </Carousel>
         </Stack>
     );
 
@@ -308,7 +358,7 @@ export default function HomeHero() {
 
     const renderEllipses = (
         <>
-            {mdUp && <StyledEllipseTop />}
+            {smUp && <StyledEllipseTop />}
             <StyledEllipseBottom />
         </>
     );
@@ -325,12 +375,20 @@ export default function HomeHero() {
             >
                 <StyledWrapper>
                     <Container component={MotionContainer} sx={{ height: 1 }}>
-                        <Grid container columnSpacing={{ md: 10 }} sx={{ height: 1 }}>
-                            <Grid xs={12} md={7}>
+                        <Grid
+                            container
+                            columnSpacing={{ md: 10 }}
+                            sx={{ height: 1, position: "relative" }}
+                        >
+                            <Grid xs={12} sm={7} md={6}>
                                 {renderDescription}
                             </Grid>
 
-                            {mdUp && <Grid md={5}>{renderSlides}</Grid>}
+                            {smUp && (
+                                <Grid sm={5} md={6} sx={{ position: "absolute", right: 0 }}>
+                                    {renderSlides}
+                                </Grid>
+                            )}
                         </Grid>
                     </Container>
 
@@ -338,7 +396,7 @@ export default function HomeHero() {
                 </StyledWrapper>
             </StyledRoot>
 
-            {mdUp && renderPolygons}
+            {smUp && renderPolygons}
 
             <Box sx={{ height: { md: "100vh" } }} />
         </>

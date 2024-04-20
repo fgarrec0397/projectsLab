@@ -218,14 +218,18 @@ export default function HomeHero() {
     );
 
     const renderSlides = (
-        <ReactPlayer
-            url="assets/demo-homepage2.mp4"
-            width="100%"
-            height="100%"
-            loop
-            muted
-            playing
-        />
+        <Stack
+            sx={{
+                width: "100%",
+                opacity: opacity > 0 ? opacity : 0,
+                transform: `skew(${-16 - percent / 24}deg, ${4 - percent / 16}deg)`,
+                ...(theme.direction === "rtl" && {
+                    transform: `skew(${16 + percent / 24}deg, ${4 + percent / 16}deg)`,
+                }),
+            }}
+        >
+            <ReactPlayer url="assets/main_4.mp4" width="100%" height="100%" loop muted playing />
+        </Stack>
     );
 
     const renderPolygons = (
@@ -261,7 +265,11 @@ export default function HomeHero() {
                                 {renderDescription}
                             </Grid>
 
-                            {mdUp && <Grid md={5}>{renderSlides}</Grid>}
+                            {mdUp && (
+                                <Grid md={5} sx={{ position: "absolute", right: 0 }}>
+                                    {renderSlides}
+                                </Grid>
+                            )}
                         </Grid>
                     </Container>
 

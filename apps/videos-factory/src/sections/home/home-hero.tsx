@@ -8,10 +8,8 @@ import Grid from "@mui/material/Unstable_Grid2";
 import { m, useScroll } from "framer-motion";
 import { useCallback, useEffect, useRef, useState } from "react";
 import ReactPlayer from "react-player";
-import Slider from "react-slick";
 
 import { MotionContainer, varFade } from "@/components/animate";
-import Carousel from "@/components/carousel";
 import Iconify from "@/components/iconify";
 import { useResponsive } from "@/hooks/use-responsive";
 import { HEADER } from "@/layouts/config-layout";
@@ -25,7 +23,6 @@ import { pxToRem } from "@/theme/typography";
 const StyledRoot = styled("div")(({ theme }) => ({
     ...bgGradient({
         color: alpha(theme.palette.background.default, theme.palette.mode === "light" ? 0.9 : 0.94),
-        imgUrl: "/assets/background/overlay_3.jpg",
     }),
     width: "100%",
     height: "100vh",
@@ -132,18 +129,6 @@ export default function HomeHero() {
     const [percent, setPercent] = useState(0);
 
     const lightMode = theme.palette.mode === "light";
-    const settings = {
-        dots: false,
-        arrows: false,
-        infinite: true,
-        slidesToShow: 2,
-        // slidesToScroll: 1,
-        autoplay: true,
-        speed: 10000,
-        autoplaySpeed: 0,
-        cssEase: "linear",
-        vertical: true,
-    };
 
     const getScroll = useCallback(() => {
         let heroHeight = 0;
@@ -166,7 +151,7 @@ export default function HomeHero() {
     const transition = {
         repeatType: "loop",
         ease: "linear",
-        duration: 60 * 4,
+        duration: 30,
         repeat: Infinity,
     } as const;
 
@@ -228,122 +213,16 @@ export default function HomeHero() {
 
     const renderSlides = (
         <Stack
-            direction="row"
-            spacing={1}
             sx={{
+                width: "100%",
                 opacity: opacity > 0 ? opacity : 0,
-                ".slick-list": {
-                    overflow: "visible",
-                },
-                "slick-slide": {
-                    maxWidth: 200,
-                },
+                transform: `skew(${-16 - percent / 24}deg, ${4 - percent / 16}deg)`,
+                ...(theme.direction === "rtl" && {
+                    transform: `skew(${16 + percent / 24}deg, ${4 + percent / 16}deg)`,
+                }),
             }}
         >
-            <Carousel {...settings}>
-                <ReactPlayer
-                    url="assets/demo-video1.mp4"
-                    width={200}
-                    height={355}
-                    loop
-                    playing
-                    muted
-                />
-                <ReactPlayer
-                    url="assets/demo-video2.mp4"
-                    width={200}
-                    height={355}
-                    loop
-                    playing
-                    muted
-                />
-
-                <ReactPlayer
-                    url="assets/demo-video3.mp4"
-                    width={200}
-                    height={355}
-                    loop
-                    playing
-                    muted
-                />
-
-                <ReactPlayer
-                    url="assets/demo-video4.mp4"
-                    width={200}
-                    height={355}
-                    loop
-                    playing
-                    muted
-                />
-            </Carousel>
-            <Carousel {...settings} rtl>
-                <ReactPlayer
-                    url="assets/demo-video1.mp4"
-                    width={200}
-                    height={355}
-                    loop
-                    playing
-                    muted
-                />
-                <ReactPlayer
-                    url="assets/demo-video2.mp4"
-                    width={200}
-                    height={355}
-                    loop
-                    playing
-                    muted
-                />
-                <ReactPlayer
-                    url="assets/demo-video3.mp4"
-                    width={200}
-                    height={355}
-                    loop
-                    playing
-                    muted
-                />
-                <ReactPlayer
-                    url="assets/demo-video4.mp4"
-                    width={200}
-                    height={355}
-                    loop
-                    playing
-                    muted
-                />
-            </Carousel>
-            <Carousel {...settings}>
-                <ReactPlayer
-                    url="assets/demo-video1.mp4"
-                    width={200}
-                    height={355}
-                    loop
-                    playing
-                    muted
-                />
-                <ReactPlayer
-                    url="assets/demo-video2.mp4"
-                    width={200}
-                    height={355}
-                    loop
-                    playing
-                    muted
-                />
-                <ReactPlayer
-                    url="assets/demo-video3.mp4"
-                    width={200}
-                    height={355}
-                    loop
-                    playing
-                    muted
-                />
-                <ReactPlayer
-                    url="assets/demo-video4.mp4"
-                    width={200}
-                    height={355}
-                    loop
-                    playing
-                    muted
-                />
-            </Carousel>
+            <ReactPlayer url="assets/main_4.mp4" width="100%" height="100%" loop muted playing />
         </Stack>
     );
 
@@ -385,7 +264,7 @@ export default function HomeHero() {
                             </Grid>
 
                             {smUp && (
-                                <Grid sm={5} md={6} sx={{ position: "absolute", right: 0 }}>
+                                <Grid md={6} sx={{ position: "absolute", right: 0 }}>
                                     {renderSlides}
                                 </Grid>
                             )}

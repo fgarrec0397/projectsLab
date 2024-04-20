@@ -40,7 +40,7 @@ export class VideoComponent extends BaseComponent<Video> implements IElementComp
 
         // Process as video concatenation
         ffmpegCommand.input(video.sourcePath);
-        this.complexFilterBuilder.addVideoWithAudio();
+        this.complexFilterBuilder.addVideoWithAudio(undefined, { volume: 0 });
 
         ffmpegCommand.inputOptions(inputOptions);
     }

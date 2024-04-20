@@ -13,7 +13,7 @@ export class AudioComponent extends BaseComponent<Audio> implements IElementComp
         }
 
         ffmpegCommand.input(audio.sourcePath);
-        this.complexFilterBuilder.addAudio(audio.volume);
+        this.complexFilterBuilder.addAudio({ volume: audio.volume });
     }
 
     async handleVideoDuration(ffmpegCommand: ffmpeg.FfmpegCommand) {

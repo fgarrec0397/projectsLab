@@ -7,6 +7,7 @@ import Typography from "@mui/material/Typography";
 import Grid from "@mui/material/Unstable_Grid2";
 import { m, useScroll } from "framer-motion";
 import { useCallback, useEffect, useRef, useState } from "react";
+import ReactPlayer from "react-player";
 
 import { MotionContainer, varFade } from "@/components/animate";
 import Iconify from "@/components/iconify";
@@ -217,84 +218,14 @@ export default function HomeHero() {
     );
 
     const renderSlides = (
-        <Stack
-            direction="row"
-            alignItems="flex-start"
-            sx={{
-                height: "150%",
-                position: "absolute",
-                opacity: opacity > 0 ? opacity : 0,
-                transform: `skew(${-16 - percent / 24}deg, ${4 - percent / 16}deg)`,
-                ...(theme.direction === "rtl" && {
-                    transform: `skew(${16 + percent / 24}deg, ${4 + percent / 16}deg)`,
-                }),
-            }}
-        >
-            <Stack
-                component={m.div}
-                variants={varFade().in}
-                sx={{
-                    width: 344,
-                    position: "relative",
-                }}
-            >
-                <Box
-                    component={m.img}
-                    animate={{ y: ["0%", "100%"] }}
-                    transition={transition}
-                    alt={lightMode ? "light_1" : "dark_1"}
-                    src={
-                        lightMode
-                            ? `/assets/images/home/hero/ezgif.com-animated-gif-maker.gif`
-                            : `/assets/images/home/hero/dark_1.webp`
-                    }
-                    sx={{ position: "absolute", mt: -5 }}
-                />
-                <Box
-                    component={m.img}
-                    animate={{ y: ["-100%", "0%"] }}
-                    transition={transition}
-                    alt={lightMode ? "light_1" : "dark_1"}
-                    src={
-                        lightMode
-                            ? `/assets/images/home/hero/ezgif.com-animated-gif-maker.gif`
-                            : `/assets/images/home/hero/dark_1.webp`
-                    }
-                    sx={{ position: "absolute" }}
-                />
-            </Stack>
-
-            <Stack
-                component={m.div}
-                variants={varFade().in}
-                sx={{ width: 720, position: "relative", ml: -5 }}
-            >
-                <Box
-                    component={m.img}
-                    animate={{ y: ["100%", "0%"] }}
-                    transition={transition}
-                    alt={lightMode ? "light_2" : "dark_2"}
-                    src={
-                        lightMode
-                            ? `/assets/images/home/hero/ezgif.com-animated-gif-maker.gif`
-                            : `/assets/images/home/hero/dark_2.webp`
-                    }
-                    sx={{ position: "absolute", mt: -5 }}
-                />
-                <Box
-                    component={m.img}
-                    animate={{ y: ["0%", "-100%"] }}
-                    transition={transition}
-                    alt={lightMode ? "light_2" : "dark_2"}
-                    src={
-                        lightMode
-                            ? `/assets/images/home/hero/ezgif.com-animated-gif-maker.gif`
-                            : `/assets/images/home/hero/dark_2.webp`
-                    }
-                    sx={{ position: "absolute" }}
-                />
-            </Stack>
-        </Stack>
+        <ReactPlayer
+            url="assets/demo-homepage2.mp4"
+            width="100%"
+            height="100%"
+            loop
+            muted
+            playing
+        />
     );
 
     const renderPolygons = (

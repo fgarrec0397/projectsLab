@@ -20,19 +20,12 @@ type AudioStream = {
     options?: string[];
 };
 
-type AudioOption = {
-    adjustedName?: string;
-    volume?: number;
-};
-
 type Overlay = { index: number; start?: number; end?: number };
 
 type OverlayParam = Omit<Overlay, "index">;
 
 export class ComplexFilterBuilder {
     private audioCount: number = 0;
-
-    private videoCount: number = 0;
 
     private overlayCount: number = 0;
 
@@ -42,21 +35,9 @@ export class ComplexFilterBuilder {
 
     private videoOutputName = "";
 
-    private videoOptions: string;
-
-    private audioOptions: string;
-
     private videoWithAudioStreams: VideoWithAudioStream[] = [];
 
     private audioStreams: AudioStream[] = [];
-
-    private audioComplexFilter: AudioOption[] = [];
-
-    private videoComplexFilter: string[] = [];
-
-    private overlayComplexFilter: string[] = [];
-
-    private videoWithAudioComplexFilter: string[] = [];
 
     private cropComplexFilter: string = "";
 
@@ -66,27 +47,10 @@ export class ComplexFilterBuilder {
 
     private finalComplexFilter: string[] = [];
 
-    // Current Complex filter
-    // [0:v][0:a][1:v][1:a][2:v][2:a][3:v][3:a][4:v][4:a][5:v][5:a][6:v][6:a]concat=n=7:v=1:a=1[v][a];
-    // [v]crop=out_w=in_h*(1080/1920):out_h=in_h[vCropped];
-    // [7:a]volume=1.2[aAdjustedVolume0];
-    // [a][aAdjustedVolume0]amix=inputs=2[a_out];
-    //  -map [vCropped] -map [a_out]
-
-    // Should have
-    // [0:a]volume=0.8[a0];
-    // [0:v]null[v0];
-    // [1:a]anull[a1];
-    // [1:v]null[v1];
-    // [2:a]null[a2];
-    // [v0][a0][v1][a1]concat=n=3:v=1:a=1[v][a];
-
     addVideoWithAudio(videoOptions?: { volume?: number }, audioOptions?: { volume?: number }) {
         if (this.videoOutputName === "") {
             this.videoOutputName = "v";
         }
-
-        console.log(videoOptions, audioOptions, "videoOptions, audioOptions");
 
         this.videoWithAudioStreams.push({
             video: {
@@ -106,10 +70,6 @@ export class ComplexFilterBuilder {
                         : undefined, // should be an array of something like that [0:a]volume=0.8[a0];
             },
         });
-
-        // this.videoWithAudioComplexFilter.push(
-        //     `[${this.videoWithAudioCount}:v][${this.videoWithAudioCount}:a]`
-        // );
 
         this.incrementVideoWithAudioCount();
 
@@ -172,7 +132,7 @@ export class ComplexFilterBuilder {
         this.concatVideoWithAudioComplexFilter();
         // this.buildVideoWithAudioComplexFilter();
         this.buildCropComplexFilter();
-        this.buildAudioComplexFilter();
+        this.mixAudioStreams();
         this.buildOverlayComplexFilter();
 
         if (!this.finalComplexFilter.length) {
@@ -184,15 +144,10 @@ export class ComplexFilterBuilder {
 
     reset() {
         this.audioCount = 0;
-        this.videoCount = 0;
         this.overlayCount = 0;
         this.videoWithAudioCount = 0;
         this.audioOutputName = "a_out";
         this.videoOutputName = "";
-        this.audioComplexFilter = [];
-        this.videoComplexFilter = [];
-        this.overlayComplexFilter = [];
-        this.videoWithAudioComplexFilter = [];
         this.cropComplexFilter = "";
         this.size = undefined;
         this.overlays = [];
@@ -200,15 +155,6 @@ export class ComplexFilterBuilder {
     }
 
     private buildStreamsOptions() {
-        /**
-         * Should build this part 0:a]volume=0.8[a0]; \
-            [1:a]volume=1.0[a1]; \
-            [2:a]volume=0.9[a2]; \
-            [3:a]volume=1.2[a3]; \
-            [4:a]volume=1.0[a4]; \
-            [5:a]volume=1.1[a5]; \
-         */
-
         const videoOptions = this.videoWithAudioStreams
             .map((x) => {
                 return [
@@ -222,10 +168,6 @@ export class ComplexFilterBuilder {
             })
             .join(";");
 
-        console.log(this.videoWithAudioStreams, "this.videoWithAudioStreams");
-
-        console.log(videoOptions, "videoOptions");
-
         const audioOptions = this.audioStreams
             .map((x) => `${x.inputName}${x.options.join(",")}${x.outputName}`)
             .join(";");
@@ -238,24 +180,10 @@ export class ComplexFilterBuilder {
             return;
         }
 
-        // // [v0][a0][v1][a1][v2][a2]concat=n=3:v=1:a=1[v][a];
-
         const videoWithAudioConcatFilter =
             this.videoWithAudioStreams
                 .map((x) => `${x.video.outputName}${x.audio.outputName}`)
                 .join("") + `concat=n=${this.videoWithAudioStreams.length}:v=1:a=1[v][a]`;
-
-        this.finalComplexFilter.push(videoWithAudioConcatFilter);
-    }
-
-    private buildVideoWithAudioComplexFilter() {
-        if (this.videoWithAudioCount === 0) {
-            return;
-        }
-
-        const videoWithAudioConcatFilter =
-            this.videoWithAudioComplexFilter.join("") +
-            `concat=n=${this.videoWithAudioCount}:v=1:a=1[v][a]`;
 
         this.finalComplexFilter.push(videoWithAudioConcatFilter);
     }
@@ -279,16 +207,10 @@ export class ComplexFilterBuilder {
         this.finalComplexFilter.push(this.cropComplexFilter);
     }
 
-    private buildAudioComplexFilter() {
+    private mixAudioStreams() {
         if (this.audioCount === 0) {
             return;
         }
-
-        const adjustedAudioComplexFilter = this.audioComplexFilter.map((audio, index) =>
-            audio.adjustedName
-                ? `[${audio.adjustedName}]`
-                : `[${index + this.videoWithAudioCount}:a]`
-        );
 
         const audioOutputs = this.audioStreams.map((x) => `${x.outputName}`).join("");
 
@@ -299,6 +221,7 @@ export class ComplexFilterBuilder {
         this.finalComplexFilter.push(audioConcatFilter);
     }
 
+    // TODO - make sure this works when will need it
     private buildOverlayComplexFilter() {
         const overlayComplexFilter: string[] = [];
 
